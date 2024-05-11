@@ -1,0 +1,6 @@
+﻿services:
+  homer.netdaemon:
+    image: homer.netdaemon
+    build:
+      context: .
+      dockerfile: Homer.NetDaemon/Dockerfile

@@ -4,6 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homer.ServiceDefaults", "Ho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homer.AppHost", "Homer.AppHost\Homer.AppHost.csproj", "{EF1E599A-C666-43DF-A92D-DEF4BC2D21CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homer.NetDaemon", "Homer.NetDaemon\Homer.NetDaemon.csproj", "{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F08C67DA-682A-4D0A-8361-B6A3A34F3CDD}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +25,9 @@ Global
 		{EF1E599A-C666-43DF-A92D-DEF4BC2D21CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF1E599A-C666-43DF-A92D-DEF4BC2D21CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF1E599A-C666-43DF-A92D-DEF4BC2D21CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
