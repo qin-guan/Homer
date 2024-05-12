@@ -1,4 +1,5 @@
 using System.Reflection;
+using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Logging;
 using NetDaemon.Extensions.Scheduler;
@@ -7,18 +8,19 @@ using NetDaemon.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
 builder.Host.UseNetDaemonAppSettings();
 builder.Host.UseNetDaemonDefaultLogging();
 builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
 
-builder.Services.AddProblemDetails();
-
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddNetDaemonStateManager();
 builder.Services.AddNetDaemonScheduler();
+builder.Services.AddHomeAssistantGenerated();
+
+builder.AddServiceDefaults();
+
+builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,5 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapDefaultEndpoints();
 
 app.Run();

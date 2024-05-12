@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>85506478-b17d-4829-8a46-95c22d4190ab</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,7 +19,7 @@
         <PackageReference Include="NetDaemon.HassModel" Version="24.16.0"/>
         <PackageReference Include="NetDaemon.Runtime" Version="24.16.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
         <PackageReference Include="System.Reactive" Version="6.0.0"/>
     </ItemGroup>
 
