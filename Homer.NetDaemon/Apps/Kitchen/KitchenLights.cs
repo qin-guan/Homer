@@ -15,7 +15,7 @@ public class KitchenLights
     public KitchenLights(ILogger<KitchenLights> logger, IScheduler scheduler, BinarySensorEntities bse,
         SwitchEntities se, SensorEntities sensors)
     {
-        bse.KitchenTuyaPresencePresence.StateChanges().Subscribe(Console.WriteLine);
+        bse.KitchenTuyaPresencePresence.StateChanges().Subscribe(logger.LogInformation);
         bse.KitchenTuyaPresencePresence.StateChanges()
             .WhenStateIsFor(
                 e => e.IsOff(),
