@@ -1,6 +1,5 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using Homer.NetDaemon.Apps.LivingRoom;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
@@ -12,35 +11,40 @@ namespace Homer.NetDaemon.Apps.Kitchen;
 [Focus]
 public class KitchenLights
 {
-    public KitchenLights(ILogger<KitchenLights> logger, IScheduler scheduler, BinarySensorEntities bse,
-        SwitchEntities se, SensorEntities sensors)
+    public KitchenLights(
+        ILogger<KitchenLights> logger,
+        IScheduler scheduler,
+        BinarySensorEntities binarySensorEntities,
+        SwitchEntities switchEntities,
+        SensorEntities sensors
+    )
     {
-        bse.KitchenTuyaPresencePresence.StateChanges().Subscribe(e => logger.LogInformation("{0}", e));
-        bse.KitchenTuyaPresencePresence.StateChanges()
+        binarySensorEntities.KitchenTuyaPresencePresence.StateChanges()
             .WhenStateIsFor(
                 e => e.IsOff(),
-                TimeSpan.FromMinutes(1),
+                TimeSpan.FromSeconds(5),
                 scheduler
             )
             .Subscribe(_ =>
             {
-                se.KitchenLightsLeft.TurnOff();
-                se.KitchenLightsRight.TurnOff();
+                switchEntities.KitchenLightsLeft.TurnOff();
+                switchEntities.KitchenLightsRight.TurnOff();
             });
 
-        bse.KitchenTuyaPresencePresence.StateChanges()
+        binarySensorEntities.KitchenTuyaPresencePresence.StateChanges()
             .Where(e => e.New.IsOn())
             .Subscribe(e =>
             {
-                if (TimeOnly.FromDateTime(DateTime.Now) > new TimeOnly(22, 0)
+                if (
+                    TimeOnly.FromDateTime(DateTime.Now) > new TimeOnly(22, 0)
                     && TimeOnly.FromDateTime(DateTime.Now) < new TimeOnly(6, 0)
-                   )
-                    se.KitchenLightsLeft.TurnOn();
+                )
+                    switchEntities.KitchenLightsLeft.TurnOn();
                 else
                 {
                     if (sensors.PresenceSensorFp2B4c4LightSensorLightLevel.State < 60)
                     {
-                        se.KitchenLightsRight.TurnOn();
+                        switchEntities.KitchenLightsRight.TurnOn();
                     }
                 }
             });
