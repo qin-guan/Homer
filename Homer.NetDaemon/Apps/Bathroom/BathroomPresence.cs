@@ -6,13 +6,19 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class BathroomPresence
 {
-    public BathroomPresence(BinarySensorEntities bse)
+    public BathroomPresence(BinarySensorEntities bse, SwitchEntities se)
     {
         var presence = new Presence.Presence(
-            [bse.MotionSensor, bse.MotionSensor2],
-            [bse.ContactSensor],
-            () => { },
-            () => { }
+            [bse.BathroomDoorMotionOccupancy, bse.BathroomSinkMotionOccupancy],
+            [bse.BathroomDoorMotionOccupancy],
+            () =>
+            {
+                // se.BathroomLightsCenter.TurnOn();
+            },
+            () =>
+            {
+                // se.BathroomLightsCenter.TurnOff();
+            }
         );
     }
 }

@@ -31,6 +31,67 @@ public class Presence
         motionSensors
             .Select(e => e.StateChanges())
             .Merge()
-            .Subscribe((e) => { });
+            .Subscribe(e =>
+            {
+                if (DoorClosed)
+                {
+                    if (MotionDetected)
+                    {
+                        _onPresenceDetected();
+                        WaspState = WaspState.WaspInBox;
+                    }
+                    else
+                    {
+                        _onPresenceCleared();
+                        WaspState = WaspState.NoWaspInBox;
+                    }
+                }
+                else
+                {
+                    if (MotionDetected)
+                    {
+                        _onPresenceDetected();
+                        WaspState = WaspState.WaspInBox;
+                    }
+                    else
+                    {
+                        _onPresenceCleared();
+                        WaspState = WaspState.NoWasp;
+                    }
+                }
+            });
+
+        doorSensors
+            .Select(e => e.StateChanges())
+            .Merge()
+            .Subscribe(e =>
+            {
+                if (DoorClosed)
+                {
+                    if (MotionDetected)
+                    {
+                        _onPresenceDetected();
+                        WaspState = WaspState.WaspInBox;
+                    }
+                    else
+                    {
+                        _onPresenceCleared();
+                        WaspState = WaspState.NoWaspInBox;
+                    }
+                }
+                else
+                {
+                    if (MotionDetected)
+                    {
+                        _onPresenceDetected();
+                        WaspState = WaspState.WaspInBox;
+                    }
+                    else
+                    {
+                        _onPresenceCleared();
+                        WaspState = WaspState.NoWasp;
+                    }
+                }
+            });
     }
 }

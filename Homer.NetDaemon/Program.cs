@@ -1,6 +1,7 @@
 using System.Reflection;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.Logging;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
 using NetDaemon.Runtime;
@@ -10,7 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseNetDaemonAppSettings();
 
-builder.Host.UseSerilog((_, config) => config.WriteTo.Console());
+builder.Host.UseSerilog((_, config) =>
+    config.ReadFrom.Configuration(builder.Configuration)
+        .WriteTo.Console()
+);
+
+builder.Host.UseNetDaemonDefaultLogging();
 
 builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
