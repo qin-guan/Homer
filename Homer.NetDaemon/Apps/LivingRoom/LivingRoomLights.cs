@@ -8,7 +8,7 @@ using NetDaemon.HassModel.Entities;
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 [NetDaemonApp]
-public class LivingRoomLights: IAsyncInitializable
+public class LivingRoomLights : IAsyncInitializable
 {
     private readonly SensorEntities _sensorEntities;
     private readonly InputBooleanEntities _inputBooleanEntities;
@@ -38,14 +38,14 @@ public class LivingRoomLights: IAsyncInitializable
         };
 
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
-        
+
         presenceObservables
             .Where(e =>
             {
                 logger.LogDebug("Living room presence state changed: {State}", e.New);
                 return e.New.IsOn();
             })
-            .Subscribe(_ => { TurnOn(); });
+            .Subscribe(_ => { PresenceDetected(); });
 
         presenceObservables
             .WhenStateIsFor(e =>
@@ -54,7 +54,10 @@ public class LivingRoomLights: IAsyncInitializable
                 return e.IsOff() && _presenceEntities.All(entity => entity.IsOff());
             }, TimeSpan.FromMinutes(1), scheduler)
             .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
-        
+
+        sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
+            .Subscribe(e => { PresenceDetected(); });
+
         inputBooleanEntities.LivingRoomFanLights.StateChanges()
             .SubscribeAsync(async _ =>
             {
@@ -66,10 +69,16 @@ public class LivingRoomLights: IAsyncInitializable
             });
     }
 
-    private void TurnOn()
+    private void PresenceDetected()
     {
-        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 60) return;
-        _inputBooleanEntities.LivingRoomFanLights.TurnOn();
+        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 60)
+        {
+            _inputBooleanEntities.LivingRoomFanLights.TurnOff();
+        }
+        else
+        {
+            _inputBooleanEntities.LivingRoomFanLights.TurnOn();
+        }
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
