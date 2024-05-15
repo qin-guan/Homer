@@ -59,9 +59,9 @@ public class LivingRoomLights: IAsyncInitializable
             .SubscribeAsync(async _ =>
             {
                 await irRemoteLock.SemaphoreSlim.WaitAsync();
-                await Task.Delay(1000);
+                await Task.Delay(1500);
                 remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
                 irRemoteLock.SemaphoreSlim.Release();
             });
     }
