@@ -52,5 +52,26 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapDefaultEndpoints();
+app.MapGet("/gc", () =>
+{
+    var info = GC.GetGCMemoryInfo();
+    var total = GC.GetTotalMemory(false);
+    var totalAlloc = GC.GetTotalAllocatedBytes();
+    
+    return new
+    {
+        info.Generation,
+        info.Compacted,
+        info.Concurrent,
+        total,
+        totalAlloc,
+        info.PromotedBytes,
+        info.HeapSizeBytes,
+        info.MemoryLoadBytes,
+        info.TotalCommittedBytes,
+        info.TotalAvailableMemoryBytes,
+        info.HighMemoryLoadThresholdBytes
+    };
+});
 
 app.Run();
