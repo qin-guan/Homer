@@ -1,4 +1,5 @@
 using System.Reflection;
+using Homer.NetDaemon.Apps;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
@@ -13,7 +14,6 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseNetDaemonAppSettings();
-
 builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
 
@@ -35,6 +35,8 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IrRemoteLock>();
 
 var app = builder.Build();
 

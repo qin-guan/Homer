@@ -1,4 +1,6 @@
+using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
+using Homer.NetDaemon.Presence;
 using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Bathroom;
@@ -6,19 +8,25 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class BathroomPresence
 {
-    public BathroomPresence(BinarySensorEntities bse, SwitchEntities se)
+    private WaspState WaspState = WaspState.NoWasp;
+
+    public BathroomPresence(BinarySensorEntities binarySensorEntities, SwitchEntities switchEntities)
     {
-        var presence = new Presence.Presence(
-            [bse.BathroomDoorMotionOccupancy, bse.BathroomSinkMotionOccupancy],
-            [bse.BathroomDoorMotionOccupancy],
-            () =>
+        var motionSensors = new List<BinarySensorEntity>
+        {
+            binarySensorEntities.BathroomSinkMotionOccupancy,
+            binarySensorEntities.BathroomDoorMotionOccupancy
+        };
+
+        var contactSensors = new List<BinarySensorEntity>
+        {
+            binarySensorEntities.BathroomContactSensorContact
+        };
+
+        motionSensors.Select(e => e.StateChanges()).Merge()
+            .Subscribe(e =>
             {
-                // se.BathroomLightsCenter.TurnOn();
-            },
-            () =>
-            {
-                // se.BathroomLightsCenter.TurnOff();
-            }
-        );
+                
+            });
     }
 }
