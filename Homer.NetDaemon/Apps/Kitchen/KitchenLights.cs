@@ -12,7 +12,8 @@ namespace Homer.NetDaemon.Apps.Kitchen;
 public class KitchenLights
 {
     private readonly SwitchEntities _switchEntities;
-    
+    private readonly SensorEntities _sensorEntities;
+
     private static readonly TimeOnly DawnTime = new(6, 20);
     private const string DawnTimeCron = "20 6 * * *";
     private static readonly TimeOnly NightTime = new(21, 45);
@@ -23,10 +24,11 @@ public class KitchenLights
         IScheduler scheduler,
         BinarySensorEntities binarySensorEntities,
         SwitchEntities switchEntities,
-        SensorEntities sensors
+        SensorEntities sensorEntities
     )
     {
         _switchEntities = switchEntities;
+        _sensorEntities = sensorEntities;
 
         var presenceEntities = new List<BinarySensorEntity>()
         {
@@ -82,6 +84,8 @@ public class KitchenLights
 
     private void TurnOnLights()
     {
+        if (_sensorEntities.KitchenTuyaPresenceIlluminanceLux.State > 1100) return;
+
         if (TimeHelpers.TimeNow >= DawnTime &&
             TimeHelpers.TimeNow <= NightTime)
         {
