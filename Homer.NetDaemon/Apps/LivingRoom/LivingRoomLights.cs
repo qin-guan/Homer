@@ -56,7 +56,18 @@ public class LivingRoomLights : IAsyncInitializable
             .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
 
         sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-            .Subscribe(e => { PresenceDetected(); });
+            .WhenStateIsFor(e => e?.State > 60, TimeSpan.FromMinutes(2), scheduler)
+            .Subscribe(e => { _inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
+
+        sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
+            .WhenStateIsFor(e => e?.State < 60, TimeSpan.FromMinutes(2), scheduler)
+            .Subscribe(e =>
+            {
+                if (_presenceEntities.Any(e => e.IsOn()))
+                {
+                    PresenceDetected();
+                }
+            });
 
         inputBooleanEntities.LivingRoomFanLights.StateChanges()
             .SubscribeAsync(async _ =>
