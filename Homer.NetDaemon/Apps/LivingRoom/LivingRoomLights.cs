@@ -14,6 +14,8 @@ public class LivingRoomLights : IAsyncInitializable
     private readonly InputBooleanEntities _inputBooleanEntities;
     private readonly List<BinarySensorEntity> _presenceEntities;
 
+    private bool Presence => _presenceEntities.Any(e => e.IsOn());
+
     public LivingRoomLights(
         ILogger<LivingRoomLights> logger,
         IScheduler scheduler,
@@ -27,53 +29,53 @@ public class LivingRoomLights : IAsyncInitializable
         _sensorEntities = sensorEntities;
         _inputBooleanEntities = inputBooleanEntities;
 
-        _presenceEntities = new List<BinarySensorEntity>
-        {
+        _presenceEntities =
+        [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor2,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor4,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor7,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor8,
-        };
+        ];
 
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
 
         presenceObservables
             .Where(e =>
             {
-                logger.LogDebug("Living room presence state changed: {State}", e.New);
-                return e.New.IsOn();
+                logger.LogDebug("Living room presence state changed: {Presence}", Presence);
+                return Presence;
             })
             .Subscribe(_ => { PresenceDetected(); });
 
         presenceObservables
             .WhenStateIsFor(e =>
             {
-                logger.LogDebug("Living room presence state changed: {State}", e?.State);
-                return e.IsOff() && _presenceEntities.All(entity => entity.IsOff());
+                logger.LogDebug("Living room presence state changed: {Presence}", Presence);
+                return !Presence;
             }, TimeSpan.FromMinutes(1), scheduler)
             .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
 
-        sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-            .WhenStateIsFor(e => e?.State > 30, TimeSpan.FromMinutes(2), scheduler)
-            .Subscribe(e =>
-            {
-                logger.LogDebug("Living room light level too high: {State}", e.New?.State);
-                _inputBooleanEntities.LivingRoomFanLights.TurnOff();
-            });
-
-        sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-            .WhenStateIsFor(e => e?.State < 30, TimeSpan.FromMinutes(2), scheduler)
-            .Subscribe(e =>
-            {
-                logger.LogDebug("Living room light level too low: {State}", e.New?.State);
-
-                if (_presenceEntities.Any(entity => entity.IsOn()))
-                {
-                    PresenceDetected();
-                }
-            });
+        // sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
+        //     .WhenStateIsFor(e => e?.State > 30, TimeSpan.FromMinutes(2), scheduler)
+        //     .Subscribe(e =>
+        //     {
+        //         logger.LogDebug("Living room light level too high: {State}", e.New?.State);
+        //         _inputBooleanEntities.LivingRoomFanLights.TurnOff();
+        //     });
+        //
+        // sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
+        //     .WhenStateIsFor(e => e?.State < 30, TimeSpan.FromMinutes(2), scheduler)
+        //     .Subscribe(e =>
+        //     {
+        //         logger.LogDebug("Living room light level too low: {State}", e.New?.State);
+        //
+        //         if (_presenceEntities.Any(entity => entity.IsOn()))
+        //         {
+        //             PresenceDetected();
+        //         }
+        //     });
 
         inputBooleanEntities.LivingRoomFanLights.StateChanges()
             .SubscribeAsync(async _ =>
@@ -88,19 +90,19 @@ public class LivingRoomLights : IAsyncInitializable
 
     private void PresenceDetected()
     {
-        // if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30)
-        // {
-        //     _inputBooleanEntities.LivingRoomFanLights.TurnOff();
-        // }
-        // else
-        // {
-        // }
-        _inputBooleanEntities.LivingRoomFanLights.TurnOn();
+        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30)
+        {
+            _inputBooleanEntities.LivingRoomFanLights.TurnOff();
+        }
+        else
+        {
+            _inputBooleanEntities.LivingRoomFanLights.TurnOn();
+        }
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        if (_presenceEntities.All(e => e.IsOff()))
+        if (!Presence)
         {
             _inputBooleanEntities.LivingRoomFanLights.TurnOff();
         }
