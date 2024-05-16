@@ -57,23 +57,29 @@ public class LivingRoomLight : IAsyncInitializable
         _light = inputBooleanEntities.LivingRoomFanLights;
         _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
 
-        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
-        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
+        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
+        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         _lightSensor.StateChanges()
-            .WhenStateIsFor(_ => TooBright, TimeSpan.FromMinutes(5), scheduler)
+            .Where(_ => TooBright)
+            .Throttle(TimeSpan.FromMinutes(5), scheduler)
+            .Where(_ => TooBright)
             .Subscribe(_ => { _light.TurnOff(); });
 
         _lightSensor.StateChanges()
-            .WhenStateIsFor(_ => TooDark && Presence, TimeSpan.FromMinutes(5), scheduler)
+            .Where(_ => TooDark && Presence)
+            .Throttle(TimeSpan.FromMinutes(5), scheduler)
+            .Where(_ => TooDark && Presence)
             .Subscribe(_ => { _light.TurnOn(); });
 
-        presenceObservables
+        triggerObservables
             .Where(e => Presence)
             .Subscribe(_ => { _light.TurnOn(); });
 
         presenceObservables
-            .WhenStateIsFor(e => !Presence, TimeSpan.FromMinutes(1), scheduler)
+            .Where(_ => !Presence)
+            .Throttle(TimeSpan.FromSeconds(15), scheduler)
+            .Where(e => !Presence)
             .Subscribe(_ => { _light.TurnOff(); });
     }
 

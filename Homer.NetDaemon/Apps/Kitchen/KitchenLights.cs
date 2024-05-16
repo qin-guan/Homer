@@ -9,7 +9,6 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Kitchen;
 
-[Focus]
 [NetDaemonApp]
 public class KitchenLights : IAsyncInitializable
 {
@@ -77,14 +76,15 @@ public class KitchenLights : IAsyncInitializable
         });
 
         _lightSensor.StateChanges()
-            .WhenStateIsFor(
-                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500,
-                TimeSpan.FromSeconds(5),
-                scheduler
+            .Where(
+                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
+            )
+            .Throttle(TimeSpan.FromSeconds(5), scheduler)
+            .Where(
+                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
             )
             .Subscribe(_ =>
             {
-                Console.WriteLine("turned off here");
                 _lights.TurnOff();
                 _nightLights.TurnOff();
             });

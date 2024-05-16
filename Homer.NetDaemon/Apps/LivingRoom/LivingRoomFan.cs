@@ -48,15 +48,15 @@ public class LivingRoomFan : IAsyncInitializable
         _fan = inputBooleanEntities.LivingRoomFan;
         _temperatureSensor = sensorEntities.Daikinap16703InsideTemperature;
 
-        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
-        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
+        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
+        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         _temperatureSensor.StateChanges()
             .Where(_ => TooCold)
             .Subscribe(_ => { _fan.TurnOff(); });
 
         triggerObservables
-            .WhenStateIsFor(_ => Presence, TimeSpan.FromSeconds(1), scheduler)
+            .WhenStateIsFor(e => e.IsOn(), TimeSpan.FromSeconds(15), scheduler)
             .Subscribe(_ =>
             {
                 if (TooCold) return;
@@ -64,7 +64,7 @@ public class LivingRoomFan : IAsyncInitializable
             });
 
         presenceObservables
-            .WhenStateIsFor(e => !Presence, TimeSpan.FromMinutes(2), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(2), scheduler)
             .Subscribe(_ => { _fan.TurnOff(); });
     }
 
