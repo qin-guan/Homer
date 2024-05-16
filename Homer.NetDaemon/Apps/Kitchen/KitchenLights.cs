@@ -4,20 +4,27 @@ using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Helpers;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
+using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Kitchen;
 
+[Focus]
 [NetDaemonApp]
-public class KitchenLights
+public class KitchenLights : IAsyncInitializable
 {
-    private readonly SwitchEntities _switchEntities;
-    private readonly SensorEntities _sensorEntities;
+    private readonly List<BinarySensorEntity> _triggerEntities;
+    private readonly List<BinarySensorEntity> _presenceEntities;
+    private readonly List<SwitchEntity> _lights;
+    private readonly List<SwitchEntity> _nightLights;
+    private readonly NumericSensorEntity _lightSensor;
 
-    private static readonly TimeOnly DawnTime = new(6, 20);
-    private const string DawnTimeCron = "20 6 * * *";
-    private static readonly TimeOnly NightTime = new(21, 45);
-    private const string NightTimeCron = "45 21 * * *";
+    private bool Presence => _presenceEntities.Any(e => e.IsOn());
+    private bool TriggerPresence => _triggerEntities.Any(e => e.IsOn());
+    private bool IsNight => TimeHelpers.TimeNow > new TimeOnly(21, 30) || TimeHelpers.TimeNow < new TimeOnly(6, 20);
+
+    private const string NightStartCron = "30 21 * * *";
+    private const string NightEndCron = "20 6 * * *";
 
     public KitchenLights(
         ILogger<KitchenLights> logger,
@@ -27,75 +34,93 @@ public class KitchenLights
         SensorEntities sensorEntities
     )
     {
-        _switchEntities = switchEntities;
-        _sensorEntities = sensorEntities;
+        _triggerEntities =
+        [
+            binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor6
+        ];
 
-        var presenceEntities = new List<BinarySensorEntity>()
-        {
+        _presenceEntities =
+        [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor6,
             binarySensorEntities.KitchenTuyaPresencePresence
-        };
+        ];
 
-        var presenceObservables = presenceEntities.Select(e => e.StateChanges()).Merge();
+        _lights =
+        [
+            switchEntities.KitchenLightsRight,
+        ];
 
-        if (presenceEntities.All(e => e.IsOff()))
+        _nightLights =
+        [
+            switchEntities.KitchenLightsLeft,
+        ];
+
+        _lightSensor = sensorEntities.KitchenTuyaPresenceIlluminanceLux;
+
+        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
+        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
+
+        scheduler.ScheduleCron(NightStartCron, () =>
         {
-            TurnOffLights();
-        }
+            if (!_lights.Any(e => e.IsOn())) return;
 
-        scheduler.ScheduleCron(DawnTimeCron, () =>
-        {
-            if (presenceEntities.Any(e => e.IsOn()))
-            {
-                TurnOnLights();
-            }
+            _nightLights.TurnOn();
+            _lights.TurnOff();
         });
 
-        scheduler.ScheduleCron(NightTimeCron, () =>
+        scheduler.ScheduleCron(NightEndCron, () =>
         {
-            if (presenceEntities.Any(e => e.IsOn()))
-            {
-                TurnOnLights();
-            }
+            if (!_nightLights.Any(e => e.IsOn())) return;
+
+            _lights.TurnOn();
+            _nightLights.TurnOff();
         });
 
-        presenceObservables
-            .Where(e =>
+        _lightSensor.StateChanges()
+            .WhenStateIsFor(
+                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1100,
+                TimeSpan.FromSeconds(5),
+                scheduler
+            )
+            .Subscribe(_ =>
             {
-                logger.LogDebug("Kitchen presence state changed: {State}", e.New);
-                return e.New.IsOn();
-            })
-            .Subscribe(_ => { TurnOnLights(); });
+                Console.WriteLine("turned off here");
+                _lights.TurnOff();
+                _nightLights.TurnOff();
+            });
+
+        triggerObservables
+            .Where(e => TriggerPresence)
+            .Subscribe(_ =>
+            {
+                if (_lightSensor.State > 1100) return;
+
+                if (IsNight)
+                {
+                    _nightLights.TurnOn();
+                }
+                else
+                {
+                    _lights.TurnOn();
+                }
+            });
 
         presenceObservables
-            .Where(e =>
+            .Where(e => !Presence)
+            .Subscribe(_ =>
             {
-                logger.LogDebug("Kitchen presence state changed: {State}", e.New);
-                return e.New.IsOff() && presenceEntities.All(entity => entity.IsOff());
-            })
-            .Subscribe(_ => { TurnOffLights(); });
+                _lights.TurnOff();
+                _nightLights.TurnOff();
+            });
     }
 
-    private void TurnOffLights()
+    public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        _switchEntities.KitchenLightsLeft.TurnOff();
-        _switchEntities.KitchenLightsRight.TurnOff();
-    }
+        if (Presence) return Task.CompletedTask;
 
-    private void TurnOnLights()
-    {
-        if (_sensorEntities.KitchenTuyaPresenceIlluminanceLux.State > 1100) return;
+        _lights.TurnOff();
+        _nightLights.TurnOff();
 
-        if (TimeHelpers.TimeNow >= DawnTime &&
-            TimeHelpers.TimeNow <= NightTime)
-        {
-            _switchEntities.KitchenLightsRight.TurnOn();
-            _switchEntities.KitchenLightsLeft.TurnOff();
-        }
-        else
-        {
-            _switchEntities.KitchenLightsLeft.TurnOn();
-            _switchEntities.KitchenLightsRight.TurnOff();
-        }
+        return Task.CompletedTask;
     }
 }
