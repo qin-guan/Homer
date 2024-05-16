@@ -56,14 +56,14 @@ public class LivingRoomLights : IAsyncInitializable
             .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
 
         sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-            .WhenStateIsFor(e => e?.State > 60, TimeSpan.FromMinutes(2), scheduler)
+            .WhenStateIsFor(e => e?.State > 50, TimeSpan.FromMinutes(2), scheduler)
             .Subscribe(e => { _inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
 
         sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-            .WhenStateIsFor(e => e?.State < 60, TimeSpan.FromMinutes(2), scheduler)
+            .WhenStateIsFor(e => e?.State < 50, TimeSpan.FromMinutes(2), scheduler)
             .Subscribe(e =>
             {
-                if (_presenceEntities.Any(e => e.IsOn()))
+                if (_presenceEntities.Any(entity => entity.IsOn()))
                 {
                     PresenceDetected();
                 }
@@ -82,7 +82,7 @@ public class LivingRoomLights : IAsyncInitializable
 
     private void PresenceDetected()
     {
-        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 60)
+        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 50)
         {
             _inputBooleanEntities.LivingRoomFanLights.TurnOff();
         }
