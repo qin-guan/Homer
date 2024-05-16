@@ -57,12 +57,18 @@ public class LivingRoomLights : IAsyncInitializable
 
         sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
             .WhenStateIsFor(e => e?.State > 30, TimeSpan.FromMinutes(2), scheduler)
-            .Subscribe(e => { _inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
+            .Subscribe(e =>
+            {
+                logger.LogDebug("Living room light level too high: {State}", e.New?.State);
+                _inputBooleanEntities.LivingRoomFanLights.TurnOff();
+            });
 
         sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
             .WhenStateIsFor(e => e?.State < 30, TimeSpan.FromMinutes(2), scheduler)
             .Subscribe(e =>
             {
+                logger.LogDebug("Living room light level too low: {State}", e.New?.State);
+                
                 if (_presenceEntities.Any(entity => entity.IsOn()))
                 {
                     PresenceDetected();
