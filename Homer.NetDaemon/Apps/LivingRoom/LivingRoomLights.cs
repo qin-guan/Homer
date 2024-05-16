@@ -47,7 +47,7 @@ public class LivingRoomLights : IAsyncInitializable
                 logger.LogDebug("Living room presence state changed: {Presence}", Presence);
                 return Presence;
             })
-            .Subscribe(_ => { PresenceDetected(); });
+            .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOn(); });
 
         presenceObservables
             .WhenStateIsFor(e =>
@@ -58,7 +58,7 @@ public class LivingRoomLights : IAsyncInitializable
             .Subscribe(_ => { inputBooleanEntities.LivingRoomFanLights.TurnOff(); });
 
         // sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-        //     .WhenStateIsFor(e => e?.State > 30, TimeSpan.FromMinutes(2), scheduler)
+        //     .WhenStateIsFor(e => e?.State > 40, TimeSpan.FromMinutes(2), scheduler)
         //     .Subscribe(e =>
         //     {
         //         logger.LogDebug("Living room light level too high: {State}", e.New?.State);
@@ -66,7 +66,7 @@ public class LivingRoomLights : IAsyncInitializable
         //     });
         //
         // sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.StateChanges()
-        //     .WhenStateIsFor(e => e?.State < 30, TimeSpan.FromMinutes(2), scheduler)
+        //     .WhenStateIsFor(e => e?.State < 40, TimeSpan.FromMinutes(2), scheduler)
         //     .Subscribe(e =>
         //     {
         //         logger.LogDebug("Living room light level too low: {State}", e.New?.State);
@@ -86,18 +86,6 @@ public class LivingRoomLights : IAsyncInitializable
                 await Task.Delay(1500);
                 irRemoteLock.SemaphoreSlim.Release();
             });
-    }
-
-    private void PresenceDetected()
-    {
-        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30)
-        {
-            _inputBooleanEntities.LivingRoomFanLights.TurnOff();
-        }
-        else
-        {
-            _inputBooleanEntities.LivingRoomFanLights.TurnOn();
-        }
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
