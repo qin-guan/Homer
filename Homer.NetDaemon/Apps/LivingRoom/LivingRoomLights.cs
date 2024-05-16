@@ -68,7 +68,7 @@ public class LivingRoomLights : IAsyncInitializable
             .Subscribe(e =>
             {
                 logger.LogDebug("Living room light level too low: {State}", e.New?.State);
-                
+
                 if (_presenceEntities.Any(entity => entity.IsOn()))
                 {
                     PresenceDetected();
@@ -88,14 +88,14 @@ public class LivingRoomLights : IAsyncInitializable
 
     private void PresenceDetected()
     {
-        if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30)
-        {
-            _inputBooleanEntities.LivingRoomFanLights.TurnOff();
-        }
-        else
-        {
-            _inputBooleanEntities.LivingRoomFanLights.TurnOn();
-        }
+        // if (_sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30)
+        // {
+        //     _inputBooleanEntities.LivingRoomFanLights.TurnOff();
+        // }
+        // else
+        // {
+        // }
+        _inputBooleanEntities.LivingRoomFanLights.TurnOn();
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
