@@ -69,6 +69,8 @@ public static class Extensions
     {
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
+        Console.WriteLine($"Exporting to {builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]}");
+
         if (useOtlpExporter)
         {
             builder.Services.AddOpenTelemetry().UseOtlpExporter();
