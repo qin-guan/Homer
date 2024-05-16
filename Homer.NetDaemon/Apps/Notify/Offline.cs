@@ -1,7 +1,6 @@
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
-using Serilog;
 
 namespace Homer.NetDaemon.Apps.Notify;
 

@@ -78,7 +78,7 @@ public class KitchenLights : IAsyncInitializable
 
         _lightSensor.StateChanges()
             .WhenStateIsFor(
-                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1100,
+                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500,
                 TimeSpan.FromSeconds(5),
                 scheduler
             )
@@ -93,7 +93,7 @@ public class KitchenLights : IAsyncInitializable
             .Where(e => TriggerPresence)
             .Subscribe(_ =>
             {
-                if (_lightSensor.State > 1100) return;
+                if (_lightSensor.State > 1500) return;
 
                 if (IsNight)
                 {

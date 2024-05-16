@@ -1,5 +1,6 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
@@ -8,15 +9,17 @@ using NetDaemon.HassModel.Entities;
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 [NetDaemonApp]
-[Focus]
 public class LivingRoomFan : IAsyncInitializable
 {
     private readonly ILogger<LivingRoomFan> _logger;
-    private readonly SensorEntities _sensorEntities;
-    private readonly InputBooleanEntities _inputBooleanEntities;
+
+    private readonly List<BinarySensorEntity> _triggerEntities;
     private readonly List<BinarySensorEntity> _presenceEntities;
+    private readonly InputBooleanEntity _fan;
+    private readonly NumericSensorEntity _temperatureSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
+    private bool TooCold => _temperatureSensor.State < 26;
 
     public LivingRoomFan(
         ILogger<LivingRoomFan> logger,
@@ -29,8 +32,12 @@ public class LivingRoomFan : IAsyncInitializable
     )
     {
         _logger = logger;
-        _sensorEntities = sensorEntities;
-        _inputBooleanEntities = inputBooleanEntities;
+
+        _triggerEntities =
+        [
+            binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor2,
+            binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
+        ];
 
         _presenceEntities =
         [
@@ -38,52 +45,34 @@ public class LivingRoomFan : IAsyncInitializable
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
         ];
 
+        _fan = inputBooleanEntities.LivingRoomFan;
+        _temperatureSensor = sensorEntities.Daikinap16703InsideTemperature;
+
+        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
 
-        presenceObservables
-            .WhenStateIsFor(e =>
-            {
-                logger.LogDebug("Living room fan presence state changed: {State}", Presence);
-                return Presence;
-            }, TimeSpan.FromSeconds(1), scheduler)
-            .Subscribe(_ => { TurnOn(); });
+        _temperatureSensor.StateChanges()
+            .Where(_ => TooCold)
+            .Subscribe(_ => { _fan.TurnOff(); });
 
-        presenceObservables
-            .WhenStateIsFor(e =>
+        triggerObservables
+            .WhenStateIsFor(_ => Presence, TimeSpan.FromSeconds(1), scheduler)
+            .Subscribe(_ =>
             {
-                logger.LogDebug("Living room fan presence state changed: {State}", Presence);
-                return !Presence;
-            }, TimeSpan.FromMinutes(1), scheduler)
-            .Subscribe(_ => { inputBooleanEntities.LivingRoomFan.TurnOff(); });
-
-        _inputBooleanEntities.LivingRoomFan.StateChanges()
-            .SubscribeAsync(async _ =>
-            {
-                await irRemoteLock.SemaphoreSlim.WaitAsync();
-                await Task.Delay(1500);
-                remoteEntities.LivingRoomRemote.SendCommand("Power", "Living Room KDK");
-                await Task.Delay(1500);
-                irRemoteLock.SemaphoreSlim.Release();
+                if (TooCold) return;
+                _fan.TurnOn();
             });
-    }
 
-    private void TurnOn()
-    {
-        if (_sensorEntities.Daikinap16703InsideTemperature.State < 26)
-        {
-            _logger.LogDebug("Temperature in living room is {State}, not turning on fan",
-                _sensorEntities.Daikinap16703InsideTemperature.State);
-            return;
-        }
-
-        _inputBooleanEntities.LivingRoomFan.TurnOn();
+        presenceObservables
+            .WhenStateIsFor(e => !Presence, TimeSpan.FromMinutes(2), scheduler)
+            .Subscribe(_ => { _fan.TurnOff(); });
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
         if (!Presence)
         {
-            _inputBooleanEntities.LivingRoomFan.TurnOff();
+            _fan.TurnOff();
         }
 
         return Task.CompletedTask;

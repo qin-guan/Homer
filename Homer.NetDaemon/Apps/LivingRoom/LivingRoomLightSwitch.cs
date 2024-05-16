@@ -5,11 +5,13 @@ using NetDaemon.AppModel;
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 [NetDaemonApp]
-[Focus]
 public class LivingRoomLightSwitch
 {
-    public LivingRoomLightSwitch(SensorEntities sensorEntities, SwitchEntities switchEntities,
-        RemoteEntities remoteEntities)
+    public LivingRoomLightSwitch(
+        SensorEntities sensorEntities,
+        SwitchEntities switchEntities,
+        RemoteEntities remoteEntities
+    )
     {
         sensorEntities.LivingRoomLightsAction.StateChanges()
             .Where(e => e.Entity.State == "single_center")

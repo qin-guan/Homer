@@ -1,4 +1,4 @@
-namespace Homer.NetDaemon.Apps;
+namespace Homer.NetDaemon.Apps.Remotes;
 
 public class IrRemoteLock
 {
