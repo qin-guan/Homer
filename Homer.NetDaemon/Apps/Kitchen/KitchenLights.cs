@@ -35,7 +35,7 @@ public class KitchenLights : IAsyncInitializable
     )
     {
         var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("kitchen_lights.events_processed");
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.kitchen_lights.events_processed");
 
         _triggerEntities =
         [

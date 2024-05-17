@@ -15,7 +15,7 @@ public class LivingRoomLightSwitch
     )
     {
         var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("living_room_light_switch.events_processed");
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light_switch.events_processed");
 
         sensorEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>

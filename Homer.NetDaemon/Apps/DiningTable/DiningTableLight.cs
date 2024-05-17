@@ -13,7 +13,7 @@ public class DiningTableLight
     public DiningTableLight(IScheduler scheduler, BinarySensorEntities binarySensorEntities, SwitchEntities switchEntities)
     {
         var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("dining_table_light.events_processed");
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.dining_table_light.events_processed");
         
         binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5.StateChanges()
             .WhenStateIsFor(e =>

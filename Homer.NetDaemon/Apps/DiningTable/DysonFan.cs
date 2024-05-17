@@ -15,7 +15,7 @@ public class DysonFan
         BinarySensorEntities binarySensorEntities, RemoteEntities remoteEntities)
     {
         var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("dyson_fan.events_processed");
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.dyson_fan.events_processed");
 
         binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5.StateChanges()
             .WhenStateIsFor(e =>

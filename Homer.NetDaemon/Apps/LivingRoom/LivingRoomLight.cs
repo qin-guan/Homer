@@ -33,7 +33,7 @@ public class LivingRoomLight : IAsyncInitializable
         RemoteEntities remoteEntities
     )
     {
-        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("living_room_light.events_processed");
+        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light.events_processed");
 
         _logger = logger;
 

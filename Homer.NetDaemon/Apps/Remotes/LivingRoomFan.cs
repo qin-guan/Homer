@@ -14,7 +14,7 @@ public class LivingRoomFan
         RemoteEntities remoteEntities
     )
     {
-        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("living_room_fan_remote.events_processed");
+        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan_remote.events_processed");
         
         inputBooleanEntities.LivingRoomFan.StateChanges()
             .SubscribeAsync(async _ =>
