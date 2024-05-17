@@ -18,18 +18,21 @@ public class DefaultApp
             if (e.DataElement.HasValue)
             {
                 var val = e.DataElement.GetValueOrDefault();
+                var tags = new List<KeyValuePair<string, object?>>();
 
-                var entityId = val.GetProperty("entity_id").GetString();
-                var friendlyName = val
-                    .GetProperty("new_state")
-                    .GetProperty("attributes")
-                    .GetProperty("friendly_name")
-                    .GetString();
+                if (val.TryGetProperty("entity_id", out var entityId))
+                {
+                    tags.Add(new KeyValuePair<string, object?>("entity_id", entityId.GetString()));
+                }
 
-                eventsProcessedMeter.Add(1, [
-                    new KeyValuePair<string, object?>("entity_id", entityId),
-                    new KeyValuePair<string, object?>("friendly_name", friendlyName)
-                ]);
+                if (val.TryGetProperty("new_state", out var i) &&
+                    i.TryGetProperty("attributes", out var i2) &&
+                    i2.TryGetProperty("friendly_name", out var friendlyName))
+                {
+                    tags.Add(new KeyValuePair<string, object?>("friendly_name", friendlyName.GetString()));
+                }
+
+                eventsProcessedMeter.Add(1, tags.ToArray());
             }
             else
             {
