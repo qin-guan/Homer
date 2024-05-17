@@ -19,7 +19,7 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
-    private bool TooBright => _lightSensor.State > 50;
+    private bool TooBright => _lightSensor.State > 90;
     private bool TooDark => _lightSensor.State < 10;
 
     public LivingRoomLight(
@@ -74,8 +74,9 @@ public class LivingRoomLight : IAsyncInitializable
 
         triggerObservables
             .Where(e => Presence)
-            .Subscribe(_ => { 
-                if (!TooBright) _light.TurnOn(); 
+            .Subscribe(_ =>
+            {
+                if (!TooBright) _light.TurnOn();
             });
 
         presenceObservables
