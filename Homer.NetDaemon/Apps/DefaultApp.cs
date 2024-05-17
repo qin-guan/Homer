@@ -15,10 +15,10 @@ public class DefaultApp
 
         haContext.Events.Subscribe(e =>
         {
-            if (e.DataElement is not null)
+            if (e.DataElement.HasValue)
             {
                 var val = e.DataElement.GetValueOrDefault();
-                
+
                 var entityId = val.GetProperty("entity_id").GetString();
                 var friendlyName = val
                     .GetProperty("new_state")
