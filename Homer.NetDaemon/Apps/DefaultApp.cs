@@ -17,9 +17,11 @@ public class DefaultApp
         {
             if (e.DataElement is not null)
             {
+                e.DataElement.Value.TryGetProperty("entity_id", out var eid);
+                var entityId = eid.GetString();
+
                 eventsProcessedMeter.Add(1, [
-                    new KeyValuePair<string, object?>("entity_id",
-                        e.DataElement.Value.GetProperty("entity_id").GetString())
+                    new KeyValuePair<string, object?>("entity_id", entityId)
                 ]);
             }
             else
