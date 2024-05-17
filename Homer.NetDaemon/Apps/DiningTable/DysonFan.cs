@@ -9,15 +9,26 @@ using NetDaemon.HassModel.Entities;
 namespace Homer.NetDaemon.Apps.DiningTable;
 
 [NetDaemonApp]
-public class DysonFan
+public class DysonFan : IAsyncInitializable
 {
-    public DysonFan(IScheduler scheduler, IrRemoteLock irRemoteLock, SwitchEntities switchEntities,
-        BinarySensorEntities binarySensorEntities, RemoteEntities remoteEntities)
+    private readonly BinarySensorEntity _presence;
+    private readonly SwitchEntity _switch;
+
+    public DysonFan(
+        IScheduler scheduler,
+        IrRemoteLock irRemoteLock,
+        SwitchEntities switchEntities,
+        BinarySensorEntities binarySensorEntities,
+        RemoteEntities remoteEntities
+    )
     {
+        _presence = binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5;
+        _switch = switchEntities.LivingRoomIkeaPlug;
+
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.dyson_fan.events_processed");
 
-        binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5.StateChanges()
+        _presence.StateChanges()
             .WhenStateIsFor(e =>
             {
                 eventsProcessedMeter.Add(1);
@@ -25,7 +36,7 @@ public class DysonFan
             }, TimeSpan.FromSeconds(15), scheduler)
             .SubscribeAsync(async e =>
             {
-                switchEntities.LivingRoomIkeaPlug.TurnOn();
+                _switch.TurnOn();
                 await Task.Delay(500);
                 await irRemoteLock.SemaphoreSlim.WaitAsync();
                 remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
@@ -33,12 +44,22 @@ public class DysonFan
                 irRemoteLock.SemaphoreSlim.Release();
             });
 
-        binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5.StateChanges()
+        _presence.StateChanges()
             .WhenStateIsFor(e =>
             {
                 eventsProcessedMeter.Add(1);
                 return e.IsOff();
-            }, TimeSpan.FromMinutes(2), scheduler)
-            .Subscribe(e => { switchEntities.LivingRoomIkeaPlug.TurnOff(); });
+            }, TimeSpan.FromSeconds(30), scheduler)
+            .Subscribe(e => { _switch.TurnOff(); });
+    }
+
+    public Task InitializeAsync(CancellationToken cancellationToken)
+    {
+        if (_presence.IsOff())
+        {
+            _switch.TurnOff();
+        }
+
+        return Task.CompletedTask;
     }
 }
