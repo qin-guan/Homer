@@ -52,12 +52,15 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapDefaultEndpoints();
+
+app.MapGet("/loaderio-ca6d5d4b20f8f8643ec788ce67b5aaab", () => "loaderio-ca6d5d4b20f8f8643ec788ce67b5aaab");
+
 app.MapGet("/gc", () =>
 {
     var info = GC.GetGCMemoryInfo();
     var total = GC.GetTotalMemory(false);
     var totalAlloc = GC.GetTotalAllocatedBytes();
-    
+
     return new
     {
         info.Generation,
