@@ -22,7 +22,7 @@ public class DefaultApp
 
                 if (val.TryGetProperty("entity_id", out var entityId))
                 {
-                    tags.Add(new KeyValuePair<string, object?>("entity_id", entityId.GetString()));
+                    tags.Add(new KeyValuePair<string, object?>("ha.device_id", entityId.GetString()));
                 }
 
                 // if (val.TryGetProperty("new_state", out var i) &&
