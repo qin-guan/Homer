@@ -74,7 +74,9 @@ public class LivingRoomLight : IAsyncInitializable
 
         triggerObservables
             .Where(e => Presence)
-            .Subscribe(_ => { _light.TurnOn(); });
+            .Subscribe(_ => { 
+                if (!TooBright) _light.TurnOn(); 
+            });
 
         presenceObservables
             .Where(_ => !Presence)
