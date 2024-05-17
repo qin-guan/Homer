@@ -1,9 +1,10 @@
+using System.Diagnostics.Metrics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
+using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
-using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
@@ -31,6 +32,8 @@ public class LivingRoomFan : IAsyncInitializable
         RemoteEntities remoteEntities
     )
     {
+        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("living_room_fan.events_processed");
+
         _logger = logger;
 
         _triggerEntities =
@@ -52,11 +55,19 @@ public class LivingRoomFan : IAsyncInitializable
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
 
         _temperatureSensor.StateChanges()
-            .Where(_ => TooCold)
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return TooCold;
+            })
             .Subscribe(_ => { _fan.TurnOff(); });
 
         triggerObservables
-            .Where(_ => _triggerEntities.Any(e => e.IsOn()))
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return _triggerEntities.Any(e => e.IsOn());
+            })
             .Throttle(TimeSpan.FromSeconds(10), scheduler)
             .Where(_ => _triggerEntities.Any(e => e.IsOn()))
             .Subscribe(_ =>
@@ -66,7 +77,11 @@ public class LivingRoomFan : IAsyncInitializable
             });
 
         presenceObservables
-            .Where(_ => !Presence)
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return !Presence;
+            })
             .Throttle(TimeSpan.FromSeconds(10), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ => { _fan.TurnOff(); });

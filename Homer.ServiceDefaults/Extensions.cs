@@ -1,3 +1,4 @@
+using Homer.ServiceDefaults.Metrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,9 +49,11 @@ public static class Extensions
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {
-                metrics.AddAspNetCoreInstrumentation()
+                metrics
+                    .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter(EntityMetrics.MeterInstance.Name);
             })
             .WithTracing(tracing =>
             {
