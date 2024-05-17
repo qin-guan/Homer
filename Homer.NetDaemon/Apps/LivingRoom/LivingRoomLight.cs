@@ -2,6 +2,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
+using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
@@ -32,6 +33,8 @@ public class LivingRoomLight : IAsyncInitializable
         RemoteEntities remoteEntities
     )
     {
+        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("living_room_light.events_processed");
+
         _logger = logger;
 
         _triggerEntities =
@@ -61,26 +64,42 @@ public class LivingRoomLight : IAsyncInitializable
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         _lightSensor.StateChanges()
-            .Where(_ => TooBright)
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return TooBright;
+            })
             .Throttle(TimeSpan.FromMinutes(5), scheduler)
             .Where(_ => TooBright)
             .Subscribe(_ => { _light.TurnOff(); });
 
         _lightSensor.StateChanges()
-            .Where(_ => TooDark && Presence)
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return TooDark && Presence;
+            })
             .Throttle(TimeSpan.FromMinutes(5), scheduler)
             .Where(_ => TooDark && Presence)
             .Subscribe(_ => { _light.TurnOn(); });
 
         triggerObservables
-            .Where(e => Presence)
+            .Where(e =>
+            {
+                eventsProcessedMeter.Add(1);
+                return Presence;
+            })
             .Subscribe(_ =>
             {
                 if (!TooBright) _light.TurnOn();
             });
 
         presenceObservables
-            .Where(_ => !Presence)
+            .Where(_ =>
+            {
+                eventsProcessedMeter.Add(1);
+                return !Presence;
+            })
             .Throttle(TimeSpan.FromSeconds(15), scheduler)
             .Where(e => !Presence)
             .Subscribe(_ => { _light.TurnOff(); });

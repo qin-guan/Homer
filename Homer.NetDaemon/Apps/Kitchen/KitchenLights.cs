@@ -2,6 +2,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Helpers;
+using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
@@ -33,6 +34,9 @@ public class KitchenLights : IAsyncInitializable
         SensorEntities sensorEntities
     )
     {
+        var eventsProcessedMeter =
+            EntityMetrics.MeterInstance.CreateCounter<int>("kitchen_lights.events_processed");
+
         _triggerEntities =
         [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor6
@@ -77,8 +81,11 @@ public class KitchenLights : IAsyncInitializable
 
         _lightSensor.StateChanges()
             .Where(
-                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
-            )
+                _ =>
+                {
+                    eventsProcessedMeter.Add(1);
+                    return _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500;
+                })
             .Throttle(TimeSpan.FromSeconds(5), scheduler)
             .Where(
                 _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
@@ -90,7 +97,11 @@ public class KitchenLights : IAsyncInitializable
             });
 
         triggerObservables
-            .Where(e => TriggerPresence)
+            .Where(e =>
+            {
+                eventsProcessedMeter.Add(1);
+                return TriggerPresence;
+            })
             .Subscribe(_ =>
             {
                 if (_lightSensor.State > 1500) return;
@@ -106,7 +117,11 @@ public class KitchenLights : IAsyncInitializable
             });
 
         presenceObservables
-            .Where(e => !Presence)
+            .Where(e =>
+            {
+                eventsProcessedMeter.Add(1);
+                return !Presence;
+            })
             .Subscribe(_ =>
             {
                 _lights.TurnOff();
