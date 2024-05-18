@@ -62,7 +62,7 @@ public class KitchenLights : IAsyncInitializable
         _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
-        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
+        var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         scheduler.ScheduleCron(NightStartCron, () =>
         {
