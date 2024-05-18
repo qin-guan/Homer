@@ -58,7 +58,7 @@ public class KitchenLights : IAsyncInitializable
             switchEntities.KitchenLightsLeft,
         ];
 
-        _lightSensor = sensorEntities.KitchenTuyaPresenceIlluminanceLux;
+        _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
@@ -104,7 +104,7 @@ public class KitchenLights : IAsyncInitializable
             })
             .Subscribe(_ =>
             {
-                if (_lightSensor.State > 1500) return;
+                if (_lightSensor.State > 50) return;
 
                 if (IsNight)
                 {
