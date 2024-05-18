@@ -20,7 +20,7 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
-    private bool TooBright => _lightSensor.State > 90;
+    private bool TooBright => _lightSensor.State > 50;
     private bool TooDark => _lightSensor.State < 10;
 
     public LivingRoomLight(
