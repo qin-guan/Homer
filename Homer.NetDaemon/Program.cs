@@ -53,7 +53,7 @@ app.UseHttpsRedirection();
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/loaderio-ca6d5d4b20f8f8643ec788ce67b5aaab", () => "loaderio-ca6d5d4b20f8f8643ec788ce67b5aaab");
+app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 
 app.MapGet("/gc", () =>
 {
