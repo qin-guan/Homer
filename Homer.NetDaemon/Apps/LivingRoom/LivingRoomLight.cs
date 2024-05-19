@@ -20,7 +20,7 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
-    private bool TooBright => _lightSensor.State > 50;
+    private bool TooBright => _lightSensor.State is > 50 and < 55;
     private bool TooDark => _lightSensor.State < 10;
 
     public LivingRoomLight(
@@ -33,7 +33,8 @@ public class LivingRoomLight : IAsyncInitializable
         RemoteEntities remoteEntities
     )
     {
-        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light.events_processed");
+        var eventsProcessedMeter =
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light.events_processed");
 
         _logger = logger;
 
@@ -60,7 +61,7 @@ public class LivingRoomLight : IAsyncInitializable
         _light = inputBooleanEntities.LivingRoomFanLights;
         _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
 
-        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
+        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         _lightSensor.StateChanges()

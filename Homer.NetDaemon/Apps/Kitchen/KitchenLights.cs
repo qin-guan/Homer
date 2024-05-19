@@ -87,7 +87,7 @@ public class KitchenLights : IAsyncInitializable
                     eventsProcessedMeter.Add(1);
                     return _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500;
                 })
-            .Throttle(TimeSpan.FromSeconds(5), scheduler)
+            .Throttle(TimeSpan.FromMinutes(5), scheduler)
             .Where(
                 _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
             )
