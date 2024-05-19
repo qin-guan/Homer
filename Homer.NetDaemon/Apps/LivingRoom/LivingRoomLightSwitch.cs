@@ -11,7 +11,8 @@ public class LivingRoomLightSwitch
     public LivingRoomLightSwitch(
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
-        RemoteEntities remoteEntities
+        RemoteEntities remoteEntities,
+        InputBooleanEntities inputBooleanEntities
     )
     {
         var eventsProcessedMeter =
@@ -23,7 +24,7 @@ public class LivingRoomLightSwitch
                 eventsProcessedMeter.Add(1);
                 return e.Entity.State == "single_center";
             })
-            .Subscribe(e => { remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK"); });
+            .Subscribe(e => { inputBooleanEntities.LivingRoomFanLights.Toggle(); });
 
         sensorEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>
