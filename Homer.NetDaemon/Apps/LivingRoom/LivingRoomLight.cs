@@ -20,7 +20,8 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
-    private bool TooBright => _lightSensor.State is > 50 and < 55;
+    private bool WithinTooBrightRange => _lightSensor.State is > 50 and < 55;
+    private bool TooBright => _lightSensor.State > 50;
     private bool TooDark => _lightSensor.State < 10;
 
     public LivingRoomLight(
@@ -68,10 +69,10 @@ public class LivingRoomLight : IAsyncInitializable
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
-                return TooBright;
+                return WithinTooBrightRange;
             })
             .Throttle(TimeSpan.FromMinutes(5), scheduler)
-            .Where(_ => TooBright)
+            .Where(_ => WithinTooBrightRange)
             .Subscribe(_ => { _light.TurnOff(); });
 
         _lightSensor.StateChanges()
