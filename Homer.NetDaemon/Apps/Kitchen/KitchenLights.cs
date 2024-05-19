@@ -59,7 +59,7 @@ public class KitchenLights : IAsyncInitializable
             switchEntities.KitchenLightsLeft,
         ];
 
-        _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
+        _lightSensor = sensorEntities.KitchenTuyaPresenceIlluminanceLux;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
@@ -80,23 +80,6 @@ public class KitchenLights : IAsyncInitializable
             _nightLights.TurnOff();
         });
 
-        _lightSensor.StateChanges()
-            .Where(
-                _ =>
-                {
-                    eventsProcessedMeter.Add(1);
-                    return _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500;
-                })
-            .Throttle(TimeSpan.FromMinutes(5), scheduler)
-            .Where(
-                _ => _lights.Any(entity => entity.IsOn()) && _lightSensor.State > 1500
-            )
-            .Subscribe(_ =>
-            {
-                _lights.TurnOff();
-                _nightLights.TurnOff();
-            });
-
         triggerObservables
             .Where(e =>
             {
@@ -105,7 +88,7 @@ public class KitchenLights : IAsyncInitializable
             })
             .Subscribe(_ =>
             {
-                if (_lightSensor.State > 50) return;
+                if (_lightSensor.State > 1100) return;
 
                 if (IsNight)
                 {
@@ -118,11 +101,13 @@ public class KitchenLights : IAsyncInitializable
             });
 
         presenceObservables
-            .Where(e =>
+            .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
                 return !Presence;
             })
+            .Throttle(TimeSpan.FromSeconds(15), scheduler)
+            .Where(_ => !Presence)
             .Subscribe(_ =>
             {
                 _lights.TurnOff();

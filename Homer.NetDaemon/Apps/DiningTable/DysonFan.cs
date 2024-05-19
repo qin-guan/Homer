@@ -38,10 +38,10 @@ public class DysonFan : IAsyncInitializable
             {
                 _switch.TurnOn();
                 await Task.Delay(500);
-                await irRemoteLock.SemaphoreSlim.WaitAsync();
+                await irRemoteLock.LivingRoom.WaitAsync();
                 remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
                 await Task.Delay(500);
-                irRemoteLock.SemaphoreSlim.Release();
+                irRemoteLock.LivingRoom.Release();
             });
 
         _presence.StateChanges()

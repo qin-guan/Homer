@@ -4,7 +4,6 @@ using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps;
 
-[Focus]
 [NetDaemonApp]
 public class DefaultApp
 {
@@ -24,13 +23,6 @@ public class DefaultApp
                 {
                     tags.Add(new KeyValuePair<string, object?>("ha.entity_id", entityId.GetString()));
                 }
-
-                // if (val.TryGetProperty("new_state", out var i) &&
-                //     i.TryGetProperty("attributes", out var i2) &&
-                //     i2.TryGetProperty("friendly_name", out var friendlyName))
-                // {
-                //     tags.Add(new KeyValuePair<string, object?>("friendly_name", friendlyName.GetString()));
-                // }
 
                 eventsProcessedMeter.Add(1, tags.ToArray());
             }

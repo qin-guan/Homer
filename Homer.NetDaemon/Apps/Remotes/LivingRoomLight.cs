@@ -21,11 +21,11 @@ public class LivingRoomLight
             .SubscribeAsync(async _ =>
             {
                 eventsProcessedMeter.Add(1);
-                await irRemoteLock.SemaphoreSlim.WaitAsync();
+                await irRemoteLock.LivingRoom.WaitAsync();
                 await Task.Delay(1000);
                 remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK");
                 await Task.Delay(1000);
-                irRemoteLock.SemaphoreSlim.Release();
+                irRemoteLock.LivingRoom.Release();
             });
     }
 }
