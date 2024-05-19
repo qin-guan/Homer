@@ -50,7 +50,7 @@ public class DysonFan : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return e.IsOff();
             }, TimeSpan.FromSeconds(30), scheduler)
-            .Subscribe(e => { _switch.TurnOff(); });
+            .Subscribe(e => { if (_presence.IsOff()) _switch.TurnOff(); });
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
