@@ -15,9 +15,5 @@ public class Bedroom4Lights
         sensorEntities.ScreekHumanSensor2a06ead0Zone1TargetCounts.StateChanges()
             .Where(e => e.Entity.State > 0)
             .Subscribe(_ => { switchEntities.Bedroom4Lights.TurnOn(); });
-
-        sensorEntities.ScreekHumanSensor2a06ead0Zone1TargetCounts.StateChanges()
-            .WhenStateIsFor(e => e?.State == 0, TimeSpan.FromSeconds(15), scheduler)
-            .Subscribe(_ => { switchEntities.Bedroom4Lights.TurnOff(); });
     }
 }
