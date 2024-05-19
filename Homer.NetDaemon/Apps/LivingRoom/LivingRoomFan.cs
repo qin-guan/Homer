@@ -82,7 +82,7 @@ public class LivingRoomFan : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromSeconds(10), scheduler)
+            .Throttle(TimeSpan.FromSeconds(60), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ => { _fan.TurnOff(); });
     }
