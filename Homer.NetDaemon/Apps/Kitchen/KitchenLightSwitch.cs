@@ -26,7 +26,7 @@ public class KitchenLightSwitch
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
 
-        sensorEntities.LivingRoomLightsAction.StateChanges()
+        sensorEntities.KitchenLightsAction.StateChanges()
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
