@@ -5,7 +5,6 @@ using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Kitchen;
 
-[Focus]
 [NetDaemonApp]
 public class KitchenLightSwitch
 {
@@ -33,13 +32,5 @@ public class KitchenLightSwitch
                 return e.Entity.State == "single_left";
             })
             .Subscribe(e => { switchEntities.KitchenLightsLeft.Toggle(); });
-
-        sensorEntities.Bedroom4LightsAction.StateChanges()
-            .Where(e =>
-            {
-                eventsProcessedMeter.Add(1);
-                return e.Entity.State == "single";
-            })
-            .Subscribe(e => { switchEntities.Bedroom4Lights.Toggle(); });
     }
 }

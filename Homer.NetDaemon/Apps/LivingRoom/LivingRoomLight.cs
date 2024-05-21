@@ -27,7 +27,6 @@ public class LivingRoomLight : IAsyncInitializable
     public LivingRoomLight(
         ILogger<LivingRoomLight> logger,
         IScheduler scheduler,
-        IrRemoteLock irRemoteLock,
         BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
         InputBooleanEntities inputBooleanEntities,

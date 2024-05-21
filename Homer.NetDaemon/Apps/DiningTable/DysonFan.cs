@@ -33,7 +33,7 @@ public class DysonFan : IAsyncInitializable
             {
                 eventsProcessedMeter.Add(1);
                 return e.IsOn();
-            }, TimeSpan.FromSeconds(15), scheduler)
+            }, TimeSpan.FromSeconds(45), scheduler)
             .SubscribeAsync(async e =>
             {
                 _switch.TurnOn();

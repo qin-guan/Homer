@@ -68,7 +68,7 @@ public class LivingRoomFan : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return _triggerEntities.Any(e => e.IsOn());
             })
-            .Throttle(TimeSpan.FromSeconds(10), scheduler)
+            .Throttle(TimeSpan.FromSeconds(30), scheduler)
             .Where(_ => _triggerEntities.Any(e => e.IsOn()))
             .Subscribe(_ =>
             {
