@@ -1,26 +1,24 @@
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
+using Homer.NetDaemon.Apps.Core;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Bedroom4;
 
+[Focus]
 [NetDaemonApp]
-public class Bedroom4Lights
+public class Bedroom4Lights : Occupancy
 {
     public Bedroom4Lights(
-        IScheduler scheduler,
-        SensorEntities sensorEntities,
-        SwitchEntities switchEntities,
-        ClimateEntities climateEntities
+        InputDatetimeEntities inputDatetimeEntities,
+        InputBooleanEntities inputBooleanEntities,
+        BinarySensorEntities contactSensors,
+        BinarySensorEntities motionSensors
+    ) : base(
+        inputDatetimeEntities.Bedroom4LastPresence,
+        inputBooleanEntities.Bedroom4Presence,
+        [contactSensors.Bedroom4DoorContact],
+        [motionSensors.ScreekHumanSensor2a06ead0Zone1Presence]
     )
     {
-        sensorEntities.ScreekHumanSensor2a06ead0Zone1TargetCounts.StateChanges()
-            .Where(e => e.Entity.State > 0)
-            .Subscribe(_ => { switchEntities.Bedroom4Lights.TurnOn(); });
-        //
-        // sensorEntities.ScreekHumanSensor2a06ead0Zone1TargetCounts.StateChanges()
-        //     .Where(e => e.Entity.State == 0)
-        //     .Subscribe(_ => { switchEntities.Bedroom4Lights.TurnOff(); });
     }
 }
