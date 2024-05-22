@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
@@ -26,9 +27,11 @@ public class DefaultApp
 
                 if (val.TryGetProperty("new_state", out var state))
                 {
-                    if (state.TryGetProperty("attributes", out var attributes))
+                    if (state.ValueKind == JsonValueKind.Object &&
+                        state.TryGetProperty("attributes", out var attributes))
                     {
-                        if (attributes.TryGetProperty("friendly_name", out var friendlyName))
+                        if (attributes.ValueKind == JsonValueKind.Object &&
+                            attributes.TryGetProperty("friendly_name", out var friendlyName))
                         {
                             if (friendlyName.GetString() is not null)
                             {
@@ -38,9 +41,10 @@ public class DefaultApp
                         }
                     }
 
-                    if (state.TryGetProperty("context", out var context))
+                    if (state.ValueKind == JsonValueKind.Object && state.TryGetProperty("context", out var context))
                     {
-                        if (context.TryGetProperty("user_id", out var userIdElement))
+                        if (context.ValueKind == JsonValueKind.Object &&
+                            context.TryGetProperty("user_id", out var userIdElement))
                         {
                             if (userIdElement.GetString() is not null)
                             {
