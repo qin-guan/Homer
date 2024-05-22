@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.HassModel.Entities;
@@ -10,7 +11,7 @@ public abstract class Occupancy
     private readonly InputBooleanEntity _presence;
     private readonly List<BinarySensorEntity> _contactSensors;
     private readonly List<BinarySensorEntity> _motionSensors;
-    private bool DoorClosed => _contactSensors.All(e => e.IsOn());
+    private bool DoorClosed => _contactSensors.All(e => e.IsOff());
 
     private DateTime LastPresenceDateTime
     {
@@ -58,7 +59,7 @@ public abstract class Occupancy
                     _presence.TurnOn();
                 }
 
-                _lastPresence.SetDatetime(time: DateTime.Now);
+                _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
             });
 
         motionSensorObservables
@@ -71,7 +72,8 @@ public abstract class Occupancy
         var motionLastChanged = _motionSensors.Max(e => e.EntityState?.LastChanged) ?? default;
         var contactSensorsLastChanged = _contactSensors.Max(e => e.EntityState?.LastChanged) ?? default;
 
-        if (_presence.IsOn() && (
+        if (_presence.IsOn() &&
+            (
                 (invocationSource == OccupancyInvocationSource.MotionCleared && (
                         !DoorClosed || (DoorClosed &&
                                         LastPresenceDateTime < contactSensorsLastChanged &&
@@ -79,8 +81,8 @@ public abstract class Occupancy
                                         contactSensorsLastChanged
                         ))
                 ) ||
-                (invocationSource == OccupancyInvocationSource.DoorOpened && _presence.IsOff()))
-           )
+                (invocationSource == OccupancyInvocationSource.DoorOpened && _presence.IsOff())
+            ))
         {
             _presence.TurnOff();
         }

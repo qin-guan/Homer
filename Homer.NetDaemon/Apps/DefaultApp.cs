@@ -24,6 +24,33 @@ public class DefaultApp
                     tags.Add(new KeyValuePair<string, object?>("ha.entity_id", entityId.GetString()));
                 }
 
+                if (val.TryGetProperty("new_state", out var state))
+                {
+                    if (state.TryGetProperty("attributes", out var attributes))
+                    {
+                        if (attributes.TryGetProperty("friendly_name", out var friendlyName))
+                        {
+                            if (friendlyName.GetString() is not null)
+                            {
+                                tags.Add(
+                                    new KeyValuePair<string, object?>("ha.friendly_name", friendlyName.GetString()));
+                            }
+                        }
+                    }
+
+                    if (state.TryGetProperty("context", out var context))
+                    {
+                        if (context.TryGetProperty("user_id", out var userIdElement))
+                        {
+                            if (userIdElement.GetString() is not null)
+                            {
+                                tags.Add(
+                                    new KeyValuePair<string, object?>("ha.user_id", userIdElement.GetString()));
+                            }
+                        }
+                    }
+                }
+
                 eventsProcessedMeter.Add(1, tags.ToArray());
             }
             else
