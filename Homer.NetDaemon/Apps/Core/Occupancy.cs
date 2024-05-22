@@ -11,6 +11,8 @@ public abstract class Occupancy
     private readonly InputBooleanEntity _presence;
     private readonly List<BinarySensorEntity> _contactSensors;
     private readonly List<BinarySensorEntity> _motionSensors;
+    private readonly TimeSpan _delay = TimeSpan.FromSeconds(12);
+
     private bool DoorClosed => _contactSensors.All(e => e.IsOff());
 
     private DateTime LastPresenceDateTime
@@ -29,6 +31,17 @@ public abstract class Occupancy
                 (int)_lastPresence.Attributes.Hour.Value, (int)_lastPresence.Attributes.Minute.Value,
                 (int)_lastPresence.Attributes.Second.Value);
         }
+    }
+
+    public Occupancy(
+        InputDatetimeEntity lastPresence,
+        InputBooleanEntity presence,
+        List<BinarySensorEntity> contactSensors,
+        List<BinarySensorEntity> motionSensors,
+        TimeSpan delay
+    ) : this(lastPresence, presence, contactSensors, motionSensors)
+    {
+        _delay = delay;
     }
 
     public Occupancy(
@@ -77,7 +90,7 @@ public abstract class Occupancy
                 (invocationSource == OccupancyInvocationSource.MotionCleared && (
                         !DoorClosed || (DoorClosed &&
                                         LastPresenceDateTime < contactSensorsLastChanged &&
-                                        motionLastChanged.Subtract(TimeSpan.FromSeconds(15)) <=
+                                        motionLastChanged.Subtract(_delay) <=
                                         contactSensorsLastChanged
                         ))
                 ) ||
