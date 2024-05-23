@@ -106,7 +106,7 @@ public class KitchenLights : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromSeconds(15), scheduler)
+            .Throttle(TimeSpan.FromMinutes(1), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ =>
             {
