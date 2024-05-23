@@ -30,7 +30,7 @@ public class BathroomPresence : Occupancy
             .Subscribe(_ => { switchEntities.BathroomLightsCenter.TurnOn(); });
 
         inputBooleanEntities.BathroomPresence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(3), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1), scheduler)
             .Subscribe(_ => { switchEntities.BathroomLightsCenter.TurnOff(); });
     }
 }
