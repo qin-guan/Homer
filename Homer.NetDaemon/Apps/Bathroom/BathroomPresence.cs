@@ -31,6 +31,11 @@ public class BathroomPresence : Occupancy
 
         inputBooleanEntities.BathroomPresence.StateChanges()
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1), scheduler)
-            .Subscribe(_ => { switchEntities.BathroomLightsCenter.TurnOff(); });
+            .Subscribe(_ =>
+            {
+                switchEntities.BathroomLightsCenter.TurnOff();
+                switchEntities.BathroomLightsLeft.TurnOff();
+                switchEntities.BathroomLightsRight.TurnOff();
+            });
     }
 }
