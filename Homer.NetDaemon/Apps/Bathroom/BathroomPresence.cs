@@ -13,7 +13,7 @@ public class BathroomPresence : Occupancy
 {
     private readonly List<NumericSensorEntity> _lightSensors;
     private readonly SwitchEntities _switchEntities;
-    private bool TooBright => _lightSensors.Min(e => e.State) < 25;
+    private bool TooBright => _lightSensors.Min(e => e.State) > 25;
 
     private List<SwitchEntity> Switches
     {
