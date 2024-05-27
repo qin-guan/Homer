@@ -19,19 +19,30 @@ public class BathroomPresence : Occupancy
     {
         get
         {
-            switch (TimeOnly.FromDateTime(DateTime.Now))
+            return TimeOnly.FromDateTime(DateTime.Now) switch
             {
-                case var value when value >= new TimeOnly(0, 0) && value < new TimeOnly(6, 0):
-                    return [_switchEntities.BathroomLightsRight];
-                case var value when value >= new TimeOnly(6, 0) && value < new TimeOnly(18, 0):
-                    return [_switchEntities.BathroomLightsCenter];
-                case var value when value >= new TimeOnly(18, 0) && value < new TimeOnly(23, 0):
-                    return [_switchEntities.BathroomLightsCenter, _switchEntities.BathroomLightsLeft];
-                case var value when value >= new TimeOnly(23, 0) && value < new TimeOnly(0, 0):
-                    return [_switchEntities.BathroomLightsRight];
-                default:
-                    return [_switchEntities.BathroomLightsRight];
-            }
+                var value when value >= new TimeOnly(0, 0) && value < new TimeOnly(6, 0) =>
+                [
+                    _switchEntities.BathroomLightsRight
+                ],
+                
+                var value when value >= new TimeOnly(6, 0) && value < new TimeOnly(18, 0) =>
+                [
+                    _switchEntities.BathroomLightsCenter
+                ],
+                
+                var value when value >= new TimeOnly(18, 0) && value < new TimeOnly(23, 0) =>
+                [
+                    _switchEntities.BathroomLightsCenter, _switchEntities.BathroomLightsLeft
+                ],
+                
+                var value when value >= new TimeOnly(23, 0) && value < new TimeOnly(0, 0) =>
+                [
+                    _switchEntities.BathroomLightsRight
+                ],
+                
+                _ => [_switchEntities.BathroomLightsRight]
+            };
         }
     }
 
