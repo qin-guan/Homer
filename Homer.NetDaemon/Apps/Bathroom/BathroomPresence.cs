@@ -31,7 +31,7 @@ public class BathroomPresence : Occupancy
                     _switchEntities.BathroomLightsCenter
                 ],
                 
-                var value when value >= new TimeOnly(18, 0) && value < new TimeOnly(0, 0) =>
+                var value when value >= new TimeOnly(18, 0) && value < new TimeOnly(23, 59) =>
                 [
                     _switchEntities.BathroomLightsCenter, _switchEntities.BathroomLightsLeft
                 ],
