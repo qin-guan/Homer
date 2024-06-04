@@ -54,7 +54,7 @@ public class BathroomPresence : Occupancy
         inputBooleanEntities.BathroomPresence,
         [contactSensors.BathroomContactSensorContact],
         [motionSensors.BathroomDoorMotionOccupancy, motionSensors.BathroomSinkMotionOccupancy],
-        TimeSpan.FromSeconds(30)
+        TimeSpan.FromSeconds(12)
     )
     {
         _switchEntities = switchEntities;
@@ -78,7 +78,7 @@ public class BathroomPresence : Occupancy
             });
 
         inputBooleanEntities.BathroomPresence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1.5), scheduler)
             .Subscribe(_ =>
             {
                 switchEntities.BathroomLightsCenter.TurnOff();
