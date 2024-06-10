@@ -39,10 +39,10 @@ public class Bedroom4Lights : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
-                if (TooBright)
-                {
-                    remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
-                }
+                // if (TooBright)
+                // {
+                //     remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
+                // }
 
                 remoteEntities.Bedroom4Remote.SendCommand("Fan 1", "Bedroom 4 Fanco");
             });
@@ -73,7 +73,7 @@ public class Bedroom4Lights : Occupancy
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromSeconds(1), scheduler)
             .Subscribe(_ =>
             {
-                remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
+                // remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
                 remoteEntities.Bedroom4Remote.SendCommand("Power", "Bedroom 4 Fanco");
             });
     }
