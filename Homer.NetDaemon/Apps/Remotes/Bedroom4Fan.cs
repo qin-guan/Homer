@@ -30,12 +30,12 @@ public class Bedroom4Fan
 
                 if (e.Entity.IsOn())
                 {
-                    remoteEntities.LivingRoomRemote.SendCommand($"Fan {fanSpeed}", "Bedroom 4 Fanco");
+                    remoteEntities.Bedroom4Remote.SendCommand($"Fan {fanSpeed}", "Bedroom 4 Fanco");
                 }
 
                 if (e.Entity.IsOff())
                 {
-                    remoteEntities.LivingRoomRemote.SendCommand("Power", "Bedroom 4 Fanco");
+                    remoteEntities.Bedroom4Remote.SendCommand("Power", "Bedroom 4 Fanco");
                 }
 
                 return Task.CompletedTask;
