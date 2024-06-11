@@ -48,7 +48,7 @@ public class Bedroom4Lights : Occupancy
             });
 
         climateEntities.Daikinap97235.StateChanges()
-            .Where(s => s.New.IsOn())
+            .Where(s => s.Old.IsOff())
             .Subscribe(_ =>
             {
                 if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
