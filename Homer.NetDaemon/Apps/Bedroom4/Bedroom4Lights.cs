@@ -24,7 +24,8 @@ public class Bedroom4Lights : Occupancy
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
         RemoteEntities remoteEntities,
-        ClimateEntities climateEntities
+        ClimateEntities climateEntities,
+        FanEntities fanEntities
     ) : base(
         inputDatetimeEntities.Bedroom4LastPresence,
         inputBooleanEntities.Bedroom4Presence,
@@ -44,7 +45,11 @@ public class Bedroom4Lights : Occupancy
                 //     remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
                 // }
 
-                remoteEntities.Bedroom4Remote.SendCommand("Fan 1", "Bedroom 4 Fanco");
+                fanEntities.Bedroom4Fan.TurnOn();
+
+                fanEntities.Bedroom4Fan.SetPercentage(
+                    (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16)
+                );
             });
 
         climateEntities.Daikinap97235.StateChanges()
@@ -53,10 +58,17 @@ public class Bedroom4Lights : Occupancy
             {
                 if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
 
-                remoteEntities.Bedroom4Remote.SendCommand("Fan 4", "Bedroom 4 Fanco");
+                fanEntities.Bedroom4Fan.SetPercentage(
+                    (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16) * 5
+                );
 
                 netDaemonScheduler.RunIn(TimeSpan.FromMinutes(5),
-                    () => { remoteEntities.Bedroom4Remote.SendCommand("Fan 1", "Bedroom 4 Fanco"); });
+                    () =>
+                    {
+                        fanEntities.Bedroom4Fan.SetPercentage(
+                            (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16)
+                        );
+                    });
             });
 
         climateEntities.Daikinap97235.StateChanges()
@@ -66,7 +78,12 @@ public class Bedroom4Lights : Occupancy
                 if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
 
                 netDaemonScheduler.RunIn(TimeSpan.FromHours(2),
-                    () => { remoteEntities.Bedroom4Remote.SendCommand("Fan 3", "Bedroom 4 Fanco"); });
+                    () =>
+                    {
+                        fanEntities.Bedroom4Fan.SetPercentage(
+                            (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16) * 2
+                        );
+                    });
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
@@ -74,7 +91,9 @@ public class Bedroom4Lights : Occupancy
             .Subscribe(_ =>
             {
                 // remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
-                remoteEntities.Bedroom4Remote.SendCommand("Power", "Bedroom 4 Fanco");
+                // remoteEntities.Bedroom4Remote.SendCommand("Power", "Bedroom 4 Fanco");
+
+                fanEntities.Bedroom4Fan.TurnOff();
             });
     }
 }
