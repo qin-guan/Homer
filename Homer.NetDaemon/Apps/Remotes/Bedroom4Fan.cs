@@ -14,7 +14,7 @@ public class Bedroom4Fan
         RemoteEntities remoteEntities
     )
     {
-        fanEntities.Bedroom4Fan.StateChanges()
+        fanEntities.Bedroom4Fan.StateAllChanges()
             .SubscribeAsync((e) =>
             {
                 var fanSpeed = (fanEntities.Bedroom4Fan.Attributes?.Percentage ?? 0) switch
