@@ -87,7 +87,7 @@ public class Bedroom4Lights : Occupancy
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromSeconds(1), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(3), scheduler)
             .Subscribe(_ =>
             {
                 // remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
