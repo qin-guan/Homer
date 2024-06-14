@@ -4,6 +4,7 @@ using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Notify;
 
+[Focus]
 [NetDaemonApp]
 public class Offline
 {
@@ -18,6 +19,12 @@ public class Offline
 
         foreach (var entity in sensorEntities.EnumerateAll())
         {
+            var isPrinter = entity.Attributes?.Name?.Contains("dcp_") ?? false;
+            if (isPrinter)
+            {
+                continue;
+            }
+            
             count++;
             entity.StateAllChanges()
                 .Where(e => e.New?.State is null or "unavailable" || e.Old?.State is null or "unavailable")
