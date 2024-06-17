@@ -40,7 +40,7 @@ public class Bedroom4Lights : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
-                if (TooBright)
+                if (!TooBright)
                 {
                     inputBooleanEntities.Bedroom4Light.TurnOn();
                 }
