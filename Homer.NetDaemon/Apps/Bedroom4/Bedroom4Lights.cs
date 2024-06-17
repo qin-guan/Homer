@@ -31,7 +31,7 @@ public class Bedroom4Lights : Occupancy
         inputBooleanEntities.Bedroom4Presence,
         [binarySensorEntities.Bedroom4DoorContact],
         [binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence],
-        TimeSpan.FromSeconds(5)
+        TimeSpan.FromSeconds(2)
     )
     {
         _sensorEntities = sensorEntities;
@@ -40,16 +40,12 @@ public class Bedroom4Lights : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
-                // if (TooBright)
-                // {
-                //     remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
-                // }
+                if (TooBright)
+                {
+                    inputBooleanEntities.Bedroom4Light.TurnOn();
+                }
 
                 fanEntities.Bedroom4Fan.TurnOn();
-
-                fanEntities.Bedroom4Fan.SetPercentage(
-                    (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16)
-                );
             });
 
         climateEntities.Daikinap97235.StateChanges()
@@ -90,9 +86,7 @@ public class Bedroom4Lights : Occupancy
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(3), scheduler)
             .Subscribe(_ =>
             {
-                // remoteEntities.Bedroom4Remote.SendCommand("Light Power", "Bedroom 4 Fanco");
-                // remoteEntities.Bedroom4Remote.SendCommand("Power", "Bedroom 4 Fanco");
-
+                inputBooleanEntities.Bedroom4Light.TurnOff();
                 fanEntities.Bedroom4Fan.TurnOff();
             });
     }
