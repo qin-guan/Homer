@@ -1,4 +1,5 @@
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
 using Homer.ServiceDefaults.Metrics;
@@ -11,7 +12,7 @@ namespace Homer.NetDaemon.Apps.DiningTable;
 [NetDaemonApp]
 public class DysonFan : IAsyncInitializable
 {
-    private readonly BinarySensorEntity _presence;
+    private readonly List<BinarySensorEntity> _presence;
     private readonly SwitchEntity _switch;
 
     public DysonFan(
@@ -22,13 +23,17 @@ public class DysonFan : IAsyncInitializable
         RemoteEntities remoteEntities
     )
     {
-        _presence = binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5;
+        _presence =
+        [
+            binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor5,
+            binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor4
+        ];
         _switch = switchEntities.LivingRoomIkeaPlug;
 
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.dyson_fan.events_processed");
 
-        _presence.StateChanges()
+        _presence.Select(e => e.StateChanges()).Merge().DistinctUntilChanged()
             .WhenStateIsFor(e =>
             {
                 eventsProcessedMeter.Add(1);
@@ -50,12 +55,18 @@ public class DysonFan : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return e.IsOff();
             }, TimeSpan.FromSeconds(30), scheduler)
-            .Subscribe(e => { if (_presence.IsOff()) _switch.TurnOff(); });
+            .Subscribe(e =>
+            {
+                if (_presence.All(e => e.IsOff()))
+                {
+                    _switch.TurnOff();
+                }
+            });
     }
 
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        if (_presence.IsOff())
+        if (_presence.All(e => e.IsOff()))
         {
             _switch.TurnOff();
         }
