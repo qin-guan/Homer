@@ -14,6 +14,7 @@ public class Bedroom4Lights : Occupancy
 {
     private readonly SensorEntities _sensorEntities;
     public bool TooBright => _sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30;
+    public bool IsMidnight => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(1, 0), new TimeOnly(6, 0));
 
     public Bedroom4Lights(
         IScheduler scheduler,
@@ -40,7 +41,7 @@ public class Bedroom4Lights : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
-                if (!TooBright)
+                if (!TooBright && !IsMidnight)
                 {
                     inputBooleanEntities.Bedroom4Light.TurnOn();
                 }
