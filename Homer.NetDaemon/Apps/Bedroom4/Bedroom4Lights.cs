@@ -41,6 +41,8 @@ public class Bedroom4Lights : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
+                switchEntities.Bedroom4Lights.TurnOn();
+
                 if (!TooBright && !IsMidnight)
                 {
                     inputBooleanEntities.Bedroom4Light.TurnOn();
@@ -85,10 +87,14 @@ public class Bedroom4Lights : Occupancy
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(3), scheduler)
-            .Subscribe(_ =>
+            .SubscribeAsync(async _ =>
             {
                 inputBooleanEntities.Bedroom4Light.TurnOff();
                 fanEntities.Bedroom4Fan.TurnOff();
+
+                await Task.Delay(1000);
+
+                switchEntities.Bedroom4Lights.TurnOff();
             });
     }
 }
