@@ -78,7 +78,7 @@ app.MapGet("/gc", () =>
     };
 });
 
-app.MapPost("/contact/qg", ([FromBody] string content, NotifyServices notifyServices) =>
+app.MapPost("/contact/qg", ([FromQuery] string content, NotifyServices notifyServices) =>
 {
     notifyServices.MobileAppQinsIphone(content, "Message from the internet");
 });
