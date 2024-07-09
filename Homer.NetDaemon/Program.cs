@@ -1,6 +1,7 @@
 using System.Reflection;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
+using Microsoft.AspNetCore.Mvc;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
@@ -75,6 +76,11 @@ app.MapGet("/gc", () =>
         info.TotalAvailableMemoryBytes,
         info.HighMemoryLoadThresholdBytes
     };
+});
+
+app.MapPost("/contact/qg", ([FromBody] string content, NotifyServices notifyServices) =>
+{
+    notifyServices.MobileAppQinsIphone(content, "Message from the internet");
 });
 
 app.Run();
