@@ -25,17 +25,17 @@ public class BathroomPresence : Occupancy
                 [
                     _switchEntities.BathroomLightsRight
                 ],
-                
+
                 var value when value >= new TimeOnly(6, 0) && value < new TimeOnly(18, 0) =>
                 [
                     _switchEntities.BathroomLightsCenter
                 ],
-                
+
                 var value when value >= new TimeOnly(18, 0) && value < new TimeOnly(23, 59) =>
                 [
                     _switchEntities.BathroomLightsCenter, _switchEntities.BathroomLightsLeft
                 ],
-                
+
                 _ => [_switchEntities.BathroomLightsRight]
             };
         }
@@ -52,7 +52,7 @@ public class BathroomPresence : Occupancy
     ) : base(
         inputDatetimeEntities.BathroomLastPresence,
         inputBooleanEntities.BathroomPresence,
-        [contactSensors.BathroomContactSensorContact],
+        [contactSensors.BathroomContactContact],
         [motionSensors.BathroomDoorMotionOccupancy, motionSensors.BathroomSinkMotionOccupancy],
         TimeSpan.FromSeconds(12)
     )
