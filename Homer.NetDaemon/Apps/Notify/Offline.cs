@@ -4,7 +4,6 @@ using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Notify;
 
-[Focus]
 [NetDaemonApp]
 public class Offline
 {
