@@ -52,7 +52,7 @@ public class BathroomPresence : Occupancy
     ) : base(
         inputDatetimeEntities.BathroomLastPresence,
         inputBooleanEntities.BathroomPresence,
-        [contactSensors.BathroomContactContact],
+        [contactSensors.BathroomDoorContact],
         [motionSensors.BathroomDoorMotionOccupancy, motionSensors.BathroomSinkMotionOccupancy],
         TimeSpan.FromSeconds(12)
     )
