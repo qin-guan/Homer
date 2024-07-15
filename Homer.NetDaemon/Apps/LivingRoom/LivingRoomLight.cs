@@ -101,7 +101,7 @@ public class LivingRoomLight : IAsyncInitializable
                 eventsProcessedMeter.Add(1);
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromSeconds(15), scheduler)
+            .Throttle(TimeSpan.FromMinutes(3), scheduler)
             .Where(e => !Presence)
             .Subscribe(_ => { _light.TurnOff(); });
     }
