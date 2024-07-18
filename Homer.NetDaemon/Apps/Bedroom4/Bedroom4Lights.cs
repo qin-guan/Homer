@@ -94,7 +94,7 @@ public class Bedroom4Lights : Occupancy
                 inputBooleanEntities.Bedroom4Light.TurnOff();
                 fanEntities.Bedroom4Fan.TurnOff();
 
-                await Task.Delay(1000);
+                await Task.Delay(3000);
 
                 switchEntities.Bedroom4Lights.TurnOff();
             });
