@@ -38,7 +38,7 @@ public class Bedroom4Lights : Occupancy
         _sensorEntities = sensorEntities;
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
-            .Where(e => e.Entity.IsOn())
+            .WhenStateIsFor(e => e.IsOn(), TimeSpan.FromSeconds(3), scheduler)
             .SubscribeAsync(async _ =>
             {
                 switchEntities.Bedroom4Lights.TurnOn();
