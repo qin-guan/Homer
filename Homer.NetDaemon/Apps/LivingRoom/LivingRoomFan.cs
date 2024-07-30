@@ -25,14 +25,14 @@ public class LivingRoomFan : IAsyncInitializable
     public LivingRoomFan(
         ILogger<LivingRoomFan> logger,
         IScheduler scheduler,
-        IrRemoteLock irRemoteLock,
         BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
         InputBooleanEntities inputBooleanEntities,
         RemoteEntities remoteEntities
     )
     {
-        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan.events_processed");
+        var eventsProcessedMeter =
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan.events_processed");
 
         _logger = logger;
 
