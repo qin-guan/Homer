@@ -60,7 +60,7 @@ public class DysonFan : IAsyncInitializable
                 if (_presence.All(e => e.IsOff()))
                 {
                     _switch.TurnOff();
-                    await Task.Delay(3000);
+                    await Task.Delay(10000);
                     _switch.TurnOn();
                 }
             });
