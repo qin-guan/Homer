@@ -26,7 +26,7 @@ public class Offline
             
             count++;
             entity.StateAllChanges()
-                .Where(e => e.New?.State is null or "unavailable" || e.Old?.State is null or "unavailable")
+                .Where(e => e.New?.State is null or "unavailable")
                 .Subscribe(e =>
                 {
                     notifyServices.MobileAppQinsIphone(
@@ -39,7 +39,7 @@ public class Offline
         {
             count++;
             entity.StateAllChanges()
-                .Where(e => e.New?.State is null or "unavailable" || e.Old?.State is null or "unavailable")
+                .Where(e => e.New?.State is null or "unavailable")
                 .Subscribe(e =>
                 {
                     notifyServices.MobileAppQinsIphone(
@@ -52,7 +52,7 @@ public class Offline
         {
             count++;
             entity.StateAllChanges()
-                .Where(e => e.New?.State is null or "unavailable" || e.Old?.State is null or "unavailable")
+                .Where(e => e.New?.State is null or "unavailable")
                 .Subscribe(e =>
                 {
                     notifyServices.MobileAppQinsIphone(
