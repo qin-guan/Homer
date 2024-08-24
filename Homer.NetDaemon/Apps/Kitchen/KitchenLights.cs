@@ -17,11 +17,24 @@ public class KitchenLights : IAsyncInitializable
     private readonly List<BinarySensorEntity> _presenceEntities;
     private readonly List<SwitchEntity> _lights;
     private readonly List<SwitchEntity> _nightLights;
-    private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
     private bool TriggerPresence => _triggerEntities.Any(e => e.IsOn());
-    private bool IsNight => TimeHelpers.TimeNow > new TimeOnly(21, 30) || TimeHelpers.TimeNow < new TimeOnly(6, 20);
+
+    private static KitchenLightingPreference LightingPreference()
+    {
+        if (TimeHelpers.TimeNow > new TimeOnly(2, 0) && TimeHelpers.TimeNow < new TimeOnly(5, 30))
+        {
+            return KitchenLightingPreference.Disabled;
+        }
+
+        if (TimeHelpers.TimeNow < new TimeOnly(21, 30))
+        {
+            return KitchenLightingPreference.All;
+        }
+
+        return KitchenLightingPreference.NightLight;
+    }
 
     private const string NightStartCron = "30 21 * * *";
     private const string NightEndCron = "20 6 * * *";
@@ -59,7 +72,7 @@ public class KitchenLights : IAsyncInitializable
             switchEntities.KitchenLightsLeft,
         ];
 
-        _lightSensor = sensorEntities.KitchenTuyaPresenceIlluminanceLux;
+        var lightSensor = sensorEntities.KitchenTuyaPresenceIlluminanceLux;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
@@ -88,15 +101,23 @@ public class KitchenLights : IAsyncInitializable
             })
             .Subscribe(_ =>
             {
-                if (_lightSensor.State > 1100) return;
+                if (lightSensor.State > 1100) return;
 
-                if (IsNight)
+                switch (LightingPreference())
                 {
-                    _nightLights.TurnOn();
-                }
-                else
-                {
-                    _lights.TurnOn();
+                    case KitchenLightingPreference.All:
+                    {
+                        _lights.TurnOn();
+                        break;
+                    }
+                    case KitchenLightingPreference.NightLight:
+                    {
+                        _nightLights.TurnOn();
+                        break;
+                    }
+                    case KitchenLightingPreference.Disabled:
+                    default:
+                        break;
                 }
             });
 
