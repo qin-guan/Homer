@@ -16,14 +16,15 @@ public class Offline
     {
         var count = 0;
 
-        foreach (var entity in sensorEntities.EnumerateAll())
+        foreach (var entity in sensorEntities.EnumerateAll()
+                     .Where(s => !s.EntityId.Contains("mi_smart_standing_fan_2_lite")))
         {
             var isPrinter = entity.Attributes?.Name?.Contains("dcp_") ?? false;
             if (isPrinter)
             {
                 continue;
             }
-            
+
             count++;
             entity.StateAllChanges()
                 .Where(e => e.New?.State is null or "unavailable")
@@ -35,7 +36,8 @@ public class Offline
                 });
         }
 
-        foreach (var entity in binarySensorEntities.EnumerateAll())
+        foreach (var entity in binarySensorEntities.EnumerateAll()
+                     .Where(s => !s.EntityId.Contains("mi_smart_standing_fan_2_lite")))
         {
             count++;
             entity.StateAllChanges()
@@ -48,7 +50,8 @@ public class Offline
                 });
         }
 
-        foreach (var entity in switchEntities.EnumerateAll())
+        foreach (var entity in switchEntities.EnumerateAll()
+                     .Where(s => !s.EntityId.Contains("mi_smart_standing_fan_2_lite")))
         {
             count++;
             entity.StateAllChanges()
