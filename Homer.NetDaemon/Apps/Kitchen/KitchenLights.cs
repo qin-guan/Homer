@@ -53,13 +53,13 @@ public class KitchenLights : IAsyncInitializable
         _triggerEntities =
         [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor6,
-            binarySensorEntities.KitchenTuyaPresencePresence
+            binarySensorEntities.ScreekHumanSensor2a872668Zone1Presence
         ];
 
         _presenceEntities =
         [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor6,
-            binarySensorEntities.KitchenTuyaPresencePresence
+            binarySensorEntities.ScreekHumanSensor2a872668Zone1Presence
         ];
 
         _lights =
