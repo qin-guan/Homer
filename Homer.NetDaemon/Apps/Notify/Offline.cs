@@ -20,12 +20,6 @@ public class Offline
 
         foreach (var entity in sensorEntities.EnumerateAll())
         {
-            var isPrinter = entity.Attributes?.Name?.Contains("dcp_") ?? false;
-            if (isPrinter)
-            {
-                continue;
-            }
-
             count++;
             entity.StateAllChanges()
                 .WhenStateIsFor(e => e?.State is null or "unavailable", TimeSpan.FromMinutes(1), scheduler)
