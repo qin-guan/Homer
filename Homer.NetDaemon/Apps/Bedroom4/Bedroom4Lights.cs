@@ -37,13 +37,25 @@ public class Bedroom4Lights : Occupancy
     {
         _sensorEntities = sensorEntities;
 
+        sensorEntities.Bedroom4LightsAction.StateChanges()
+            .SubscribeAsync(async e =>
+            {
+                if (switchEntities.Bedroom4Lights.IsOff())
+                {
+                    switchEntities.Bedroom4Lights.TurnOn();
+                    await Task.Delay(1000);
+                }
+
+                inputBooleanEntities.Bedroom4Light.TurnOn();
+            });
+
         inputBooleanEntities.Bedroom4Presence.StateChanges()
             .WhenStateIsFor(e => e.IsOn(), TimeSpan.FromSeconds(3), scheduler)
             .SubscribeAsync(async _ =>
             {
                 switchEntities.Bedroom4Lights.TurnOn();
                 fanEntities.MiSmartStandingFan2Lite.TurnOn();
-                
+
                 await Task.Delay(1000);
 
                 if (!TooBright && !IsMidnight)
