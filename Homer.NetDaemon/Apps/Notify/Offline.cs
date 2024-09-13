@@ -2,6 +2,7 @@ using System.Reactive.Concurrency;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
+using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Notify;
 
@@ -18,7 +19,7 @@ public class Offline
     {
         var count = 0;
 
-        foreach (var entity in sensorEntities.EnumerateAll())
+        foreach (var entity in sensorEntities.EnumerateAll().FilterPrinter())
         {
             count++;
             entity.StateAllChanges()
@@ -31,7 +32,7 @@ public class Offline
                 });
         }
 
-        foreach (var entity in binarySensorEntities.EnumerateAll())
+        foreach (var entity in binarySensorEntities.EnumerateAll().FilterPrinter())
         {
             count++;
             entity.StateAllChanges()
@@ -44,7 +45,7 @@ public class Offline
                 });
         }
 
-        foreach (var entity in switchEntities.EnumerateAll())
+        foreach (var entity in switchEntities.EnumerateAll().FilterPrinter())
         {
             count++;
             entity.StateAllChanges()
@@ -60,5 +61,13 @@ public class Offline
         notifyServices.MobileAppQinsIphone(
             $"Registered {count} entities for offline detection."
         );
+    }
+}
+
+public static class OfflineExtensions
+{
+    public static IEnumerable<T> FilterPrinter<T>(this IEnumerable<T> entities) where T : IEntityCore
+    {
+        return entities.Where(e => !e.EntityId.Contains("brother_dcp"));
     }
 }
