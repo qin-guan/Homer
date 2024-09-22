@@ -10,14 +10,17 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
-        <PackageReference Include="NetDaemon.AppModel" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.Client" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.Extensions.Logging" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.Extensions.Tts" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.HassModel" Version="24.35.1" />
-        <PackageReference Include="NetDaemon.Runtime" Version="24.35.1" />
+        <PackageReference Include="NetDaemon.AppModel" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Client" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Extensions.Logging" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Extensions.Mqtt" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Extensions.Tts" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.HassModel" Version="24.37.1" />
+        <PackageReference Include="NetDaemon.Runtime" Version="24.37.1" />
+        <PackageReference Include="Refit" Version="7.2.1" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="7.2.1" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
         <PackageReference Include="System.Reactive" Version="6.0.1"/>

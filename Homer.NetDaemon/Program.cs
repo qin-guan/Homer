@@ -1,11 +1,16 @@
 using System.Reflection;
+using Homer.NetDaemon.Apps.Bathroom;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
+using Homer.NetDaemon.Options;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.MqttEntityManager;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
 using NetDaemon.Runtime;
+using Refit;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -17,6 +22,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseNetDaemonAppSettings();
 builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
+builder.Host.UseNetDaemonMqttEntityManagement();
+
+builder.Services.AddOptions<DaikinOptions>()
+    .Bind(builder.Configuration.GetSection("Daikin"))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Token))
+    .ValidateOnStart();
 
 builder.Services.AddSerilog((services, lc) => lc
     .ReadFrom.Configuration(builder.Configuration)
@@ -24,6 +35,13 @@ builder.Services.AddSerilog((services, lc) => lc
     .Enrich.FromLogContext()
     .WriteTo.Console()
 );
+
+builder.Services.AddRefitClient<IDaikinApi>()
+    .ConfigureHttpClient((sp, client) =>
+    {
+        client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443");
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
+    });
 
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddNetDaemonStateManager();

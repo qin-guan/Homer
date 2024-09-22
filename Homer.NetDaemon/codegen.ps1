@@ -6,5 +6,5 @@ Write-Output "Using secret: $secret"
 dotnet tool run nd-codegen -o "Entities/Entities.cs" -ns "Homer.NetDaemon.Entities" -token $secret
 
 if ($?) {
-    Remove-Item -Recurse NetDaemonCodeGen
+    Remove-Item -Recurse NetDaemonCodegen
 }
