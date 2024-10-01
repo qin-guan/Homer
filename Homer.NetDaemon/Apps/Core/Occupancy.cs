@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.HassModel.Entities;

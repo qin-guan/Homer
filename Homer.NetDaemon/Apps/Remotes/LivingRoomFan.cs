@@ -9,22 +9,18 @@ namespace Homer.NetDaemon.Apps.Remotes;
 public class LivingRoomFan
 {
     public LivingRoomFan(
-        IrRemoteLock irRemoteLock,
+        IrRemoteChannel irRemoteChannel,
         InputBooleanEntities inputBooleanEntities,
-        RemoteEntities remoteEntities
-    )
+        RemoteEntities remoteEntities)
     {
-        var eventsProcessedMeter = EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan_remote.events_processed");
+        var eventsProcessedMeter =
+            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan_remote.events_processed");
 
         inputBooleanEntities.LivingRoomFan.StateChanges()
             .SubscribeAsync(async _ =>
             {
                 eventsProcessedMeter.Add(1);
-                await irRemoteLock.LivingRoom.WaitAsync();
-                await Task.Delay(1000);
-                remoteEntities.LivingRoomRemote.SendCommand("Power", "Living Room KDK");
-                await Task.Delay(1000);
-                irRemoteLock.LivingRoom.Release();
+                await irRemoteChannel.LivingRoomChannel.Writer.WriteAsync(LivingRoomRemoteCommand.Fan);
             });
     }
 }

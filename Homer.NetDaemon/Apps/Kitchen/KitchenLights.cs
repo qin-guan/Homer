@@ -5,7 +5,6 @@ using Homer.NetDaemon.Helpers;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Kitchen;

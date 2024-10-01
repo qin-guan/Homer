@@ -16,8 +16,8 @@ public class DysonFan : IAsyncInitializable
     private readonly SwitchEntity _switch;
 
     public DysonFan(
+        IrRemoteChannel irRemoteChannel,
         IScheduler scheduler,
-        IrRemoteLock irRemoteLock,
         SwitchEntities switchEntities,
         BinarySensorEntities binarySensorEntities,
         RemoteEntities remoteEntities
@@ -42,11 +42,7 @@ public class DysonFan : IAsyncInitializable
             .SubscribeAsync(async e =>
             {
                 _switch.TurnOn();
-                await Task.Delay(500);
-                await irRemoteLock.LivingRoom.WaitAsync();
-                remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
-                await Task.Delay(500);
-                irRemoteLock.LivingRoom.Release();
+                await irRemoteChannel.LivingRoomChannel.Writer.WriteAsync(LivingRoomRemoteCommand.Dyson);
             });
 
         _presence.StateChanges()

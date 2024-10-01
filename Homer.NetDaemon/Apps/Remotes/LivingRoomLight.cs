@@ -9,7 +9,7 @@ namespace Homer.NetDaemon.Apps.Remotes;
 public class LivingRoomLight
 {
     public LivingRoomLight(
-        IrRemoteLock irRemoteLock,
+        IrRemoteChannel irRemoteChannel,
         InputBooleanEntities inputBooleanEntities,
         RemoteEntities remoteEntities
     )
@@ -21,11 +21,7 @@ public class LivingRoomLight
             .SubscribeAsync(async _ =>
             {
                 eventsProcessedMeter.Add(1);
-                await irRemoteLock.LivingRoom.WaitAsync();
-                await Task.Delay(1000);
-                remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK");
-                await Task.Delay(1000);
-                irRemoteLock.LivingRoom.Release();
+                await irRemoteChannel.LivingRoomChannel.Writer.WriteAsync(LivingRoomRemoteCommand.Light);
             });
     }
 }

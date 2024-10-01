@@ -1,5 +1,4 @@
 using Homer.NetDaemon.Entities;
-using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;

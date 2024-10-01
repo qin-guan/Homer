@@ -40,7 +40,8 @@ builder.Services.AddRefitClient<IDaikinApi>()
     .ConfigureHttpClient((sp, client) =>
     {
         client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443");
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
+        client.DefaultRequestHeaders.Add("Authorization",
+            $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
     });
 
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
@@ -55,7 +56,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IrRemoteLock>();
+builder.Services.AddSingleton<IrRemoteChannel>();
 
 var app = builder.Build();
 
@@ -96,9 +97,10 @@ app.MapGet("/gc", () =>
     };
 });
 
-app.MapPost("/contact/qg", ([FromQuery] string content, NotifyServices notifyServices) =>
-{
-    notifyServices.MobileAppQinsIphone(content, "Message from the internet");
-});
+app.MapPost("/contact/qg",
+    ([FromQuery] string content, NotifyServices notifyServices) =>
+    {
+        notifyServices.MobileAppQinsIphone(content, "Message from the internet");
+    });
 
 app.Run();
