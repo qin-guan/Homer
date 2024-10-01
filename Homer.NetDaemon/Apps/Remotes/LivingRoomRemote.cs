@@ -8,35 +8,38 @@ public class LivingRoomRemote(IrRemoteChannel irRemoteChannel, RemoteEntities re
 {
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        while (await irRemoteChannel.LivingRoomChannel.Reader.WaitToReadAsync(cancellationToken))
+        _ = Task.Run(async () =>
         {
-            while (irRemoteChannel.LivingRoomChannel.Reader.TryRead(out var item))
+            while (await irRemoteChannel.LivingRoomChannel.Reader.WaitToReadAsync(cancellationToken))
             {
-                switch (item)
+                while (irRemoteChannel.LivingRoomChannel.Reader.TryRead(out var item))
                 {
-                    case LivingRoomRemoteCommand.Fan:
+                    switch (item)
                     {
-                        remoteEntities.LivingRoomRemote.SendCommand("Power", "Living Room KDK");
-                        break;
+                        case LivingRoomRemoteCommand.Fan:
+                        {
+                            remoteEntities.LivingRoomRemote.SendCommand("Power", "Living Room KDK");
+                            break;
+                        }
+                        case LivingRoomRemoteCommand.Light:
+                        {
+                            remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK");
+                            break;
+                        }
+                        case LivingRoomRemoteCommand.Dyson:
+                        {
+                            remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
+                            break;
+                        }
+                        default:
+                        {
+                            throw new Exception("Unhandled command.");
+                        }
                     }
-                    case LivingRoomRemoteCommand.Light:
-                    {
-                        remoteEntities.LivingRoomRemote.SendCommand("Light Power", "Living Room KDK");
-                        break;
-                    }
-                    case LivingRoomRemoteCommand.Dyson:
-                    {
-                        remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
-                        break;
-                    }
-                    default:
-                    {
-                        throw new Exception("Unhandled command.");
-                    }
-                }
 
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                }
             }
-        }
+        }, cancellationToken);
     }
 }
