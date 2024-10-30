@@ -10,6 +10,7 @@ public abstract class Occupancy
     private readonly InputBooleanEntity _presence;
     private readonly List<BinarySensorEntity> _contactSensors;
     private readonly List<BinarySensorEntity> _motionSensors;
+    private readonly List<BinarySensorEntity> _triggerSensors;
     private readonly TimeSpan _delay = TimeSpan.FromSeconds(12);
 
     private bool DoorClosed => _contactSensors.All(e => e.IsOff());
@@ -31,14 +32,14 @@ public abstract class Occupancy
                 (int)_lastPresence.Attributes.Second.Value);
         }
     }
-
+    
     public Occupancy(
         InputDatetimeEntity lastPresence,
         InputBooleanEntity presence,
         List<BinarySensorEntity> contactSensors,
-        List<BinarySensorEntity> motionSensors,
+        List<BinarySensorEntity> motionAndTriggerSensors,
         TimeSpan delay
-    ) : this(lastPresence, presence, contactSensors, motionSensors)
+    ) : this(lastPresence, presence, contactSensors, motionAndTriggerSensors, motionAndTriggerSensors)
     {
         _delay = delay;
     }
@@ -47,22 +48,37 @@ public abstract class Occupancy
         InputDatetimeEntity lastPresence,
         InputBooleanEntity presence,
         List<BinarySensorEntity> contactSensors,
+        List<BinarySensorEntity> triggerSensors,
+        List<BinarySensorEntity> motionSensors,
+        TimeSpan delay
+    ) : this(lastPresence, presence, contactSensors, motionSensors, triggerSensors)
+    {
+        _delay = delay;
+    }
+
+    public Occupancy(
+        InputDatetimeEntity lastPresence,
+        InputBooleanEntity presence,
+        List<BinarySensorEntity> contactSensors,
+        List<BinarySensorEntity> triggerSensors,
         List<BinarySensorEntity> motionSensors
     )
     {
         _lastPresence = lastPresence;
         _presence = presence;
         _contactSensors = contactSensors;
+        _triggerSensors = triggerSensors;
         _motionSensors = motionSensors;
 
-        var contactSensorObservables = _contactSensors.Select(e => e.StateChanges()).Merge();
+        var contactSensorObservables = _contactSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
+        var triggerSensorObservables = _triggerSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
         var motionSensorObservables = _motionSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         contactSensorObservables
             .Where(e => e.New.IsOff())
             .Subscribe(e => { Logic(OccupancyInvocationSource.DoorOpened); });
 
-        motionSensorObservables
+        triggerSensorObservables
             .Where(e => e.New.IsOn())
             .Subscribe(_ =>
             {
@@ -71,6 +87,13 @@ public abstract class Occupancy
                     _presence.TurnOn();
                 }
 
+                _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
+            });
+
+        motionSensorObservables
+            .Where(e => e.New.IsOn())
+            .Subscribe(_ =>
+            {
                 _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
             });
 
