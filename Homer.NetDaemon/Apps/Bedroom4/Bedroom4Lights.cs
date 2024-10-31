@@ -51,7 +51,6 @@ public class Bedroom4Lights : Occupancy
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
-            .WhenStateIsFor(e => e.IsOn(), TimeSpan.FromSeconds(3), scheduler)
             .SubscribeAsync(async _ =>
             {
                 switchEntities.Bedroom4Lights.TurnOn();
