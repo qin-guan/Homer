@@ -32,7 +32,7 @@ public class Bedroom4Lights : Occupancy
         inputBooleanEntities.Bedroom4Presence,
         [binarySensorEntities.Bedroom4DoorContact],
         [binarySensorEntities.ScreekHumanSensor2a06ead0Zone2Presence],
-        [binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence],
+        [binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence, binarySensorEntities.ScreekHumanSensor2a06ead0Zone2Presence],
         TimeSpan.FromSeconds(2)
     )
     {
