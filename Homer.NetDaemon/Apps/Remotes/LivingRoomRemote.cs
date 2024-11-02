@@ -37,7 +37,7 @@ public class LivingRoomRemote(IrRemoteChannel irRemoteChannel, RemoteEntities re
                         }
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(4), cancellationToken);
                 }
             }
         }, cancellationToken);
