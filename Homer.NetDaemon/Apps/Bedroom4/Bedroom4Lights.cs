@@ -26,7 +26,8 @@ public class Bedroom4Lights : Occupancy
         SwitchEntities switchEntities,
         RemoteEntities remoteEntities,
         ClimateEntities climateEntities,
-        FanEntities fanEntities
+        FanEntities fanEntities,
+        EventEntities eventEntities
     ) : base(
         inputDatetimeEntities.Bedroom4LastPresence,
         inputBooleanEntities.Bedroom4Presence,
@@ -38,7 +39,7 @@ public class Bedroom4Lights : Occupancy
     {
         _sensorEntities = sensorEntities;
 
-        sensorEntities.Bedroom4LightsAction.StateChanges()
+        eventEntities.Bedroom4LightsAction.StateChanges()
             .SubscribeAsync(async e =>
             {
                 if (switchEntities.Bedroom4Lights.IsOff())

@@ -12,13 +12,14 @@ public class LivingRoomLightSwitch
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
         RemoteEntities remoteEntities,
-        InputBooleanEntities inputBooleanEntities
+        InputBooleanEntities inputBooleanEntities,
+        EventEntities eventEntities
     )
     {
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light_switch.events_processed");
 
-        sensorEntities.LivingRoomLightsAction.StateChanges()
+        eventEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
@@ -26,7 +27,7 @@ public class LivingRoomLightSwitch
             })
             .Subscribe(e => { inputBooleanEntities.LivingRoomFanLights.Toggle(); });
 
-        sensorEntities.LivingRoomLightsAction.StateChanges()
+        eventEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);

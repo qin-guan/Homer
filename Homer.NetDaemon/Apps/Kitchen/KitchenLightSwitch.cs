@@ -11,13 +11,14 @@ public class KitchenLightSwitch
     public KitchenLightSwitch(
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
-        RemoteEntities remoteEntities
+        RemoteEntities remoteEntities,
+        EventEntities eventEntities
     )
     {
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.kitchen_light_switch.events_processed");
 
-        sensorEntities.KitchenLightsAction.StateChanges()
+        eventEntities.KitchenLightsAction.StateChanges()
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
@@ -25,7 +26,7 @@ public class KitchenLightSwitch
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
 
-        sensorEntities.KitchenLightsAction.StateChanges()
+        eventEntities.KitchenLightsAction.StateChanges()
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);

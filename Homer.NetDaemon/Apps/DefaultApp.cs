@@ -1,6 +1,8 @@
+using System.Reactive.Concurrency;
 using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps;
@@ -8,7 +10,7 @@ namespace Homer.NetDaemon.Apps;
 [NetDaemonApp]
 public class DefaultApp
 {
-    public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext)
+    public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext, IScheduler scheduler)
     {
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.homeassistant.events_processed");
