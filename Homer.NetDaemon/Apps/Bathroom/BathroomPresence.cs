@@ -54,7 +54,7 @@ public class BathroomPresence : Occupancy
         inputBooleanEntities.BathroomPresence,
         [contactSensors.BathroomDoorContact],
         [motionSensors.BathroomTuyaPresencePresence, motionSensors.BathroomSinkMotionOccupancy],
-        TimeSpan.FromSeconds(12)
+        TimeSpan.FromSeconds(30)
     )
     {
         _switchEntities = switchEntities;
