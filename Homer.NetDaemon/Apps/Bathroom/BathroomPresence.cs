@@ -61,8 +61,8 @@ public class BathroomPresence : Occupancy
 
         _lightSensors =
         [
-            sensorEntities.BathroomSinkMotionIlluminanceLux,
-            sensorEntities.BathroomDoorMotionIlluminanceLux
+            sensorEntities.BathroomSinkMotionIlluminance,
+            sensorEntities.BathroomDoorMotionIlluminance
         ];
 
         inputBooleanEntities.BathroomPresence.StateChanges()
