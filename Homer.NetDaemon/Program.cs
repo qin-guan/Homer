@@ -33,7 +33,7 @@ builder.Services.AddOptions<DaikinOptions>()
 
 builder.Services.AddOptions<KdkOptions>()
     .Bind(builder.Configuration.GetSection("Kdk"))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.BearerToken))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.RefreshToken))
     .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey))
     .ValidateOnStart();
 
@@ -52,15 +52,17 @@ builder.Services.AddRefitClient<IDaikinApi>()
             $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
     });
 
+builder.Services.AddRefitClient<IKdkAuthApi>()
+    .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://authglb.digital.panasonic.com"); });
+
 builder.Services.AddRefitClient<IKdkApi>()
     .ConfigureHttpClient((sp, client) =>
     {
         client.BaseAddress = new Uri("https://prod.mycfan.pgtls.net");
-        client.DefaultRequestHeaders.Add("Authorization",
-            $"{sp.GetRequiredService<IOptions<KdkOptions>>().Value.BearerToken}");
-        client.DefaultRequestHeaders.Add("X-Api-Key",
-            $"{sp.GetRequiredService<IOptions<KdkOptions>>().Value.ApiKey}");
+        client.DefaultRequestHeaders.Add("User-Agent", "Ceiling Fan/1.1.0 (iPhone; iOS 18.0.1; Scale/3.00)");
+        client.DefaultRequestHeaders.Add("X-Api-Key", sp.GetRequiredService<IOptions<KdkOptions>>().Value.ApiKey);
     })
+    .AddHttpMessageHandler<KdkAuthorizationDelegatingHandler>()
     .AddHttpMessageHandler<KdkTimestampDelegatingHandler>();
 
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
@@ -77,6 +79,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
+builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 
 var app = builder.Build();
 
