@@ -1,8 +1,10 @@
 using System.Reflection;
 using Homer.NetDaemon.Apps.Bathroom;
+using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
+using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NetDaemon.AppModel;
@@ -29,6 +31,12 @@ builder.Services.AddOptions<DaikinOptions>()
     .Validate(options => !string.IsNullOrWhiteSpace(options.Token))
     .ValidateOnStart();
 
+builder.Services.AddOptions<KdkOptions>()
+    .Bind(builder.Configuration.GetSection("Kdk"))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.BearerToken))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey))
+    .ValidateOnStart();
+
 builder.Services.AddSerilog((services, lc) => lc
     .ReadFrom.Configuration(builder.Configuration)
     .ReadFrom.Services(services)
@@ -44,6 +52,17 @@ builder.Services.AddRefitClient<IDaikinApi>()
             $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
     });
 
+builder.Services.AddRefitClient<IKdkApi>()
+    .ConfigureHttpClient((sp, client) =>
+    {
+        client.BaseAddress = new Uri("https://prod.mycfan.pgtls.net");
+        client.DefaultRequestHeaders.Add("Authorization",
+            $"{sp.GetRequiredService<IOptions<KdkOptions>>().Value.BearerToken}");
+        client.DefaultRequestHeaders.Add("X-Api-Key",
+            $"{sp.GetRequiredService<IOptions<KdkOptions>>().Value.ApiKey}");
+    })
+    .AddHttpMessageHandler<KdkTimestampDelegatingHandler>();
+
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddNetDaemonStateManager();
 builder.Services.AddNetDaemonScheduler();
@@ -57,6 +76,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
+builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 
 var app = builder.Build();
 
