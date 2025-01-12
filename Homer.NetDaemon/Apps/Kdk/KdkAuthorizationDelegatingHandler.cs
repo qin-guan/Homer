@@ -8,7 +8,9 @@ namespace Homer.NetDaemon.Apps.Kdk;
 public class KdkAuthorizationDelegatingHandler(
     IKdkAuthApi authApi,
     NotifyServices notifyServices,
-    IOptions<KdkOptions> kdkOptions) : DelegatingHandler
+    InputTextEntities inputTextEntities,
+    IOptions<KdkOptions> kdkOptions
+) : DelegatingHandler
 {
     private DateTime _lastTokenRefresh = DateTime.MinValue;
 
@@ -17,7 +19,9 @@ public class KdkAuthorizationDelegatingHandler(
     {
         if (kdkOptions.Value.BearerToken is null || (DateTime.Now - _lastTokenRefresh).TotalHours >= 12)
         {
-            var res = await authApi.TokenAsync(new KdkAuthPostTokenRequest(kdkOptions.Value.RefreshToken));
+            var res = await authApi.TokenAsync(
+                new KdkAuthPostTokenRequest(inputTextEntities.KdkFanRefreshToken.State ?? kdkOptions.Value.RefreshToken)
+            );
 
             kdkOptions.Value.BearerToken = res.AccessToken;
             _lastTokenRefresh = DateTime.Now;
@@ -27,6 +31,7 @@ public class KdkAuthorizationDelegatingHandler(
             if (res.RefreshToken is not null)
             {
                 kdkOptions.Value.RefreshToken = res.RefreshToken;
+                inputTextEntities.KdkFanRefreshToken.SetValue(res.RefreshToken);
                 notifyServices.PersistentNotification(res.RefreshToken, "New KDK Refresh Token");
             }
         }
