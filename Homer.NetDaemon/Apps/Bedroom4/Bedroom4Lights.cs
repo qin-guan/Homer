@@ -21,6 +21,7 @@ public class Bedroom4Lights : Occupancy
         INetDaemonScheduler netDaemonScheduler,
         InputDatetimeEntities inputDatetimeEntities,
         InputBooleanEntities inputBooleanEntities,
+        InputNumberEntities inputNumberEntities,
         BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
@@ -33,7 +34,10 @@ public class Bedroom4Lights : Occupancy
         inputBooleanEntities.Bedroom4Presence,
         [binarySensorEntities.Bedroom4DoorContact],
         [binarySensorEntities.ScreekHumanSensor2a06ead0Zone2Presence],
-        [binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence, binarySensorEntities.ScreekHumanSensor2a06ead0Zone2Presence],
+        [
+            binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence,
+            binarySensorEntities.ScreekHumanSensor2a06ead0Zone2Presence
+        ],
         TimeSpan.FromSeconds(2)
     )
     {
@@ -64,7 +68,7 @@ public class Bedroom4Lights : Occupancy
                     inputBooleanEntities.Bedroom4Light.TurnOn();
                 }
 
-                fanEntities.Bedroom4Fan.TurnOn();
+                inputBooleanEntities.Bedroom4Fan.TurnOn();
             });
 
         climateEntities.Daikinap97235.StateChanges()
@@ -73,17 +77,10 @@ public class Bedroom4Lights : Occupancy
             {
                 if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
 
-                fanEntities.Bedroom4Fan.SetPercentage(
-                    (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16) * 5
-                );
+                inputNumberEntities.Bedroom4FanSpeed.SetValue(16 * 5);
 
                 netDaemonScheduler.RunIn(TimeSpan.FromMinutes(5),
-                    () =>
-                    {
-                        fanEntities.Bedroom4Fan.SetPercentage(
-                            (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16)
-                        );
-                    });
+                    () => { inputNumberEntities.Bedroom4FanSpeed.SetValue(16); });
             });
 
         climateEntities.Daikinap97235.StateChanges()
@@ -95,8 +92,8 @@ public class Bedroom4Lights : Occupancy
                 netDaemonScheduler.RunIn(TimeSpan.FromHours(2),
                     () =>
                     {
-                        fanEntities.Bedroom4Fan.SetPercentage(
-                            (long)Math.Floor(fanEntities.Bedroom4Fan.Attributes?.PercentageStep ?? 16) * 2
+                        inputNumberEntities.Bedroom4FanSpeed.SetValue(
+                            16 * 2
                         );
                     });
             });
@@ -106,7 +103,7 @@ public class Bedroom4Lights : Occupancy
             .SubscribeAsync(async _ =>
             {
                 inputBooleanEntities.Bedroom4Light.TurnOff();
-                fanEntities.Bedroom4Fan.TurnOff();
+                inputBooleanEntities.Bedroom4Fan.TurnOff();
                 fanEntities.MiSmartStandingFan2Lite.TurnOff();
 
                 await Task.Delay(3000);
