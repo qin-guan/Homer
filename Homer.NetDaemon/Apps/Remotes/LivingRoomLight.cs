@@ -7,7 +7,6 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Remotes;
 
-[Focus]
 [NetDaemonApp]
 public class LivingRoomLight
 {

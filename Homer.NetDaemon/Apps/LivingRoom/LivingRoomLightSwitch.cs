@@ -5,6 +5,7 @@ using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
+[Focus]
 [NetDaemonApp]
 public class LivingRoomLightSwitch
 {
@@ -23,7 +24,7 @@ public class LivingRoomLightSwitch
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
-                return e.Entity.State == "single_center";
+                return e.Entity.Attributes?.EventType == "single_center";
             })
             .Subscribe(e => { inputBooleanEntities.LivingRoomFanLights.Toggle(); });
 
@@ -31,7 +32,7 @@ public class LivingRoomLightSwitch
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
-                return e.Entity.State == "double_center";
+                return e.Entity.Attributes?.EventType == "double_center";
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
     }

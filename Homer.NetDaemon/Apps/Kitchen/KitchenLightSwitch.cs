@@ -22,7 +22,7 @@ public class KitchenLightSwitch
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
-                return e.Entity.State == "double_left";
+                return e.Entity.Attributes?.EventType == "double_left";
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
 
@@ -30,7 +30,7 @@ public class KitchenLightSwitch
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
-                return e.Entity.State == "single_left";
+                return e.Entity.Attributes?.EventType == "single_left";
             })
             .Subscribe(e => { switchEntities.KitchenLightsLeft.Toggle(); });
     }
