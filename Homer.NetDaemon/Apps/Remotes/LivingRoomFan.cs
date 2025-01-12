@@ -30,8 +30,8 @@ public class LivingRoomFan
                         KdkAppliances.LivingRoomFan,
                         inputBooleanEntities.LivingRoomFanLights.State switch
                         {
-                            "on" => e.New.IsOff() ? KdkPackets.TurnOff : KdkPackets.TurnOnWhileLightOn,
-                            "off" => e.New.IsOff() ? KdkPackets.TurnOff : KdkPackets.TurnOnWhileLightOff,
+                            "on" => e.New.IsOff() ? KdkPackets.TurnOffWhileLightOn : KdkPackets.TurnOnWhileLightOn,
+                            "off" => e.New.IsOff() ? KdkPackets.TurnOffWhileLightOff : KdkPackets.TurnOnWhileLightOff,
                             _ => throw new ArgumentOutOfRangeException(
                                 $"Invalid Living Room Fan Lights State {inputBooleanEntities.LivingRoomFanLights.State}"
                             )
