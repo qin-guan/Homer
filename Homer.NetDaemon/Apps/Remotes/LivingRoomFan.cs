@@ -7,7 +7,7 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Remotes;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class LivingRoomFan
 {
@@ -28,7 +28,14 @@ public class LivingRoomFan
                 await kdkApi.SetDeviceControlsAsync(
                     new KdkApiPostDeviceControlsRequest(
                         KdkAppliances.LivingRoomFan,
-                        e.New.IsOff() ? KdkPackets.TurnOff : KdkPackets.TurnOn
+                        inputBooleanEntities.LivingRoomFanLights.State switch
+                        {
+                            "on" => e.New.IsOff() ? KdkPackets.TurnOff : KdkPackets.TurnOnWhileLightOn,
+                            "off" => e.New.IsOff() ? KdkPackets.TurnOff : KdkPackets.TurnOnWhileLightOff,
+                            _ => throw new ArgumentOutOfRangeException(
+                                $"Invalid Living Room Fan Lights State {inputBooleanEntities.LivingRoomFanLights.State}"
+                            )
+                        }
                     )
                 );
             });
