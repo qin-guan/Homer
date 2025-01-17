@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
         <PackageReference Include="NetDaemon.AppModel" Version="24.52.0" />
         <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="24.52.0" />
         <PackageReference Include="NetDaemon.Client" Version="24.52.0" />
