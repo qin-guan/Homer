@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using Homer.NetDaemon.Apps.Daikin;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Apps.Remotes;
@@ -28,7 +29,12 @@ builder.Host.UseNetDaemonMqttEntityManagement();
 
 builder.Services.AddOptions<DaikinOptions>()
     .Bind(builder.Configuration.GetSection("Daikin"))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password))
+    .Validate(options =>
+    {
+        // !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password));
+        Console.WriteLine(JsonSerializer.Serialize(options));
+        return true;
+    })
     .ValidateOnStart();
 
 builder.Services.AddOptions<KdkOptions>()
@@ -45,10 +51,7 @@ builder.Services.AddSerilog((services, lc) => lc
 );
 
 builder.Services.AddRefitClient<IDaikinApi>()
-    .ConfigureHttpClient((sp, client) =>
-    {
-        client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443");
-    })
+    .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443"); })
     .AddHttpMessageHandler<DaikinAuthorizationDelegatingHandler>();
 
 builder.Services.AddRefitClient<IKdkAuthApi>()
