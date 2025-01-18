@@ -29,12 +29,7 @@ builder.Host.UseNetDaemonMqttEntityManagement();
 
 builder.Services.AddOptions<DaikinOptions>()
     .Bind(builder.Configuration.GetSection("Daikin"))
-    .Validate(options =>
-    {
-        // !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password));
-        Console.WriteLine(JsonSerializer.Serialize(options));
-        return true;
-    })
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password))
     .ValidateOnStart();
 
 builder.Services.AddOptions<KdkOptions>()
