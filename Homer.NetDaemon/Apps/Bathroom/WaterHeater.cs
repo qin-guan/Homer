@@ -1,16 +1,18 @@
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Apps.Daikin;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps.Bathroom;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class WaterHeater
 {
-    public WaterHeater(IDaikinApi daikinApi, ClimateEntities climateEntities)
+    public WaterHeater(IDaikinApi daikinApi, ClimateEntities climateEntities, IScheduler scheduler)
     {
         climateEntities.WaterHeater.StateAllChanges()
             .Where(e => e.New?.State == "heat")
@@ -44,5 +46,15 @@ public class WaterHeater
                     )
                 ));
             });
+
+        scheduler.ScheduleCron("0 23 * * *", () =>
+        {
+            climateEntities.WaterHeater.SetHvacMode("off");
+        });
+        
+        scheduler.ScheduleCron("0 18 * * *", () =>
+        {
+            climateEntities.WaterHeater.SetHvacMode("heat");
+        });
     }
 }
