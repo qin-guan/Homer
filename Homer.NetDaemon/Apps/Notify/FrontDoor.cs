@@ -1,7 +1,6 @@
 using System.Reactive.Concurrency;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
-using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Notify;

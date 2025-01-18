@@ -2,7 +2,6 @@ using System.Reactive.Concurrency;
 using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps;

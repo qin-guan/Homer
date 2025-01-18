@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;

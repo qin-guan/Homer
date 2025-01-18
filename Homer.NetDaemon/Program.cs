@@ -1,5 +1,5 @@
 using System.Reflection;
-using Homer.NetDaemon.Apps.Bathroom;
+using Homer.NetDaemon.Apps.Daikin;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Entities;
@@ -28,7 +28,7 @@ builder.Host.UseNetDaemonMqttEntityManagement();
 
 builder.Services.AddOptions<DaikinOptions>()
     .Bind(builder.Configuration.GetSection("Daikin"))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.Token))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password))
     .ValidateOnStart();
 
 builder.Services.AddOptions<KdkOptions>()
@@ -48,9 +48,8 @@ builder.Services.AddRefitClient<IDaikinApi>()
     .ConfigureHttpClient((sp, client) =>
     {
         client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443");
-        client.DefaultRequestHeaders.Add("Authorization",
-            $"Bearer {sp.GetRequiredService<IOptions<DaikinOptions>>().Value.Token}");
-    });
+    })
+    .AddHttpMessageHandler<DaikinAuthorizationDelegatingHandler>();
 
 builder.Services.AddRefitClient<IKdkAuthApi>()
     .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://authglb.digital.panasonic.com"); });
@@ -78,6 +77,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
+builder.Services.AddTransient<DaikinAuthorizationDelegatingHandler>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 

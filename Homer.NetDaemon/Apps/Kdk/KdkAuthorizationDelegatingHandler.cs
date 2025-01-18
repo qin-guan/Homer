@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
 using Microsoft.Extensions.Options;

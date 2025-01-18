@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Refit;
 
 namespace Homer.NetDaemon.Apps.Kdk;
 

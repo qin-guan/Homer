@@ -5,7 +5,7 @@ using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class LivingRoomLightSwitch
 {

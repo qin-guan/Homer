@@ -1,4 +1,4 @@
-namespace Homer.NetDaemon.Apps.Bathroom;
+namespace Homer.NetDaemon.Apps.Daikin;
 
 public record DaikinApiGetDevicesResponse(
     int Code,
