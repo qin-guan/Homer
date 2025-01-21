@@ -1,0 +1,26 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@using Homer.NetDaemon.Services
+@inject LivingRoomPresetService LivingRoomPresetService
+
+<PageTitle>Home</PageTitle>
+
+<div class="d-flex align-items-center justify-content-center" style="height: 100%;">
+    <label class="form-check form-switch d-flex align-items-center gap-3">
+        <InputCheckbox class="form-check-input" @bind-Value="LivingRoomPresetService.LaundryMode"></InputCheckbox>
+        
+        <span class="form-check-label">
+            晾衣模式
+        </span>
+    </label>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+}

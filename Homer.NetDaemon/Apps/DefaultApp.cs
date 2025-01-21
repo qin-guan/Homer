@@ -6,6 +6,7 @@ using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps;
 
+[Focus]
 [NetDaemonApp]
 public class DefaultApp
 {

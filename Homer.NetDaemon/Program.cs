@@ -3,8 +3,10 @@ using System.Text.Json;
 using Homer.NetDaemon.Apps.Daikin;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Apps.Remotes;
+using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
+using Homer.NetDaemon.Services;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -75,13 +77,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
+builder.Services.AddSingleton<LivingRoomPresetService>();
 builder.Services.AddTransient<DaikinAuthorizationDelegatingHandler>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 
-var app = builder.Build();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
 
-app.UseSerilogRequestLogging();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -90,9 +96,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseAntiforgery();
 
 app.MapDefaultEndpoints();
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 
