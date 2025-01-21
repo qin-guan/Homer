@@ -76,7 +76,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
-builder.Services.AddSingleton<LivingRoomPresetService>();
 builder.Services.AddTransient<DaikinAuthorizationDelegatingHandler>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
