@@ -12,13 +12,14 @@ public class LivingRoomFan : IAsyncInitializable
 {
     private readonly ILogger<LivingRoomFan> _logger;
 
-    private readonly List<BinarySensorEntity> _triggerEntities;
     private readonly List<BinarySensorEntity> _presenceEntities;
     private readonly InputBooleanEntity _fan;
+    private readonly InputBooleanEntity _laundryMode;
     private readonly NumericSensorEntity _temperatureSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
     private bool TooCold => _temperatureSensor.State < 26;
+    private bool ManualOverride => _laundryMode.IsOn();
 
     public LivingRoomFan(
         ILogger<LivingRoomFan> logger,
@@ -34,8 +35,9 @@ public class LivingRoomFan : IAsyncInitializable
 
         _logger = logger;
 
-        _triggerEntities =
-        [
+        _laundryMode = inputBooleanEntities.LiangYiMoShi;
+
+        List<BinarySensorEntity> triggerEntities = [
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor2,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
         ];
@@ -49,10 +51,11 @@ public class LivingRoomFan : IAsyncInitializable
         _fan = inputBooleanEntities.LivingRoomFan;
         _temperatureSensor = sensorEntities.Daikinap16703InsideTemperature;
 
-        var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
+        var triggerObservables = triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge();
 
         _temperatureSensor.StateChanges()
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
@@ -61,13 +64,14 @@ public class LivingRoomFan : IAsyncInitializable
             .Subscribe(_ => { _fan.TurnOff(); });
 
         triggerObservables
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
-                return _triggerEntities.Any(e => e.IsOn());
+                return triggerEntities.Any(e => e.IsOn());
             })
             .Throttle(TimeSpan.FromSeconds(10), scheduler)
-            .Where(_ => _triggerEntities.Any(e => e.IsOn()))
+            .Where(_ => triggerEntities.Any(e => e.IsOn()))
             .Subscribe(_ =>
             {
                 if (TooCold) return;
@@ -75,6 +79,7 @@ public class LivingRoomFan : IAsyncInitializable
             });
 
         presenceObservables
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);

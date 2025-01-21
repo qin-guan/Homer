@@ -15,12 +15,14 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly List<BinarySensorEntity> _triggerEntities;
     private readonly List<BinarySensorEntity> _presenceEntities;
     private readonly InputBooleanEntity _light;
+    private readonly InputBooleanEntity _laundryMode;
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
     private bool WithinTooBrightRange => _lightSensor.State is > 50 and < 55;
     private bool TooBright => _lightSensor.State > 50;
     private bool TooDark => _lightSensor.State < 10;
+    private bool ManualOverride => _laundryMode.IsOn();
 
     public LivingRoomLight(
         ILogger<LivingRoomLight> logger,
@@ -35,6 +37,8 @@ public class LivingRoomLight : IAsyncInitializable
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light.events_processed");
 
         _logger = logger;
+
+        _laundryMode = inputBooleanEntities.LiangYiMoShi;
 
         _triggerEntities =
         [
@@ -63,6 +67,7 @@ public class LivingRoomLight : IAsyncInitializable
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
 
         _lightSensor.StateChanges()
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
@@ -73,6 +78,7 @@ public class LivingRoomLight : IAsyncInitializable
             .Subscribe(_ => { _light.TurnOff(); });
 
         _lightSensor.StateChanges()
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
@@ -83,6 +89,7 @@ public class LivingRoomLight : IAsyncInitializable
             .Subscribe(_ => { _light.TurnOn(); });
 
         triggerObservables
+            .Where(_ => !ManualOverride)
             .Where(e =>
             {
                 eventsProcessedMeter.Add(1);
@@ -94,6 +101,7 @@ public class LivingRoomLight : IAsyncInitializable
             });
 
         presenceObservables
+            .Where(_ => !ManualOverride)
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
