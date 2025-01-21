@@ -6,7 +6,6 @@ using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
-using Homer.NetDaemon.Services;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
