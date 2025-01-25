@@ -48,11 +48,12 @@ public class Bedroom4Lights : Occupancy
             {
                 if (switchEntities.Bedroom4Lights.IsOff())
                 {
-                    switchEntities.Bedroom4Lights.TurnOn();
-                    await Task.Delay(1000);
+                    inputBooleanEntities.Bedroom4Presence.TurnOn();
                 }
-
-                inputBooleanEntities.Bedroom4Light.TurnOn();
+                else
+                {
+                    inputBooleanEntities.Bedroom4Presence.TurnOff();
+                }
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
