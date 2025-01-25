@@ -52,7 +52,13 @@ public class Bedroom4Lights : Occupancy
                 }
                 else
                 {
-                    inputBooleanEntities.Bedroom4Presence.TurnOff();
+                    inputBooleanEntities.Bedroom4Light.TurnOff();
+                    inputBooleanEntities.Bedroom4Fan.TurnOff();
+                    fanEntities.MiSmartStandingFan2Lite.TurnOff();
+
+                    await Task.Delay(3000);
+
+                    switchEntities.Bedroom4Lights.TurnOff();
                 }
             });
 
