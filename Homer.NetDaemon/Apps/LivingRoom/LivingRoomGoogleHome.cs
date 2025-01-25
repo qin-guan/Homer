@@ -5,12 +5,13 @@ using NetDaemon.Extensions.Scheduler;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
+[Focus]
 [NetDaemonApp]
 public class LivingRoomGoogleHome
 {
     public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
     {
-        scheduler.ScheduleCron("0 * * * *", () =>
+        scheduler.SchedulePeriodic(TimeSpan.FromMinutes(5), () =>
         {
             mediaPlayerEntities.Home.PlayMedia(new MediaPlayerPlayMediaParameters
             {
