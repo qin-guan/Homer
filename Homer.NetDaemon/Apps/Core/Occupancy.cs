@@ -91,7 +91,7 @@ public abstract class Occupancy
             });
 
         motionSensorObservables
-            .Where(e => e.New.IsOn() || e.New.State == "Home")
+            .Where(e => e.New.IsOn() || e.New?.State == "Home")
             .Subscribe(_ =>
             {
                 _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
