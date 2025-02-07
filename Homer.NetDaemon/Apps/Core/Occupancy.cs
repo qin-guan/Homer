@@ -72,7 +72,7 @@ public abstract class Occupancy
 
         var contactSensorObservables = _contactSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
         var triggerSensorObservables = _triggerSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
-        var motionSensorObservables = _motionSensors.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
+        var motionSensorObservables = _motionSensors.Select(e => e.StateChanges()).Merge();
 
         contactSensorObservables
             .Where(e => e.New.IsOff())
