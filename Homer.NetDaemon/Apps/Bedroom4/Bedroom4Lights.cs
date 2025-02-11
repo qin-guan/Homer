@@ -13,8 +13,8 @@ namespace Homer.NetDaemon.Apps.Bedroom4;
 public class Bedroom4Lights : Occupancy
 {
     private readonly SensorEntities _sensorEntities;
-    public bool TooBright => _sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel.State > 30;
-    public bool IsMidnight => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(1, 0), new TimeOnly(6, 0));
+    public bool TooBright => _sensorEntities.ScreekHumanSensor2a06ead0Illuminance.State > 15;
+    public bool IsMidnight => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(2, 0), new TimeOnly(6, 0));
 
     public Bedroom4Lights(
         IScheduler scheduler,
