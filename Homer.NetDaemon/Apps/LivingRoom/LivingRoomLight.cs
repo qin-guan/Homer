@@ -53,7 +53,6 @@ public class LivingRoomLight : IAsyncInitializable
         _presenceEntities =
         [
             binarySensorEntities.ScreekHumanSensor2a872668AnyPresence,
-            binarySensorEntities.ScreekHumanSensor2aD15cf4AnyPresence,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor2,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor4,
