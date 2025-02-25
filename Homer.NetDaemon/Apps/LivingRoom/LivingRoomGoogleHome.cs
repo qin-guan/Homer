@@ -5,7 +5,7 @@ using NetDaemon.Extensions.Scheduler;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class LivingRoomGoogleHome
 {

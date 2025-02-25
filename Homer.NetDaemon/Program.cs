@@ -17,9 +17,9 @@ using NetDaemon.Runtime;
 using Refit;
 using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+// Log.Logger = new LoggerConfiguration()
+//     .WriteTo.Console()
+//     .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,22 +29,17 @@ builder.Host.UseNetDaemonTextToSpeech();
 builder.Host.UseNetDaemonMqttEntityManagement();
 
 builder.Services.AddOptions<DaikinOptions>()
-    .Bind(builder.Configuration.GetSection("Daikin"))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.Username) && !string.IsNullOrWhiteSpace(options.Password))
-    .ValidateOnStart();
+    .Bind(builder.Configuration.GetSection("Daikin"));
 
 builder.Services.AddOptions<KdkOptions>()
-    .Bind(builder.Configuration.GetSection("Kdk"))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.RefreshToken))
-    .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey))
-    .ValidateOnStart();
+    .Bind(builder.Configuration.GetSection("Kdk"));
 
-builder.Services.AddSerilog((services, lc) => lc
-    .ReadFrom.Configuration(builder.Configuration)
-    .ReadFrom.Services(services)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-);
+// builder.Services.AddSerilog((services, lc) => lc
+//     .ReadFrom.Configuration(builder.Configuration)
+//     .ReadFrom.Services(services)
+//     .Enrich.FromLogContext()
+//     .WriteTo.Console()
+// );
 
 builder.Services.AddRefitClient<IDaikinApi>()
     .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443"); })
@@ -99,7 +94,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

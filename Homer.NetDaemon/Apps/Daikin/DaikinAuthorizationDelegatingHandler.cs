@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 namespace Homer.NetDaemon.Apps.Daikin;
 
 public class DaikinAuthorizationDelegatingHandler(
+        ILogger<DaikinAuthorizationDelegatingHandler> logger,
     IOptions<DaikinOptions> daikinOptions,
     IHttpClientFactory httpClientFactory
 ) : DelegatingHandler
@@ -14,6 +15,11 @@ public class DaikinAuthorizationDelegatingHandler(
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(daikinOptions.Value.Username))
+        {
+            logger.LogWarning("Daikin username is not set. Daikin apps will not work.");
+        }
+
         if (_token is null)
         {
             using var client = httpClientFactory.CreateClient();

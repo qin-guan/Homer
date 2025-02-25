@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 namespace Homer.NetDaemon.Apps.Kdk;
 
 public class KdkAuthorizationDelegatingHandler(
+        ILogger<KdkAuthorizationDelegatingHandler> logger,
     IKdkAuthApi authApi,
     NotifyServices notifyServices,
     InputTextEntities inputTextEntities,
@@ -16,6 +17,11 @@ public class KdkAuthorizationDelegatingHandler(
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+                if (string.IsNullOrWhiteSpace(kdkOptions.Value.RefreshToken))
+        {
+            logger.LogWarning("Kdk refresh token is not set. KDK apps will not work.");
+        }
+
         if (kdkOptions.Value.BearerToken is null || (DateTime.Now - _lastTokenRefresh).TotalHours >= 12)
         {
             var res = await authApi.TokenAsync(
