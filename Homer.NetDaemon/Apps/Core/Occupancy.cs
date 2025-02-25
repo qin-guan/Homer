@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.HassModel.Entities;
@@ -6,6 +7,8 @@ namespace Homer.NetDaemon.Apps.Core;
 
 public abstract class Occupancy
 {
+    private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.Core.Occupancy");
+
     private readonly InputDatetimeEntity _lastPresence;
     private readonly InputBooleanEntity _presence;
     private readonly List<BinarySensorEntity> _contactSensors;
@@ -32,7 +35,7 @@ public abstract class Occupancy
                 (int)_lastPresence.Attributes.Second.Value);
         }
     }
-    
+
     public Occupancy(
         InputDatetimeEntity lastPresence,
         InputBooleanEntity presence,
@@ -76,12 +79,20 @@ public abstract class Occupancy
 
         contactSensorObservables
             .Where(e => e.New.IsOff())
-            .Subscribe(e => { Logic(OccupancyInvocationSource.DoorOpened); });
+            .Subscribe(e =>
+            {
+                using var activity = _activitySource.StartActivity("Occupancy Door Opened");
+                activity?.SetTag("EntityId", e.Entity.EntityId);
+                Logic(OccupancyInvocationSource.DoorOpened);
+            });
 
         triggerSensorObservables
             .Where(e => e.New.IsOn())
             .Subscribe(_ =>
             {
+                using var activity = _activitySource.StartActivity("Occupancy Presence Triggered");
+                activity?.SetTag("EntityId", _.Entity.EntityId);
+
                 if (_presence.IsOff())
                 {
                     _presence.TurnOn();
@@ -94,12 +105,21 @@ public abstract class Occupancy
             .Where(e => e.New.IsOn() || e.New?.State == "Home")
             .Subscribe(_ =>
             {
+                using var activity = _activitySource.StartActivity("Occupancy Motion Triggered");
+                activity?.SetTag("EntityId", _.Entity.EntityId);
+
                 _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
             });
 
         motionSensorObservables
             .Where(e => e.New.IsOff())
-            .Subscribe(_ => { Logic(OccupancyInvocationSource.MotionCleared); });
+            .Subscribe(_ =>
+            {
+                using var activity = _activitySource.StartActivity("Occupancy Motion Cleared");
+                activity?.SetTag("EntityId", _.Entity.EntityId);
+
+                Logic(OccupancyInvocationSource.MotionCleared);
+            });
     }
 
     private void Logic(OccupancyInvocationSource invocationSource)

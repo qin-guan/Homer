@@ -42,6 +42,7 @@ public class BathroomPresence : Occupancy
     }
 
     public BathroomPresence(
+            ILogger<BathroomPresence> logger,
         IScheduler scheduler,
         SensorEntities sensorEntities,
         InputDatetimeEntities inputDatetimeEntities,
@@ -69,10 +70,15 @@ public class BathroomPresence : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
-                if (TooBright) return;
+                if (TooBright)
+                {
+                    logger.LogInformation("Too bright, therefore skipping turning on lights");
+                    return;
+                }
 
                 foreach (var light in Switches)
                 {
+                    logger.LogInformation("Turning on light {EntityId}", light.EntityId);
                     light.TurnOn();
                 }
             });
@@ -81,6 +87,7 @@ public class BathroomPresence : Occupancy
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1.5), scheduler)
             .Subscribe(_ =>
             {
+                logger.LogInformation("Turning off lights");
                 switchEntities.BathroomLightsCenter.TurnOff();
                 switchEntities.BathroomLightsLeft.TurnOff();
                 switchEntities.BathroomLightsRight.TurnOff();

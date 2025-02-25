@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Apps.Core;
@@ -11,6 +12,7 @@ namespace Homer.NetDaemon.Apps.MasterBathroom;
 [NetDaemonApp]
 public class MasterBathroomPresence : Occupancy
 {
+    private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.MasterBathroom.MasterBathroomPresence");
     private readonly List<NumericSensorEntity> _lightSensors;
     private readonly SwitchEntities _switchEntities;
     private bool TooBright => _lightSensors.Min(e => e.State) > 100;
@@ -69,6 +71,8 @@ public class MasterBathroomPresence : Occupancy
             .Where(e => e.Entity.IsOn())
             .Subscribe(_ =>
             {
+                using var activity = _activitySource.StartActivity();
+
                 if (TooBright) return;
 
                 foreach (var light in Switches)
@@ -81,6 +85,8 @@ public class MasterBathroomPresence : Occupancy
             .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1.5), scheduler)
             .Subscribe(_ =>
             {
+                using var activity = _activitySource.StartActivity();
+
                 switchEntities.MasterBathroomLightsLeft.TurnOff();
                 switchEntities.MasterBathroomLightsCenter.TurnOff();
                 switchEntities.MasterBathroomLightsRight.TurnOff();

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
@@ -10,6 +11,8 @@ namespace Homer.NetDaemon.Apps;
 [NetDaemonApp]
 public class DefaultApp
 {
+    private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.DefaultApp");
+
     public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext, IScheduler scheduler)
     {
         var eventsProcessedMeter =
