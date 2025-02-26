@@ -8,6 +8,7 @@ namespace Homer.NetDaemon.Apps.Core;
 public abstract class Occupancy
 {
     private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.Core.Occupancy");
+    private Activity? _activity;
 
     private readonly InputDatetimeEntity _lastPresence;
     private readonly InputBooleanEntity _presence;
@@ -81,8 +82,6 @@ public abstract class Occupancy
             .Where(e => e.New.IsOff())
             .Subscribe(e =>
             {
-                using var activity = _activitySource.StartActivity("Occupancy Door Opened");
-                activity?.SetTag("EntityId", e.Entity.EntityId);
                 Logic(OccupancyInvocationSource.DoorOpened);
             });
 
@@ -90,11 +89,11 @@ public abstract class Occupancy
             .Where(e => e.New.IsOn())
             .Subscribe(_ =>
             {
-                using var activity = _activitySource.StartActivity("Occupancy Presence Triggered");
-                activity?.SetTag("EntityId", _.Entity.EntityId);
-
                 if (_presence.IsOff())
                 {
+                    _activity ??= _activitySource.StartActivity("Occupancy");
+                    _activity?.SetTag("EntityId", _.Entity.EntityId);
+
                     _presence.TurnOn();
                 }
 
@@ -105,9 +104,7 @@ public abstract class Occupancy
             .Where(e => e.New.IsOn() || e.New?.State == "Home")
             .Subscribe(_ =>
             {
-                using var activity = _activitySource.StartActivity("Occupancy Motion Triggered");
-                activity?.SetTag("EntityId", _.Entity.EntityId);
-
+                _activity?.AddEvent(new ActivityEvent("Occupancy motion triggered"));
                 _lastPresence.SetDatetime(null, null, null, DateTimeOffset.Now.ToUnixTimeSeconds());
             });
 
@@ -115,10 +112,10 @@ public abstract class Occupancy
             .Where(e => e.New.IsOff())
             .Subscribe(_ =>
             {
-                using var activity = _activitySource.StartActivity("Occupancy Motion Cleared");
-                activity?.SetTag("EntityId", _.Entity.EntityId);
-
+                _activity?.AddEvent(new ActivityEvent("Occupancy motion cleared"));
                 Logic(OccupancyInvocationSource.MotionCleared);
+                _activity?.Dispose();
+                _activity = null;
             });
     }
 
