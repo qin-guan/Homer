@@ -5,6 +5,7 @@ using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
+using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Bathroom;
 
@@ -12,7 +13,7 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class WaterHeater
 {
-    public WaterHeater(IDaikinApi daikinApi, ClimateEntities climateEntities, IScheduler scheduler)
+    public WaterHeater(IDaikinApi daikinApi, ClimateEntities climateEntities, SwitchEntities switchEntities, IScheduler scheduler)
     {
         climateEntities.WaterHeater.StateAllChanges()
             .Where(e => e.New?.State == "heat")
@@ -47,14 +48,17 @@ public class WaterHeater
                 ));
             });
 
-        scheduler.ScheduleCron("0 23 * * *", () =>
+        switchEntities.WaterHeaterSwitch.StateChanges()
+            .Where(s => s.New.IsOn())
+            .WhenStateIsFor(s => s.IsOn(), TimeSpan.FromMinutes(30), scheduler)
+            .Subscribe(_ =>
+            {
+                switchEntities.WaterHeaterSwitch.TurnOff();
+            });
+            
+        scheduler.ScheduleCron("0 19 * * *", () =>
         {
-            climateEntities.WaterHeater.SetHvacMode("off");
-        });
-        
-        scheduler.ScheduleCron("0 18 * * *", () =>
-        {
-            climateEntities.WaterHeater.SetHvacMode("heat");
+            switchEntities.WaterHeaterSwitch.TurnOn();
         });
     }
 }

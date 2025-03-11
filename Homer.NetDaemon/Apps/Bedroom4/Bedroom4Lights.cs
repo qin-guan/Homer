@@ -54,7 +54,6 @@ public class Bedroom4Lights : Occupancy
                 {
                     inputBooleanEntities.Bedroom4Light.TurnOff();
                     inputBooleanEntities.Bedroom4Fan.TurnOff();
-                    fanEntities.MiSmartStandingFan2Lite.TurnOff();
 
                     await Task.Delay(3000);
 
@@ -66,7 +65,6 @@ public class Bedroom4Lights : Occupancy
             .SubscribeAsync(async _ =>
             {
                 switchEntities.Bedroom4Lights.TurnOn();
-                fanEntities.MiSmartStandingFan2Lite.TurnOn();
 
                 await Task.Delay(1000);
 
@@ -111,7 +109,6 @@ public class Bedroom4Lights : Occupancy
             {
                 inputBooleanEntities.Bedroom4Light.TurnOff();
                 inputBooleanEntities.Bedroom4Fan.TurnOff();
-                fanEntities.MiSmartStandingFan2Lite.TurnOff();
 
                 await Task.Delay(3000);
 

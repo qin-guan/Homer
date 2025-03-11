@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.MqttEntityManager;
 using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps;
@@ -13,8 +14,20 @@ public class DefaultApp
 {
     private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.DefaultApp");
 
-    public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext, IScheduler scheduler)
+    public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext, IScheduler scheduler, IMqttEntityManager manager)
     {
+        manager.RemoveAsync("climate.water_heater_2");
+        manager.RemoveAsync("climate.10");
+        manager.RemoveAsync("binary_sensor.daikin");
+        manager.RemoveAsync("button.daikin");
+        manager.RemoveAsync("switch.daikin");
+        manager.RemoveAsync("water_heater.daikin");
+        manager.RemoveAsync("water_heater.daikin2");
+        manager.RemoveAsync("water_heater.10");
+        manager.RemoveAsync("sensor.water_heater");
+        manager.RemoveAsync("sensor.10");
+        manager.RemoveAsync("switch.10");
+        
         var eventsProcessedMeter =
             EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.homeassistant.events_processed");
 

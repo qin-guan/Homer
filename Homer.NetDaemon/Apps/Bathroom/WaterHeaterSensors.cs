@@ -24,21 +24,7 @@ public class WaterHeaterSensors(IDaikinApi daikinApi, IMqttEntityManager entityM
                     var actuatorId = $"switch.water_heater_{device.Id}_actuator";
 
                     await entityManager.RemoveAsync(sensorId);
-                    await entityManager.CreateAsync(sensorId, new EntityCreationOptions
-                    {
-                        Name = $"Water Heater {device.Id} Temperature",
-                        DeviceClass = "temperature"
-                    }, new
-                    {
-                        unit_of_measurement = "\u00b0C",
-                    });
-                    await entityManager.SetStateAsync(sensorId, device.Data.Temperature.ToString());
-
-                    await entityManager.CreateAsync(actuatorId, new EntityCreationOptions
-                    {
-                        Name = $"Water Heater {device.Id} Actuator"
-                    });
-                    await entityManager.SetStateAsync(actuatorId, "ON");
+                    await entityManager.RemoveAsync(actuatorId);
                 }
             }, cancellationToken);
         });
