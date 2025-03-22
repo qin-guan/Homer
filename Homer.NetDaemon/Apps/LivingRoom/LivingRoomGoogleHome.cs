@@ -13,16 +13,13 @@ public class LivingRoomGoogleHome
     {
         scheduler.SchedulePeriodic(TimeSpan.FromMinutes(5), () =>
         {
-            mediaPlayerEntities.Home.PlayMedia(new MediaPlayerPlayMediaParameters
+            mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
             {
                 MediaContentId = "google-home",
                 MediaContentType = "lovelace"
             });
         });
-        
-        scheduler.ScheduleCron("55 */2 * * *", () =>
-        {
-            mediaPlayerEntities.Home.MediaStop();
-        });
+
+        scheduler.ScheduleCron("55 */2 * * *", () => { mediaPlayerEntities.Nesthub1cef.MediaStop(); });
     }
 }
