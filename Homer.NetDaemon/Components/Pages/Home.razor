@@ -1,4 +1,48 @@
 ﻿@page "/"
+@using Homer.NetDaemon.Entities
+@using global::NetDaemon.HassModel.Entities
 @rendermode InteractiveServer
 
+@code {
+  [Inject]
+  private SwitchEntities switchEntities { get; set; } = null!;
+
+  private bool Enabled
+  {
+    get
+    {
+      return switchEntities.HallwayIkeaPlug.IsOn();
+    }
+    set
+    {
+      if (value)
+      {
+        switchEntities.HallwayIkeaPlug.TurnOn();
+      }
+      else
+      {
+        switchEntities.HallwayIkeaPlug.TurnOff();
+      }
+    }
+  }
+
+  void Toggle()
+  {
+    Enabled = !Enabled;
+    StateHasChanged();
+  }
+}
+
 <PageTitle>Home</PageTitle>
+
+<div>
+  <label class="row">
+    <span class="col">Push Notifications</span>
+    <span class="col-auto">
+      <label class="form-check form-check-single form-switch">
+        @Enabled
+        <input class="form-check-input" type="checkbox" @onclick="Toggle">
+      </label>
+    </span>
+  </label>
+</div>
