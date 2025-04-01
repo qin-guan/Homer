@@ -1,4 +1,5 @@
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel;
@@ -14,52 +15,24 @@ public class Offline
         SensorEntities sensorEntities,
         BinarySensorEntities binarySensorEntities,
         SwitchEntities switchEntities,
-        IScheduler scheduler
+        IScheduler scheduler,
+        IHaRegistry registry
     )
     {
-        var count = 0;
-
-        foreach (var entity in sensorEntities.EnumerateAll().FilterPrinter())
+        foreach (var device in registry.Devices)
         {
-            count++;
-            entity.StateAllChanges()
-                .WhenStateIsFor(e => e?.State is null or "unavailable", TimeSpan.FromMinutes(1), scheduler)
+            device.Entities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged()
+                .Where(e => e.New?.State is null or "unavailable")
                 .Subscribe(e =>
                 {
                     notifyServices.MobileAppQinsIphone(
-                        $"Sensor {entity.EntityId} is {e.New?.State}"
-                    );
-                });
-        }
-
-        foreach (var entity in binarySensorEntities.EnumerateAll().FilterPrinter())
-        {
-            count++;
-            entity.StateAllChanges()
-                .WhenStateIsFor(e => e?.State is null or "unavailable", TimeSpan.FromMinutes(1), scheduler)
-                .Subscribe(e =>
-                {
-                    notifyServices.MobileAppQinsIphone(
-                        $"Sensor {entity.EntityId} is {e.New?.State}"
-                    );
-                });
-        }
-
-        foreach (var entity in switchEntities.EnumerateAll().FilterPrinter())
-        {
-            count++;
-            entity.StateAllChanges()
-                .WhenStateIsFor(e => e?.State is null or "unavailable", TimeSpan.FromMinutes(1), scheduler)
-                .Subscribe(e =>
-                {
-                    notifyServices.MobileAppQinsIphone(
-                        $"Sensor {entity.EntityId} is {e.New?.State}"
+                        $"Device {device.Name} is offline"
                     );
                 });
         }
 
         notifyServices.MobileAppQinsIphone(
-            $"Registered {count} entities for offline detection."
+            $"Registered {registry.Devices.Count} devices for offline detection."
         );
     }
 }
