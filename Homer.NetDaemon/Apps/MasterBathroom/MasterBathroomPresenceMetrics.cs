@@ -31,7 +31,7 @@ public class MasterBathroomPresenceMetrics
         DateTime? timing = null;
 
         sensorPresence.StateChanges()
-            .Where(_ => sensorPresence.All(s => s.IsOff()) && actualPresence.IsOn())
+            .Where(_ => sensorPresence.All(s => s.IsOff()) && actualPresence.IsOn() && timing is null)
             .Subscribe(_ =>
             {
                 timing = DateTime.Now;
