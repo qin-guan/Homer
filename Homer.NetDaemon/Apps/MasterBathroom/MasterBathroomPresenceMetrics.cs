@@ -51,6 +51,7 @@ public class MasterBathroomPresenceMetrics
                 }
 
                 waterHeaterMinutesOn.Add((int)(DateTime.Now - timing).Value.TotalMinutes);
+                timing = null;
             });
     }
 }
