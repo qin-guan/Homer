@@ -17,6 +17,7 @@ public class Bedroom4Lights : Occupancy
     public bool IsMidnight => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(2, 0), new TimeOnly(6, 0));
 
     public Bedroom4Lights(
+        ILogger<Bedroom4Lights> logger,
         IScheduler scheduler,
         INetDaemonScheduler netDaemonScheduler,
         InputDatetimeEntities inputDatetimeEntities,
@@ -46,12 +47,16 @@ public class Bedroom4Lights : Occupancy
         eventEntities.Bedroom4LightsAction.StateChanges()
             .SubscribeAsync(async e =>
             {
+                logger.LogInformation("Bedroom 4 light action");
+
                 if (switchEntities.Bedroom4Lights.IsOff())
                 {
+                    logger.LogInformation("Bedroom 4 light action turning on presence");
                     inputBooleanEntities.Bedroom4Presence.TurnOn();
                 }
                 else
                 {
+                    logger.LogInformation("Bedroom 4 light action turning off presence");
                     inputBooleanEntities.Bedroom4Light.TurnOff();
                     inputBooleanEntities.Bedroom4Fan.TurnOff();
 
@@ -61,7 +66,7 @@ public class Bedroom4Lights : Occupancy
                 }
             });
 
-        inputBooleanEntities.Bedroom4Presence.StateChanges()
+        inputBooleanEntities.Bedroom4Presence.StateChanges().DistinctUntilChanged()
             .SubscribeAsync(async _ =>
             {
                 switchEntities.Bedroom4Lights.TurnOn();
