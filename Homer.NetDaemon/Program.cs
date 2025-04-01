@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Text.Json;
-using Homer.NetDaemon.Apps.Daikin;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Components;
@@ -15,7 +13,6 @@ using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
 using NetDaemon.Runtime;
 using Refit;
-using Serilog;
 
 // Log.Logger = new LoggerConfiguration()
 //     .WriteTo.Console()
@@ -40,10 +37,6 @@ builder.Services.AddOptions<KdkOptions>()
 //     .Enrich.FromLogContext()
 //     .WriteTo.Console()
 // );
-
-builder.Services.AddRefitClient<IDaikinApi>()
-    .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://appdaikin.ez1.cloud:8443"); })
-    .AddHttpMessageHandler<DaikinAuthorizationDelegatingHandler>();
 
 builder.Services.AddRefitClient<IKdkAuthApi>()
     .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://authglb.digital.panasonic.com"); });
@@ -71,7 +64,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IrRemoteChannel>();
-builder.Services.AddTransient<DaikinAuthorizationDelegatingHandler>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 
@@ -80,10 +72,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 
-builder.Services.AddAntiforgery(options =>
-{
-    options.SuppressXFrameOptionsHeader = true;
-});
+builder.Services.AddAntiforgery(options => { options.SuppressXFrameOptionsHeader = true; });
 
 var app = builder.Build();
 
