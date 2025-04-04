@@ -93,7 +93,7 @@ app.UseAntiforgery();
 app.MapDefaultEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode(o => o.ContentSecurityFrameAncestorsPolicy = null);
 
 app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 
