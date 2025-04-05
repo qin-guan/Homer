@@ -71,6 +71,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
+builder.Services.AddBootstrapBlazor();
 
 builder.Services.AddAntiforgery(options => { options.SuppressXFrameOptionsHeader = true; });
 

@@ -13,14 +13,69 @@
     HaContext.StateAllChanges().SubscribeAsync(_ => InvokeAsync(StateHasChanged));
   }
 
+  protected Action<bool> Click(SwitchEntity entity)
+  {
+    return (bool value) =>
+    {
+      if (value)
+      {
+        entity.TurnOn();
+      }
+      else
+      {
+        entity.TurnOff();
+      }
+    };
+  }
+
 }
 
 <PageTitle>Home</PageTitle>
 
-<div class="d-flex flex-column gap-4">
-  <VerticalSwitch
-    @onclick="_ => Entities.Switch.HallwayIkeaPlug.Toggle()"
-    checked="@Entities.Switch.HallwayIkeaPlug.IsOn()"
-  />
-  <p class="text-center">Hallway</p>
-</div>
+<Stack Justify="StackJustifyContent.Start" style="height: 100dvh" class="p-3">
+  <StackItem>
+    <Card>
+      <BodyTemplate>
+        <Stack>
+          <StackItem>
+            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+              <StackItem>
+                <h5>阳台灯</h5>
+              </StackItem>
+              <StackItem>
+                <Toggle
+                  Value="Entities.Switch.BalconyLights.IsOn()"
+                  ValueChanged="Click(Entities.Switch.BalconyLights)"
+                  OnText="开"
+                  OffText="关"
+                  Color="Color.Warning"
+                />
+              </StackItem>
+            </Stack>
+          </StackItem>
+
+          <StackItem>
+            <Divider/>
+          </StackItem>
+
+          <StackItem>
+            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+              <StackItem>
+                <h5>热水器</h5>
+              </StackItem>
+              <StackItem>
+                <Toggle
+                  Value="Entities.Switch.WaterHeaterSwitch.IsOn()"
+                  ValueChanged="Click(Entities.Switch.WaterHeaterSwitch)"
+                  OnText="开"
+                  OffText="关"
+                  Color="Color.Warning"
+                />
+              </StackItem>
+            </Stack>
+          </StackItem>
+        </Stack>
+      </BodyTemplate>
+    </Card>
+  </StackItem>
+</Stack>
