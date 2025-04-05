@@ -25,9 +25,6 @@ builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
 builder.Host.UseNetDaemonMqttEntityManagement();
 
-builder.Services.AddOptions<DaikinOptions>()
-    .Bind(builder.Configuration.GetSection("Daikin"));
-
 builder.Services.AddOptions<KdkOptions>()
     .Bind(builder.Configuration.GetSection("Kdk"));
 
