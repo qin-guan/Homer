@@ -6,20 +6,20 @@ using NetDaemon.Extensions.Scheduler;
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 // [Focus]
-// [NetDaemonApp]
+[NetDaemonApp]
 public class LivingRoomGoogleHome
 {
     public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
     {
         scheduler.SchedulePeriodic(TimeSpan.FromMinutes(5), () =>
         {
-            mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+            mediaPlayerEntities.Nesthub1cef.MediaPlay(new MediaPlayerPlayMediaParameters
             {
                 MediaContentId = "google-home",
                 MediaContentType = "lovelace"
             });
         });
 
-        scheduler.ScheduleCron("55 */2 * * *", () => { mediaPlayerEntities.Nesthub1cef.MediaStop(); });
+        scheduler.ScheduleCron("55 */2 * * *", () => { mediaPlayerEntities.Nesthub1cef.TurnOff(); });
     }
 }
