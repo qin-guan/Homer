@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Reactive.Linq
 @using global::NetDaemon.HassModel
 @using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Entities
@@ -8,9 +9,19 @@
   [Inject] public IHaContext HaContext { get; set; } = null!;
   [Inject] public Entities Entities { get; set; } = null!;
 
+  private DateTime? HeaterOldOnDateTime { get; set; }
+  private DateTime? HeaterOldOffDateTime { get; set; }
+
   protected override void OnInitialized()
   {
     HaContext.StateAllChanges().SubscribeAsync(_ => InvokeAsync(StateHasChanged));
+    Entities.Switch.WaterHeaterSwitch.StateChanges()
+      .Where(e => e.New.IsOff())
+      .Subscribe((e) =>
+      {
+        HeaterOldOnDateTime = e.New.LastChanged;
+        HeaterOldOffDateTime = DateTime.Now;
+      });
   }
 
   protected Action<bool> Click(SwitchEntity entity)
@@ -32,98 +43,96 @@
 
 <PageTitle>Home</PageTitle>
 
-<Stack Justify="StackJustifyContent.Start" style="height: 100dvh" class="p-3">
-  <StackItem>
-    <Card>
-      <BodyTemplate>
-        <Stack>
+@* Container *@
+<Stack IsRow="true" style="height: 100vh" class="p-2 gap-1">
+  @* Left half *@
+  <StackItem IsFill="true">
+    <Stack class="gap-3">
+      <StackItem>
+        <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
           <StackItem>
-            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
-              <StackItem>
-                <h5>阳台灯</h5>
-              </StackItem>
-              <StackItem>
-                <Toggle
-                  Value="Entities.Switch.BalconyLights.IsOn()"
-                  ValueChanged="Click(Entities.Switch.BalconyLights)"
-                  OnText="开"
-                  OffText="关"
-                  Color="Color.Warning"
-                />
-              </StackItem>
-            </Stack>
+            <span>阳台灯</span>
           </StackItem>
-
           <StackItem>
-            <Divider/>
-          </StackItem>
-
-          <StackItem>
-            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
-              <StackItem>
-                <h5>热水器</h5>
-              </StackItem>
-              <StackItem>
-                @if (Entities.Switch.WaterHeaterSwitch.IsOff())
-                {
-                  <span>
-                    @Entities.Switch.WaterHeaterSwitch.EntityState.LastUpdated
-                  </span>
-                }
-
-                <Toggle
-                  Value="Entities.Switch.WaterHeaterSwitch.IsOn()"
-                  ValueChanged="Click(Entities.Switch.WaterHeaterSwitch)"
-                  OnText="开"
-                  OffText="关"
-                  Color="Color.Warning"/>
-              </StackItem>
-            </Stack>
-          </StackItem>
-
-          <StackItem>
-            <Divider/>
-          </StackItem>
-
-          <StackItem>
-            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
-              <StackItem>
-                <h5>空调1</h5>
-              </StackItem>
-              <StackItem>
-                <Toggle
-                  Value="Entities.Switch.Daikinap59921None.IsOn()"
-                  ValueChanged="Click(Entities.Switch.Daikinap59921None)"
-                  OnText="开"
-                  OffText="关"
-                  Color="Color.Warning"
-                />
-              </StackItem>
-            </Stack>
-          </StackItem>
-
-          <StackItem>
-            <Divider/>
-          </StackItem>
-
-          <StackItem>
-            <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
-              <StackItem>
-                <h5>空调2</h5>
-              </StackItem>
-              <StackItem>
-                <Toggle
-                  Value="Entities.Switch.Daikinap16703None.IsOn()"
-                  ValueChanged="Click(Entities.Switch.Daikinap16703None)"
-                  OnText="开"
-                  OffText="关"
-                  Color="Color.Warning"
-                />
-              </StackItem>
-            </Stack>
+            <Toggle
+              Value="Entities.Switch.BalconyLights.IsOn()"
+              ValueChanged="Click(Entities.Switch.BalconyLights)"
+              OnText="开"
+              OffText="关"
+              Color="Color.Warning"/>
           </StackItem>
         </Stack>
-      </BodyTemplate>
-    </Card>
+      </StackItem>
+      <StackItem>
+        <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+          <StackItem>
+            <span>热水器</span>
+          </StackItem>
+          <StackItem>
+
+            <Toggle
+              Value="Entities.Switch.WaterHeaterSwitch.IsOn()"
+              ValueChanged="Click(Entities.Switch.WaterHeaterSwitch)"
+              OnText="开"
+              OffText="关"
+              Color="Color.Warning"
+            />
+          </StackItem>
+        </Stack>
+      </StackItem>
+      <StackItem>
+        @if (Entities.Switch.WaterHeaterSwitch.IsOff() && HeaterOldOffDateTime is not null && HeaterOldOnDateTime is not null)
+        {
+          <Card Color="Color.Danger">
+            <BodyTemplate>
+              上次使用 @HeaterOldOffDateTime.Value.ToShortTimeString() 
+              <br/>
+              总 @((HeaterOldOffDateTime - HeaterOldOnDateTime).Value.TotalMinutes.ToString("F1")) 分
+            </BodyTemplate>
+          </Card>
+        }
+      </StackItem>
+    </Stack>
+  </StackItem>
+
+  <StackItem>
+    <Divider IsVertical="true"></Divider>
+  </StackItem>
+
+  @* Right half *@
+  <StackItem IsFill="true">
+    <Stack class="gap-3">
+      <StackItem>
+        <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+          <StackItem>
+            <span>空调 1</span>
+          </StackItem>
+          <StackItem>
+            <Toggle
+              Value="Entities.Switch.Daikinap59921None.IsOn()"
+              ValueChanged="Click(Entities.Switch.Daikinap59921None)"
+              OnText="开"
+              OffText="关"
+              Color="Color.Warning"/>
+          </StackItem>
+        </Stack>
+      </StackItem>
+      <StackItem>
+        <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+          <StackItem>
+            <span>空调 2</span>
+          </StackItem>
+          <StackItem>
+            <Toggle
+              Value="Entities.Switch.Daikinap16703None.IsOn()"
+              ValueChanged="Click(Entities.Switch.Daikinap16703None)"
+              OnText="开"
+              OffText="关"
+              Color="Color.Warning"
+            />
+          </StackItem>
+        </Stack>
+      </StackItem>
+    </Stack>
   </StackItem>
 </Stack>
