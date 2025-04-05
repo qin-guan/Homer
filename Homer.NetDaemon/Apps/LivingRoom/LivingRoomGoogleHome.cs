@@ -6,7 +6,7 @@ using NetDaemon.Extensions.Scheduler;
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 // [Focus]
-[NetDaemonApp]
+// [NetDaemonApp]
 public class LivingRoomGoogleHome
 {
     public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
