@@ -16,13 +16,17 @@ public class LivingRoomGoogleHome : IAsyncInitializable
     {
         _mediaPlayerEntities = mediaPlayerEntities;
 
-        scheduler.RunEvery(TimeSpan.FromMinutes(5), () =>
+        scheduler.RunEvery(TimeSpan.FromMinutes(30), () =>
         {
             mediaPlayerEntities.Nesthub1cef.TurnOff();
-            mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+            
+            scheduler.RunIn(TimeSpan.FromMinutes(1), () =>
             {
-                MediaContentId = "google-home",
-                MediaContentType = "lovelace"
+                mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+                {
+                    MediaContentId = "google-home",
+                    MediaContentType = "lovelace"
+                });
             });
         });
     }
