@@ -1,21 +1,26 @@
 ﻿@page "/"
 @using System.Reactive.Linq
 @using System.Text.Json
+@using global::NetDaemon.Extensions.Scheduler
 @using global::NetDaemon.HassModel
 @using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Entities
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
+@using Console = System.Console
 @rendermode InteractiveServer
 
 @code {
   [Inject] public IHaContext HaContext { get; set; } = null!;
   [Inject] public Entities Entities { get; set; } = null!;
+  [Inject] public INetDaemonScheduler Scheduler { get; set; } = null!;
   [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
   [SupplyParameterFromQuery] private string Secret { get; set; }
 
   private DateTime? HeaterOldOnDateTime { get; set; }
   private DateTime? HeaterOldOffDateTime { get; set; }
+  private DateTime? HeaterScheduledOffDateTime { get; set; }
+  private string? Off => (HeaterScheduledOffDateTime - DateTime.Now)?.TotalMinutes.ToString("F1");
 
   private double? PowerConsumption { get; set; }
 
@@ -26,8 +31,9 @@
       .Where(e => e.New.IsOff())
       .Subscribe((e) =>
       {
-        HeaterOldOnDateTime = e.New.LastChanged;
+        HeaterOldOnDateTime = e.Old?.LastChanged;
         HeaterOldOffDateTime = DateTime.Now;
+        HeaterScheduledOffDateTime = null;
       });
 
     var powerSensors = new List<NumericSensorEntity>
@@ -46,7 +52,7 @@
 
   protected Action<bool> Click(SwitchEntity entity)
   {
-    return (bool value) =>
+    return value =>
     {
       if (value)
       {
@@ -58,6 +64,18 @@
       }
     };
   }
+
+  protected Action TurnOnHeater(TimeSpan timeSpan)
+  {
+    return () =>
+    {
+      Console.WriteLine("nice");
+      HeaterScheduledOffDateTime = DateTime.Now + timeSpan;
+      Entities.Switch.WaterHeaterSwitch.TurnOn();
+      Scheduler.RunIn(timeSpan, () => { Entities.Switch.WaterHeaterSwitch.TurnOff(); });
+    };
+  }
+
 }
 
 <PageTitle>Home</PageTitle>
@@ -95,13 +113,20 @@ else
             </StackItem>
             <StackItem>
 
-              <Toggle
-                Value="Entities.Switch.WaterHeaterSwitch.IsOn()"
-                ValueChanged="Click(Entities.Switch.WaterHeaterSwitch)"
-                OnText="开"
-                OffText="关"
-                Color="Color.Warning"
-              />
+              @if (HeaterScheduledOffDateTime is null)
+              {
+                <div class="btn-group" role="group">
+                  <Button Color="Color.Warning" IsOutline="true" OnClick="TurnOnHeater(TimeSpan.FromMinutes(15))">15分
+                  </Button>
+                  <Button Color="Color.Warning" IsOutline="true" OnClick="TurnOnHeater(TimeSpan.FromMinutes(20))">20分
+                  </Button>
+                </div>
+              }
+              else
+              {
+                <span class="text-danger" style="font-weight: bold">@Off 分</span>
+              }
+
             </StackItem>
           </Stack>
         </StackItem>
@@ -158,6 +183,7 @@ else
             </StackItem>
           </Stack>
         </StackItem>
+
         @if (PowerConsumption is not null)
         {
           <StackItem>
