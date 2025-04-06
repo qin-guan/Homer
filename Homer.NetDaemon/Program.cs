@@ -28,6 +28,9 @@ builder.Host.UseNetDaemonMqttEntityManagement();
 builder.Services.AddOptions<KdkOptions>()
     .Bind(builder.Configuration.GetSection("Kdk"));
 
+builder.Services.AddOptions<GoogleHomeDashboardOptions>()
+    .Bind(builder.Configuration.GetSection("GoogleHomeDashboard"));
+
 // builder.Services.AddSerilog((services, lc) => lc
 //     .ReadFrom.Configuration(builder.Configuration)
 //     .ReadFrom.Services(services)
