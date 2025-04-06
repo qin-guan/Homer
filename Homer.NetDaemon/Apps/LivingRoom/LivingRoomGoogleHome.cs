@@ -13,6 +13,7 @@ public class LivingRoomGoogleHome
     {
         scheduler.SchedulePeriodic(TimeSpan.FromSeconds(5), () =>
         {
+            mediaPlayerEntities.Nesthub1cef.TurnOff();
             mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
             {
                 MediaContentId = "google-home",
