@@ -17,6 +17,8 @@
   private DateTime? HeaterOldOnDateTime { get; set; }
   private DateTime? HeaterOldOffDateTime { get; set; }
 
+  private double? PowerConsumption { get; set; }
+
   protected override void OnInitialized()
   {
     HaContext.StateAllChanges().SubscribeAsync(_ => InvokeAsync(StateHasChanged));
@@ -27,6 +29,18 @@
         HeaterOldOnDateTime = e.New.LastChanged;
         HeaterOldOffDateTime = DateTime.Now;
       });
+
+    var powerSensors = new List<NumericSensorEntity>
+    {
+      Entities.Sensor.Bedroom3IkeaPlugPower,
+      Entities.Sensor.Bedroom4IkeaPlugPower,
+      Entities.Sensor.KitchenIkeaPlugPower,
+      Entities.Sensor.WaterHeaterSwitchPower,
+      Entities.Sensor.LivingRoomIkeaPlugPower,
+      Entities.Sensor.MasterBedroomIkeaPlugPower
+    };
+
+    powerSensors.StateChanges().Subscribe(_ => { PowerConsumption = powerSensors.Sum(e => e.State); });
   }
 
   protected Action<bool> Click(SwitchEntity entity)
@@ -144,6 +158,13 @@ else
             </StackItem>
           </Stack>
         </StackItem>
+        @if (PowerConsumption is not null)
+        {
+          <StackItem>
+            <Divider/>
+            <span>总电： @PowerConsumption.Value.ToString("F1") 瓦</span>
+          </StackItem>
+        }
       </Stack>
     </StackItem>
   </Stack>
