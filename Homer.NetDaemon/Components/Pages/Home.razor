@@ -8,6 +8,7 @@
 @code {
   [Inject] public IHaContext HaContext { get; set; } = null!;
   [Inject] public Entities Entities { get; set; } = null!;
+  [Inject] public HttpContextAccessor HttpContextAccessor { get; set; } = null!;
 
   private DateTime? HeaterOldOnDateTime { get; set; }
   private DateTime? HeaterOldOffDateTime { get; set; }
@@ -43,6 +44,13 @@
 
 <PageTitle>Home</PageTitle>
 
+@* @if () *@
+@* { *@
+@*   <span>Nothing here!</span> *@
+@* } *@
+@* else *@
+{
+@HttpContextAccessor.HttpContext.Request.Host
 @* Container *@
 <Stack IsRow="true" style="height: 100vh" class="p-2 gap-1">
   @* Left half *@
@@ -85,7 +93,7 @@
         {
           <Card Color="Color.Danger">
             <BodyTemplate>
-              上次使用 @HeaterOldOffDateTime.Value.ToShortTimeString() 
+              上次使用 @HeaterOldOffDateTime.Value.ToShortTimeString()
               <br/>
               总 @((HeaterOldOffDateTime - HeaterOldOnDateTime).Value.TotalMinutes.ToString("F1")) 分
             </BodyTemplate>
@@ -136,3 +144,5 @@
     </Stack>
   </StackItem>
 </Stack>
+}
+
