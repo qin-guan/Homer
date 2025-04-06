@@ -60,6 +60,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IrRemoteChannel>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
