@@ -2,16 +2,21 @@ using System.Reactive.Concurrency;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
+using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 // [Focus]
 [NetDaemonApp]
-public class LivingRoomGoogleHome
+public class LivingRoomGoogleHome : IAsyncInitializable
 {
-    public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
+    private readonly MediaPlayerEntities _mediaPlayerEntities;
+
+    public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, INetDaemonScheduler scheduler)
     {
-        scheduler.SchedulePeriodic(TimeSpan.FromMinutes(5), () =>
+        _mediaPlayerEntities = mediaPlayerEntities;
+
+        scheduler.RunEvery(TimeSpan.FromMinutes(5), () =>
         {
             mediaPlayerEntities.Nesthub1cef.TurnOff();
             mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
@@ -20,5 +25,19 @@ public class LivingRoomGoogleHome
                 MediaContentType = "lovelace"
             });
         });
+    }
+
+    public Task InitializeAsync(CancellationToken cancellationToken)
+    {
+        if (_mediaPlayerEntities.Nesthub1cef.IsOff())
+        {
+            _mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+            {
+                MediaContentId = "google-home",
+                MediaContentType = "lovelace"
+            });
+        }
+
+        return Task.CompletedTask;
     }
 }
