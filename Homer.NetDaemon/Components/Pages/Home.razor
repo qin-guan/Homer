@@ -41,6 +41,7 @@
     };
 
     powerSensors.StateChanges().Subscribe(_ => { PowerConsumption = powerSensors.Sum(e => e.State); });
+    PowerConsumption = powerSensors.Sum(e => e.State);
   }
 
   protected Action<bool> Click(SwitchEntity entity)

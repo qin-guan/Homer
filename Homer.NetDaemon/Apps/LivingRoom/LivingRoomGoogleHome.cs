@@ -11,7 +11,7 @@ public class LivingRoomGoogleHome
 {
     public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
     {
-        scheduler.SchedulePeriodic(TimeSpan.FromMinutes(15), () =>
+        scheduler.SchedulePeriodic(TimeSpan.FromMinutes(5), () =>
         {
             mediaPlayerEntities.Nesthub1cef.TurnOff();
             mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
@@ -20,7 +20,5 @@ public class LivingRoomGoogleHome
                 MediaContentType = "lovelace"
             });
         });
-
-        scheduler.ScheduleCron("55 */2 * * *", () => { mediaPlayerEntities.Nesthub1cef.TurnOff(); });
     }
 }
