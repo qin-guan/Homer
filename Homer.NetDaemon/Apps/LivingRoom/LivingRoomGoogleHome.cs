@@ -11,7 +11,7 @@ public class LivingRoomGoogleHome
 {
     public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, IScheduler scheduler)
     {
-        scheduler.SchedulePeriodic(TimeSpan.FromSeconds(5), () =>
+        scheduler.SchedulePeriodic(TimeSpan.FromMinutes(15), () =>
         {
             mediaPlayerEntities.Nesthub1cef.TurnOff();
             mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
