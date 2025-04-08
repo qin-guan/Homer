@@ -12,7 +12,6 @@ namespace Homer.NetDaemon.Apps.Remotes;
 public class LivingRoomFan
 {
     public LivingRoomFan(
-        IrRemoteChannel irRemoteChannel,
         InputBooleanEntities inputBooleanEntities,
         RemoteEntities remoteEntities,
         IKdkApi kdkApi

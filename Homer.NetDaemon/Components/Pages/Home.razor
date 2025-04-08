@@ -1,19 +1,18 @@
 ﻿@page "/"
+@using System.Reactive.Concurrency
 @using System.Reactive.Linq
-@using System.Text.Json
-@using global::NetDaemon.Extensions.Scheduler
 @using global::NetDaemon.HassModel
 @using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Channels
 @using Homer.NetDaemon.Entities
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
-@using Console = System.Console
 @rendermode InteractiveServer
 
 @code {
   [Inject] public IHaContext HaContext { get; set; } = null!;
   [Inject] public Entities Entities { get; set; } = null!;
-  [Inject] public INetDaemonScheduler Scheduler { get; set; } = null!;
+  [Inject] public IScheduler Scheduler { get; set; } = null!;
   [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
   [SupplyParameterFromQuery] private string Secret { get; set; }
 
@@ -69,10 +68,9 @@
   {
     return () =>
     {
-      Console.WriteLine("nice");
       HeaterScheduledOffDateTime = DateTime.Now + timeSpan;
       Entities.Switch.WaterHeaterSwitch.TurnOn();
-      Scheduler.RunIn(timeSpan, () => { Entities.Switch.WaterHeaterSwitch.TurnOff(); });
+      Channels.TurnOffWaterHeaterSwitch.Writer.TryWrite(timeSpan);
     };
   }
 
@@ -116,7 +114,7 @@ else
               @if (HeaterScheduledOffDateTime is null)
               {
                 <div class="btn-group" role="group">
-                  <Button Color="Color.Warning" IsOutline="true" OnClick="TurnOnHeater(TimeSpan.FromMinutes(15))">15分
+                  <Button Color="Color.Warning" IsOutline="true" OnClick="TurnOnHeater(TimeSpan.FromMinutes(10))">10分
                   </Button>
                   <Button Color="Color.Warning" IsOutline="true" OnClick="TurnOnHeater(TimeSpan.FromMinutes(20))">20分
                   </Button>

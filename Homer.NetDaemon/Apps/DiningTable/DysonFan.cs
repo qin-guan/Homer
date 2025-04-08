@@ -16,7 +16,6 @@ public class DysonFan : IAsyncInitializable
     private readonly SwitchEntity _switch;
 
     public DysonFan(
-        IrRemoteChannel irRemoteChannel,
         IScheduler scheduler,
         SwitchEntities switchEntities,
         BinarySensorEntities binarySensorEntities,
@@ -42,7 +41,7 @@ public class DysonFan : IAsyncInitializable
             .SubscribeAsync(async e =>
             {
                 _switch.TurnOn();
-                await irRemoteChannel.LivingRoomChannel.Writer.WriteAsync(LivingRoomRemoteCommand.Dyson);
+                await Channels.Channels.LivingRoomChannel.Writer.WriteAsync(LivingRoomRemoteCommand.Dyson);
             });
 
         _presence.StateChanges()

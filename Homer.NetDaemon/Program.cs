@@ -4,6 +4,7 @@ using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
+using Homer.NetDaemon.Services;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -64,9 +65,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IrRemoteChannel>();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
+builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
 
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()

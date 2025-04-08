@@ -11,7 +11,6 @@ namespace Homer.NetDaemon.Apps.Remotes;
 public class LivingRoomLight
 {
     public LivingRoomLight(
-        IrRemoteChannel irRemoteChannel,
         InputBooleanEntities inputBooleanEntities,
         RemoteEntities remoteEntities,
         IKdkApi kdkApi
