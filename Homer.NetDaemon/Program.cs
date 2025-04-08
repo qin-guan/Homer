@@ -1,6 +1,5 @@
 using System.Reflection;
 using Homer.NetDaemon.Apps.Kdk;
-using Homer.NetDaemon.Apps.Remotes;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
@@ -13,7 +12,6 @@ using NetDaemon.Extensions.MqttEntityManager;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
 using NetDaemon.Runtime;
-using Refit;
 
 // Log.Logger = new LoggerConfiguration()
 //     .WriteTo.Console()
@@ -39,14 +37,16 @@ builder.Services.AddOptions<GoogleHomeDashboardOptions>()
 //     .WriteTo.Console()
 // );
 
-builder.Services.AddRefitClient<IKdkAuthApi>()
-    .ConfigureHttpClient((sp, client) => { client.BaseAddress = new Uri("https://authglb.digital.panasonic.com"); });
+builder.Services.AddHttpApi<IKdkAuthApi>()
+    .ConfigureHttpApi(options => { options.HttpHost = new Uri("https://authglb.digital.panasonic.com"); });
 
-builder.Services.AddRefitClient<IKdkApi>()
+builder.Services.AddHttpApi<IKdkApi>()
+    .ConfigureHttpApi((options, sp) =>
+    {
+        options.HttpHost = new Uri("https://prod.mycfan.pgtls.net");
+    })
     .ConfigureHttpClient((sp, client) =>
     {
-        client.BaseAddress = new Uri("https://prod.mycfan.pgtls.net");
-        client.DefaultRequestHeaders.Add("User-Agent", "Ceiling Fan/1.1.0 (iPhone; iOS 18.0.1; Scale/3.00)");
         client.DefaultRequestHeaders.Add("X-Api-Key", sp.GetRequiredService<IOptions<KdkOptions>>().Value.ApiKey);
     })
     .AddHttpMessageHandler<KdkAuthorizationDelegatingHandler>()

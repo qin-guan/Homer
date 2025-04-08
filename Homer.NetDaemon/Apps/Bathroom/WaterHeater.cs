@@ -5,7 +5,6 @@ using NetDaemon.Extensions.Scheduler;
 
 namespace Homer.NetDaemon.Apps.Bathroom;
 
-[Focus]
 [NetDaemonApp]
 public class WaterHeater
 {
