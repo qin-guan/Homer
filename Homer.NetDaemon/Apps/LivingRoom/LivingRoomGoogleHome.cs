@@ -1,4 +1,3 @@
-using System.Reactive.Concurrency;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;

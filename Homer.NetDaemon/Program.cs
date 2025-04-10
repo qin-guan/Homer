@@ -4,6 +4,7 @@ using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
+using Homer.NetDaemon.Services.DataMall;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,9 @@ builder.Host.UseNetDaemonMqttEntityManagement();
 builder.Services.AddOptions<KdkOptions>()
     .Bind(builder.Configuration.GetSection("Kdk"));
 
+builder.Services.AddOptions<DataMallOptions>()
+    .Bind(builder.Configuration.GetSection("DataMall"));
+
 builder.Services.AddOptions<GoogleHomeDashboardOptions>()
     .Bind(builder.Configuration.GetSection("GoogleHomeDashboard"));
 
@@ -37,14 +41,19 @@ builder.Services.AddOptions<GoogleHomeDashboardOptions>()
 //     .WriteTo.Console()
 // );
 
+builder.Services.AddHttpApi<IDataMallApi>()
+    .ConfigureHttpApi(options => { options.HttpHost = new Uri("https://datamall2.mytransport.sg"); })
+    .ConfigureHttpClient((sp, client) =>
+    {
+        client.DefaultRequestHeaders.Add("AccountKey",
+            sp.GetRequiredService<IOptions<DataMallOptions>>().Value.AccountKey);
+    });
+
 builder.Services.AddHttpApi<IKdkAuthApi>()
     .ConfigureHttpApi(options => { options.HttpHost = new Uri("https://authglb.digital.panasonic.com"); });
 
 builder.Services.AddHttpApi<IKdkApi>()
-    .ConfigureHttpApi((options, sp) =>
-    {
-        options.HttpHost = new Uri("https://prod.mycfan.pgtls.net");
-    })
+    .ConfigureHttpApi((options, sp) => { options.HttpHost = new Uri("https://prod.mycfan.pgtls.net"); })
     .ConfigureHttpClient((sp, client) =>
     {
         client.DefaultRequestHeaders.Add("X-Api-Key", sp.GetRequiredService<IOptions<KdkOptions>>().Value.ApiKey);
@@ -68,6 +77,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
+builder.Services.AddTransient<DataMallObservableFactoryService>();
+builder.Services.AddSingleton<WaterHeaterTimerService>();
 
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()

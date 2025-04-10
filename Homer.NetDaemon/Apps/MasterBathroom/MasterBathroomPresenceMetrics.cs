@@ -1,6 +1,5 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using Homer.NetDaemon.Apps.Bathroom;
 using Homer.NetDaemon.Entities;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;

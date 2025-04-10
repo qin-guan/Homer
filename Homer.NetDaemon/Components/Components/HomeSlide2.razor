@@ -1,0 +1,55 @@
+@using System.Reactive.Linq
+@using Homer.NetDaemon.Services
+@using R3
+@inject DataMallObservableFactoryService Factory
+@implements IDisposable
+
+<Stack style="height: calc(100vh / 2.5)" class="p-2 gap-1">
+  <StackItem>
+    <h4 style="font-weight: 500;">
+      巴士时间表
+    </h4>
+  </StackItem>
+
+  <StackItem>
+    <Stack IsRow="true" Justify="StackJustifyContent.Between">
+      @foreach (var (c, timings) in _items)
+      {
+        <StackItem>
+          <Tag Color="Color.Primary">
+            @c
+          </Tag>
+        </StackItem>
+        <StackItem>
+          @foreach (var timing in timings)
+          {
+            <span>@((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))</span>
+          }
+        </StackItem>
+      }
+    </Stack>
+  </StackItem>
+</Stack>
+
+@code {
+  private List<IDisposable> _disposables = [];
+  private Dictionary<string, List<DateTime?>> _items = [];
+
+  protected override void OnInitialized()
+  {
+    // Factory.CreateWithBusStopCode("53299")
+    //   .Do(t => Console.WriteLine("outcome"))
+    //   .Subscribe(s =>
+    //   {
+    //     Console.WriteLine(s);
+    //     // _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+    //     InvokeAsync(StateHasChanged);
+    //   });
+  }
+
+  public void Dispose()
+  {
+    _disposables.ForEach(e => e.Dispose());
+  }
+
+}

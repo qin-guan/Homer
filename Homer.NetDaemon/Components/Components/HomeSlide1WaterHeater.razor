@@ -1,0 +1,75 @@
+@using System.Reactive.Linq
+@using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Entities
+@using Homer.NetDaemon.Services
+
+@implements IDisposable
+
+<Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+    <StackItem>
+        <span>热水器</span>
+    </StackItem>
+    <StackItem>
+
+        @if (Switches.WaterHeaterSwitch.IsOff())
+        {
+            <div class="btn-group" role="group">
+                <Button Color="Color.Warning" IsOutline="true"
+                        OnClick="TurnOnHeater(TimeSpan.FromMinutes(10))">
+                    10分
+                </Button>
+                <Button Color="Color.Warning" IsOutline="true"
+                        OnClick="TurnOnHeater(TimeSpan.FromMinutes(20))">
+                    20分
+                </Button>
+            </div>
+        }
+
+        @if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
+        {
+            <span
+                class="text-danger"
+                style="font-weight: bold"
+            >
+                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.TotalMinutes.ToString("F1")) 分
+            </span>
+        }
+
+    </StackItem>
+</Stack>
+
+@code {
+
+    [Inject] public SwitchEntities Switches { get; set; } = null!;
+    [Inject] public WaterHeaterTimerService WaterHeaterTimerService { get; set; } = null!;
+
+    private readonly List<IDisposable> _disposables = [];
+
+    protected override void OnInitialized()
+    {
+        _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+
+    protected Action TurnOnHeater(TimeSpan timeSpan)
+    {
+        return () =>
+        {
+            WaterHeaterTimerService.ScheduledTurnOffDateTime = DateTime.Now + timeSpan;
+            Switches.WaterHeaterSwitch.TurnOn();
+            Channels.Channels.TurnOffWaterHeaterSwitch.Writer.TryWrite(timeSpan);
+            _disposables.Add(
+                Observable.Interval(TimeSpan.FromSeconds(1))
+                    .TakeUntil(
+                        DateTime.SpecifyKind(DateTime.Now + timeSpan, DateTimeKind.Utc)
+                    )
+                    .Subscribe(_ => InvokeAsync(StateHasChanged))
+            );
+        };
+    }
+
+}

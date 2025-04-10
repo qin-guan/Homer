@@ -1,0 +1,33 @@
+
+@* Container *@
+<Stack IsRow="true" style="height: calc(100vh / 2.5)" class="p-2 gap-1">
+    @* Left half *@
+    <StackItem IsFill="true">
+        <Stack class="gap-3">
+            <StackItem>
+                <HomeSlide1Balcony/>
+            </StackItem>
+            <StackItem>
+                <HomeSlide1WaterHeater/>
+            </StackItem>
+        </Stack>
+    </StackItem>
+
+    <StackItem>
+        <Divider IsVertical="true"></Divider>
+    </StackItem>
+
+    @* Right half *@
+    <StackItem IsFill="true">
+        <Stack>
+            <StackItem>
+                <HomeSlide1Aircon/>
+            </StackItem>
+
+            <StackItem>
+                <Divider/>
+                <HomeSlide1PowerConsumption></HomeSlide1PowerConsumption>
+            </StackItem>
+        </Stack>
+    </StackItem>
+</Stack>

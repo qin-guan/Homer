@@ -1,4 +1,3 @@
-using System.Diagnostics.Metrics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;

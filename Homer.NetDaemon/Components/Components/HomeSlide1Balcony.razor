@@ -1,0 +1,42 @@
+@implements IDisposable
+
+@using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Entities
+
+@inject SwitchEntities Switches
+
+<Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+    <StackItem>
+        <span>阳台灯</span>
+    </StackItem>
+    <StackItem>
+        <Toggle
+            Value="Switches.BalconyLights.IsOn()"
+            ValueChanged="ToggleSwitch(Switches.BalconyLights)"
+            OnText="开"
+            OffText="关"
+            Color="Color.Warning"
+        />
+    </StackItem>
+</Stack>
+
+@code {
+
+    private List<IDisposable> _disposables = [];
+
+    protected override void OnInitialized()
+    {
+        _disposables.Add(Switches.BalconyLights.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+
+    protected static Action ToggleSwitch(SwitchEntity sw)
+    {
+        return () => { sw.Toggle(); };
+    }
+
+}
