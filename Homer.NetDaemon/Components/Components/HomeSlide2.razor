@@ -21,7 +21,7 @@
           </Tag>
         </StackItem>
         <StackItem>
-          @foreach (var timing in timings)
+          @foreach (var timing in timings.Where(t => t.HasValue))
           {
             <span>@((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟 </span>
           }
