@@ -20,7 +20,7 @@
         <StackItem>
           <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
             <StackItem>
-              <Tag Color="Color.Danger" >
+              <Tag Color="Color.Danger">
                 <strong>
                   @c
                 </strong>
@@ -40,37 +40,63 @@
       }
     </Stack>
   </StackItem>
+
+  <StackItem>
+    @_forecast
+  </StackItem>
 </Stack>
 
 @code {
   private List<IDisposable> _disposables = [];
   private Dictionary<string, List<DateTime?>> _items = [];
+  private string _forecast = "";
+
 
   protected override void OnInitialized()
   {
     if (RendererInfo.IsInteractive)
     {
-      Factory.CreateWithBusStopCode("53299")
-        .Select(v => v.Services.First(s => s.ServiceNo == "162"))
-        .Subscribe(s =>
-        {
-          InvokeAsync(() =>
+      _disposables.Add(
+        Factory.CreateWithBusStopCode("53299")
+          .Select(v => v.Services.First(s => s.ServiceNo == "162"))
+          .Subscribe(s =>
           {
-            _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
-            StateHasChanged();
-          });
-        });
+            InvokeAsync(() =>
+            {
+              _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+              StateHasChanged();
+            });
+          })
+      );
 
-      Factory.CreateWithBusStopCode("53121")
-        .Select(v => v.Services.First(s => s.ServiceNo == "54"))
-        .Subscribe(s =>
-        {
-          InvokeAsync(() =>
+      _disposables.Add(
+        Factory.CreateWithBusStopCode("53121")
+          .Select(v => v.Services.First(s => s.ServiceNo == "54"))
+          .Subscribe(s =>
           {
-            _items["54"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
-            StateHasChanged();
-          });
-        });
+            InvokeAsync(() =>
+            {
+              _items["54"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+              StateHasChanged();
+            });
+          })
+      );
+
+      _disposables.Add(
+        Factory.CreateForecast()
+          .Select(f => f.Data.Items)
+          .SelectMany(i => i.First().Forecasts)
+          .Where(f => f.Area == "Bishan")
+          .Select(f => f.Value)
+          .Subscribe(forecast =>
+          {
+            InvokeAsync(() =>
+            {
+              _forecast = forecast;
+              StateHasChanged();
+            });
+          })
+      );
     }
 
     base.OnInitialized();

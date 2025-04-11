@@ -5,6 +5,7 @@ using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
 using Homer.NetDaemon.Services.DataMall;
+using Homer.NetDaemon.Services.DgsForecast;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -48,6 +49,9 @@ builder.Services.AddHttpApi<IDataMallApi>()
         client.DefaultRequestHeaders.Add("AccountKey",
             sp.GetRequiredService<IOptions<DataMallOptions>>().Value.AccountKey);
     });
+
+builder.Services.AddHttpApi<IDgsForecast>()
+    .ConfigureHttpApi(options => { options.HttpHost = new Uri("https://api-open.data.gov.sg"); });
 
 builder.Services.AddHttpApi<IKdkAuthApi>()
     .ConfigureHttpApi(options => { options.HttpHost = new Uri("https://authglb.digital.panasonic.com"); });
