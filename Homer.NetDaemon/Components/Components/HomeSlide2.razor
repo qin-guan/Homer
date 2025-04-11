@@ -6,25 +6,36 @@
 
 <Stack style="height: calc(100vh / 2.5)" class="p-2 gap-1">
   <StackItem>
-    <h4 style="font-weight: 500;">
-      巴士时间表
-    </h4>
+    <h5>
+      <strong>
+        巴士时间表
+      </strong>
+    </h5>
   </StackItem>
 
   <StackItem>
-    <Stack IsRow="true" Justify="StackJustifyContent.Between">
+    <Stack>
       @foreach (var (c, timings) in _items)
       {
         <StackItem>
-          <Tag Color="Color.Primary">
-            @c
-          </Tag>
-        </StackItem>
-        <StackItem>
-          @foreach (var timing in timings.Where(t => t.HasValue))
-          {
-            <span>@((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟 </span>
-          }
+          <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
+            <StackItem>
+              <Tag Color="Color.Danger" >
+                <strong>
+                  @c
+                </strong>
+              </Tag>
+            </StackItem>
+            <StackItem>
+              @foreach (var timing in timings.Where(t => t.HasValue))
+              {
+                <span style="margin-left: 10px">
+                  @((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟
+                </span>
+              }
+            </StackItem>
+          </Stack>
+          <Divider/>
         </StackItem>
       }
     </Stack>
@@ -43,8 +54,22 @@
         .Select(v => v.Services.First(s => s.ServiceNo == "162"))
         .Subscribe(s =>
         {
-          _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
-          InvokeAsync(StateHasChanged);
+          InvokeAsync(() =>
+          {
+            _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+            StateHasChanged();
+          });
+        });
+
+      Factory.CreateWithBusStopCode("53121")
+        .Select(v => v.Services.First(s => s.ServiceNo == "54"))
+        .Subscribe(s =>
+        {
+          InvokeAsync(() =>
+          {
+            _items["54"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+            StateHasChanged();
+          });
         });
     }
 
