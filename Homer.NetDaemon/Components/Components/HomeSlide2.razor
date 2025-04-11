@@ -23,7 +23,7 @@
         <StackItem>
           @foreach (var timing in timings)
           {
-            <span>@((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))</span>
+            <span>@((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟 </span>
           }
         </StackItem>
       }
@@ -37,14 +37,18 @@
 
   protected override void OnInitialized()
   {
-    // Factory.CreateWithBusStopCode("53299")
-    //   .Do(t => Console.WriteLine("outcome"))
-    //   .Subscribe(s =>
-    //   {
-    //     Console.WriteLine(s);
-    //     // _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
-    //     InvokeAsync(StateHasChanged);
-    //   });
+    if (RendererInfo.IsInteractive)
+    {
+      Factory.CreateWithBusStopCode("53299")
+        .Select(v => v.Services.First(s => s.ServiceNo == "162"))
+        .Subscribe(s =>
+        {
+          _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+          InvokeAsync(StateHasChanged);
+        });
+    }
+
+    base.OnInitialized();
   }
 
   public void Dispose()

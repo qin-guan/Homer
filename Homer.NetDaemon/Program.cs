@@ -77,7 +77,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
 builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
-builder.Services.AddTransient<DataMallObservableFactoryService>();
+builder.Services.AddSingleton<DataMallObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
 
 builder.Services.AddServerSideBlazor();

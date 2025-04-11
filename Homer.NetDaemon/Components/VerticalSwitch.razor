@@ -1,8 +1,0 @@
-<label class="form-check form-check-single form-switch">
-    <input class="form-check-input" type="checkbox" @onclick="OnClick" checked="@Checked">
-</label>
-
-@code {
-    [Parameter] public bool Checked { get; set; }
-    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-}
