@@ -1,4 +1,4 @@
-using System.Reactive.Concurrency;
+using System.Collections.Immutable;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
@@ -12,35 +12,42 @@ public class Offline
 {
     public Offline(
         NotifyServices notifyServices,
-        SensorEntities sensorEntities,
-        BinarySensorEntities binarySensorEntities,
-        SwitchEntities switchEntities,
-        IScheduler scheduler,
-        IHaRegistry registry
+        IHaContext haContext
     )
     {
-        foreach (var device in registry.Devices)
+        var devices = haContext.GetAllEntities()
+            .ExcludePrinter()
+            .GroupBy(e => e.Attributes?["DeviceId"]).ToImmutableArray();
+
+        foreach (var item in devices)
         {
-            device.Entities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged()
-                .Where(e => e.New?.State is null or "unavailable")
-                .Subscribe(e =>
+            var id = item.Key;
+
+            item.StateAllChanges()
+                .Where(_ => item.All(e2 => e2.IsOffline()))
+                .Subscribe(_ =>
                 {
                     notifyServices.MobileAppQinsIphone(
-                        $"Device {device.Name} is offline"
+                        $"Device {id} is offline"
                     );
                 });
         }
 
         notifyServices.MobileAppQinsIphone(
-            $"Registered {registry.Devices.Count} devices for offline detection."
+            $"Registered {devices.Length} devices for offline detection."
         );
     }
 }
 
 public static class OfflineExtensions
 {
-    public static IEnumerable<T> FilterPrinter<T>(this IEnumerable<T> entities) where T : IEntityCore
+    public static IEnumerable<T> ExcludePrinter<T>(this IEnumerable<T> entities) where T : IEntityCore
     {
         return entities.Where(e => !e.EntityId.Contains("brother_dcp"));
+    }
+
+    public static bool IsOffline<T>(this T entity) where T : Entity
+    {
+        return entity.State is "unknown" or "Unavailable";
     }
 }
