@@ -57,20 +57,20 @@
     if (RendererInfo.IsInteractive)
     {
       _disposables.Add(
-        Factory.CreateWithBusStopCode("53299")
+        Factory.CreateWithBusStopCode("53139")
           .Select(v => v.Services.First(s => s.ServiceNo == "162"))
           .Subscribe(s =>
           {
             InvokeAsync(() =>
             {
-              _items["162"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+              _items["74"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
               StateHasChanged();
             });
           })
       );
 
       _disposables.Add(
-        Factory.CreateWithBusStopCode("53121")
+        Factory.CreateWithBusStopCode("53131")
           .Select(v => v.Services.First(s => s.ServiceNo == "54"))
           .Subscribe(s =>
           {
