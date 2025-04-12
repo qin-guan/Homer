@@ -7,6 +7,7 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Notify;
 
+[Focus]
 [NetDaemonApp]
 public class Offline
 {
@@ -16,8 +17,9 @@ public class Offline
     )
     {
         var devices = haContext.GetAllEntities()
+            .Where(e => e.Registration?.Device?.Id is not null)
             .ExcludePrinter()
-            .GroupBy(e => e.Attributes?["DeviceId"]).ToImmutableArray();
+            .GroupBy(e => e.Registration?.Device?.Id).ToImmutableArray();
 
         foreach (var item in devices)
         {
@@ -48,6 +50,6 @@ public static class OfflineExtensions
 
     public static bool IsOffline<T>(this T entity) where T : Entity
     {
-        return entity.State is "unknown" or "Unavailable";
+        return entity.State is "unknown" or "unavailable" or null;
     }
 }

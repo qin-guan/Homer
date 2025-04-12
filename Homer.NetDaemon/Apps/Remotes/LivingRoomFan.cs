@@ -7,7 +7,7 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Remotes;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class LivingRoomFan
 {
