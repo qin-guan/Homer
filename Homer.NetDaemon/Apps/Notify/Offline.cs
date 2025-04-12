@@ -16,6 +16,8 @@ public class Offline
         IHaContext haContext
     )
     {
+        var offlineDevices = new List<string>();
+
         var devices = haContext.GetAllEntities()
             .Where(e => e.Registration?.Device?.Id is not null)
             .ExcludePrinter()
@@ -23,14 +25,27 @@ public class Offline
 
         foreach (var item in devices)
         {
-            var id = item.Key;
+            var id = item.Key!;
 
             item.StateAllChanges()
+                .Where(_ => !offlineDevices.Contains(id))
                 .Where(_ => item.All(e2 => e2.IsOffline()))
-                .Subscribe(_ =>
+                .Subscribe(e =>
                 {
+                    offlineDevices.Add(id);
                     notifyServices.MobileAppQinsIphone(
-                        $"Device {id} is offline"
+                        $"Device {e.Entity.Registration?.Device?.Name} is offline"
+                    );
+                });
+
+            item.StateAllChanges()
+                .Where(_ => offlineDevices.Contains(id))
+                .Where(_ => item.All(e2 => !e2.IsOffline()))
+                .Subscribe(e =>
+                {
+                    offlineDevices.Remove(id);
+                    notifyServices.MobileAppQinsIphone(
+                        $"Device {e.Entity.Registration?.Device?.Name} is back online"
                     );
                 });
         }
@@ -50,6 +65,6 @@ public static class OfflineExtensions
 
     public static bool IsOffline<T>(this T entity) where T : Entity
     {
-        return entity.State is "unknown" or "unavailable" or null;
+        return entity.State?.ToLower() is "unknown" or "unavailable" or null;
     }
 }
