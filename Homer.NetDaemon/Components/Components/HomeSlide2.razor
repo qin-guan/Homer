@@ -58,7 +58,7 @@
     {
       _disposables.Add(
         Factory.CreateWithBusStopCode("53139")
-          .Select(v => v.Services.First(s => s.ServiceNo == "162"))
+          .Select(v => v.Services.First(s => s.ServiceNo == "74"))
           .Subscribe(s =>
           {
             InvokeAsync(() =>
