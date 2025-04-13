@@ -15,7 +15,13 @@ public class WaterHeater
         scheduler.ScheduleCron("0 19 * * *", () =>
         {
             switchEntities.WaterHeaterSwitch.TurnOn();
-            ndScheduler.RunIn(TimeSpan.FromMinutes(30), () => { switchEntities.WaterHeaterSwitch.TurnOff(); });
+            ndScheduler.RunIn(TimeSpan.FromMinutes(20), () => { switchEntities.WaterHeaterSwitch.TurnOff(); });
+        });
+        
+        scheduler.ScheduleCron("30 20 * * *", () =>
+        {
+            switchEntities.WaterHeaterSwitch.TurnOn();
+            ndScheduler.RunIn(TimeSpan.FromMinutes(10), () => { switchEntities.WaterHeaterSwitch.TurnOff(); });
         });
     }
 }
