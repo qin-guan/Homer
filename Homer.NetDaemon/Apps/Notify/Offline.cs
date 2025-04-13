@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
@@ -13,7 +14,8 @@ public class Offline
 {
     public Offline(
         NotifyServices notifyServices,
-        IHaContext haContext
+        IHaContext haContext,
+        IScheduler scheduler
     )
     {
         var offlineDevices = new List<string>();
@@ -29,7 +31,7 @@ public class Offline
 
             item.StateAllChanges()
                 .Where(_ => !offlineDevices.Contains(id))
-                .Where(_ => item.All(e2 => e2.IsOffline()))
+                .WhenStateIsFor(_ => item.All(e2 => e2.IsOffline()), TimeSpan.FromMinutes(1), scheduler)
                 .Subscribe(e =>
                 {
                     offlineDevices.Add(id);
