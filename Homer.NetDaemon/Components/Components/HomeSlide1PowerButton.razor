@@ -7,7 +7,7 @@
     @if (_isLoading)
     {
         <div style="min-height: 75px;">
-            <Spinner Color="Color.Warning" Size="Size.ExtraLarge"/>
+            <Spinner Color="Color.Warning" Size="BootstrapBlazor.Components.Size.ExtraLarge"/>
         </div>
     }
     else if (Switch.IsOn())
@@ -15,8 +15,9 @@
         <button
             @onclick="Toggle"
             class="rounded-circle border border-3 border-warning d-flex justify-content-center align-items-center bg-warning text-dark fs-1"
-            style="min-width: 75px; min-height: 75px;">
-            <div class="rounded-circle border border-3 border-white" style="min-width: 30px; min-height: 30px"></div>
+            style="min-width: @(Size)px; min-height: @(Size)px;">
+            <div class="rounded-circle border border-3 border-white"
+                 style="min-width: @(Size / 2)px; min-height: @(Size / 2)px"></div>
         </button>
     }
     else
@@ -24,18 +25,20 @@
         <button
             @onclick="Toggle"
             class="rounded-circle border border-3 border-warning text-warning-emphasis d-flex justify-content-center align-items-center fs-3 bg-white"
-            style="min-width: 75px; min-height: 75px;">
-            <div class="rounded-circle border border-3 border-warning" style="min-width: 30px; min-height: 30px;"></div>
+            style="min-width: @(Size)px; min-height: @(Size)px;">
+            <div class="rounded-circle border border-3 border-warning"
+                 style="min-width: @(Size / 2)px; min-height: @(Size / 2)px;"></div>
         </button>
     }
 
-    <span class="fs-5">@Name</span>
+    <span class="fs-4">@Name</span>
 </div>
 
 @code {
     [Parameter] public SwitchEntity Switch { get; set; } = null!;
     [Parameter] public string Name { get; set; } = null!;
 
+    private const int Size = 90;
     private bool _isLoading;
     private readonly List<IDisposable> _disposables = [];
 

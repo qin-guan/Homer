@@ -1,0 +1,69 @@
+@using System.Reactive.Linq
+@using Homer.NetDaemon.Services
+@inject DataMallObservableFactoryService Factory
+@implements IDisposable
+
+<div class="d-flex flex-column gap-3">
+    @foreach (var (c, timings) in _items)
+    {
+        <div class="d-flex justify-content-between align-items-center" style="width: 100%">
+            <Badge Color="Color.Info" Class="fs-2">
+                @c
+            </Badge>
+
+            <div>
+                @foreach (var timing in timings.Where(t => t.HasValue))
+                {
+                    <span style="margin-left: 15px" class="fs-2">
+                        @((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<IDisposable> _disposables = [];
+    private Dictionary<string, List<DateTime?>> _items = [];
+
+    protected override void OnInitialized()
+    {
+        if (RendererInfo.IsInteractive)
+        {
+            _disposables.Add(
+                Factory.CreateWithBusStopCode("53139")
+                    .Select(v => v.Services.First(s => s.ServiceNo == "74"))
+                    .Subscribe(s =>
+                    {
+                        InvokeAsync(() =>
+                        {
+                            _items["74"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+                            StateHasChanged();
+                        });
+                    })
+            );
+
+            _disposables.Add(
+                Factory.CreateWithBusStopCode("53131")
+                    .Select(v => v.Services.First(s => s.ServiceNo == "54"))
+                    .Subscribe(s =>
+                    {
+                        InvokeAsync(() =>
+                        {
+                            _items["54"] = [s.NextBus.EstimatedArrival, s.NextBus2.EstimatedArrival, s.NextBus3.EstimatedArrival];
+                            StateHasChanged();
+                        });
+                    })
+            );
+        }
+
+        base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+
+}

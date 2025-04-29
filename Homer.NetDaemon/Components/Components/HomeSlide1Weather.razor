@@ -1,0 +1,43 @@
+@using System.Reactive.Linq
+@using Homer.NetDaemon.Services
+@inject DataMallObservableFactoryService Factory
+@implements IDisposable
+
+<h2>
+    @_forecast
+</h2>
+
+@code {
+    private List<IDisposable> _disposables = [];
+    private string _forecast = "";
+ 
+    protected override void OnInitialized()
+    {
+        if (RendererInfo.IsInteractive)
+        {
+            _disposables.Add(
+                Factory.CreateForecast()
+                    .Select(f => f.Data.Items)
+                    .SelectMany(i => i.First().Forecasts)
+                    .Where(f => f.Area == "Bishan")
+                    .Select(f => f.Value)
+                    .Subscribe(forecast =>
+                    {
+                        InvokeAsync(() =>
+                        {
+                            _forecast = forecast;
+                            StateHasChanged();
+                        });
+                    })
+            );
+        }
+ 
+        base.OnInitialized();
+    }
+ 
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+ 
+}

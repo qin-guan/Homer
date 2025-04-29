@@ -10,7 +10,7 @@ public class DataMallObservableFactoryService(IDataMallApi dataMallApi, IDgsFore
 {
     public IObservable<BusArrivalResponse> CreateWithBusStopCode(string code)
     {
-        return Observable.SelectMany(Observable.Interval(TimeSpan.FromSeconds(5)), async (i) =>
+        return Observable.Interval(TimeSpan.FromSeconds(5)).SelectMany(async (i) =>
             await dataMallApi.GetBusArrivalAsync(code)
         );
     }
