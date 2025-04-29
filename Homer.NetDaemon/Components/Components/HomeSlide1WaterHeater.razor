@@ -72,6 +72,14 @@ else
     protected override void OnInitialized()
     {
         _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+        if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
+        {
+            _disposables.Add(
+                Observable.Interval(TimeSpan.FromSeconds(1))
+                    .TakeUntil(WaterHeaterTimerService.ScheduledTurnOffDateTime.Value)
+                    .Subscribe(_ => InvokeAsync(StateHasChanged))
+            );
+        }
     }
 
     public void Dispose()
