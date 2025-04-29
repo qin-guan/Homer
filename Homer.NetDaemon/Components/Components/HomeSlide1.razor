@@ -1,33 +1,31 @@
+@using Homer.NetDaemon.Entities
+@inject SwitchEntities Switches
 
 @* Container *@
-<Stack IsRow="true" style="height: calc(100vh / 2.5)" class="p-2 gap-1">
-    @* Left half *@
-    <StackItem IsFill="true">
-        <Stack class="gap-3">
-            <StackItem>
-                <HomeSlide1Balcony/>
-            </StackItem>
-            <StackItem>
-                <HomeSlide1WaterHeater/>
-            </StackItem>
-        </Stack>
-    </StackItem>
+<div class="d-flex flex-column gap-2 m-1 bg-body-tertiary" style="font-family: Noto Sans SC, sans-serif;">
+    <HomeSlide1TopBar></HomeSlide1TopBar>
 
-    <StackItem>
-        <Divider IsVertical="true"></Divider>
-    </StackItem>
-
-    @* Right half *@
-    <StackItem IsFill="true">
-        <Stack>
-            <StackItem>
-                <HomeSlide1Aircon/>
-            </StackItem>
-
-            <StackItem>
-                <Divider/>
-                <HomeSlide1PowerConsumption></HomeSlide1PowerConsumption>
-            </StackItem>
-        </Stack>
-    </StackItem>
-</Stack>
+    <div class="d-flex gap-2">
+        <div class="card" style="flex: 1">
+            <div class="card-body">
+                <h5 class="fw-semibold" style="margin-bottom: 30px">开关</h5>
+                <div class="d-flex justify-content-between">
+                    <HomeSlide1PowerButton Switch="Switches.BalconyLights" Name="阳台灯"/>
+                    <HomeSlide1PowerButton Switch="Switches.Daikinap59921None" Name="空调一"/>
+                    <HomeSlide1PowerButton Switch="Switches.Daikinap16703None" Name="空调二"/>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="flex: 1">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="fw-semibold" style="margin-bottom: 30px">热水器</h5>
+                </div>
+                <div class="d-flex gap-4">
+                    <HomeSlide1WaterHeater/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

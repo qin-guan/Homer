@@ -5,38 +5,62 @@
 
 @implements IDisposable
 
-<Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center">
-    <StackItem>
-        <span>热水器</span>
-    </StackItem>
-    <StackItem>
+@if (Switches.WaterHeaterSwitch.IsOn())
+{
+    <div class="d-flex flex-column justify-content-center align-items-center" style="flex: 1;">
+        <span class="fs-1 text-danger fw-bold">
+            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes)分
+            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds)秒
+        </span>
+        <span class="fs-5">倒计时</span>
+    </div>
+}
+else
+{
+    <div class="d-flex gap-4 justify-content-around align-items-center" style="flex: 1; margin-top: 15px;">
+        <div class="btn-group" role="group">
+            <Button Color="Color.Danger" OnClick="TurnOnHeater(TimeSpan.FromMinutes(10))" IsOutline
+                    Size="Size.ExtraLarge">15分钟
+            </Button>
+            <Button Color="Color.Danger" OnClick="TurnOnHeater(TimeSpan.FromMinutes(25))" IsOutline
+                    Size="Size.ExtraLarge">25分钟
+            </Button>
+        </div>
+    </div>
+}
 
-        @if (Switches.WaterHeaterSwitch.IsOff())
-        {
-            <div class="btn-group" role="group">
-                <Button Color="Color.Warning" IsOutline="true"
-                        OnClick="TurnOnHeater(TimeSpan.FromMinutes(10))">
-                    10分
-                </Button>
-                <Button Color="Color.Warning" IsOutline="true"
-                        OnClick="TurnOnHeater(TimeSpan.FromMinutes(20))">
-                    20分
-                </Button>
-            </div>
-        }
-
-        @if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
-        {
-            <span
-                class="text-danger"
-                style="font-weight: bold"
-            >
-                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.TotalMinutes.ToString("F1")) 分
-            </span>
-        }
-
-    </StackItem>
-</Stack>
+@* <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center"> *@
+@*     <StackItem> *@
+@*         <span>热水器</span> *@
+@*     </StackItem> *@
+@*     <StackItem> *@
+@* *@
+@*         @if (Switches.WaterHeaterSwitch.IsOff()) *@
+@*         { *@
+@*             <div class="btn-group" role="group"> *@
+@*                 <Button Color="Color.Warning" IsOutline="true" *@
+@*                         OnClick="TurnOnHeater(TimeSpan.FromMinutes(10))"> *@
+@*                     10分 *@
+@*                 </Button> *@
+@*                 <Button Color="Color.Warning" IsOutline="true" *@
+@*                         OnClick="TurnOnHeater(TimeSpan.FromMinutes(20))"> *@
+@*                     20分 *@
+@*                 </Button> *@
+@*             </div> *@
+@*         } *@
+@* *@
+@*         @if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null) *@
+@*         { *@
+@*             <span *@
+@*                 class="text-danger" *@
+@*                 style="font-weight: bold" *@
+@*             > *@
+@*                 @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.TotalMinutes.ToString("F1")) 分 *@
+@*             </span> *@
+@*         } *@
+@* *@
+@*     </StackItem> *@
+@* </Stack> *@
 
 @code {
 

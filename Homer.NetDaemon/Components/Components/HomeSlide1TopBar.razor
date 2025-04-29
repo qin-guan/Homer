@@ -1,0 +1,70 @@
+@using global::NetDaemon.HassModel
+@using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Entities
+@inject SensorEntities Sensors
+@implements IDisposable
+
+<div class="card bg-body" style="width: 100%">
+    <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center" class="p-2">
+        <StackItem>
+            <span class="fs-4 fw-semibold">
+                @DateTime.Now.ToLongTimeString()
+            </span>
+        </StackItem>
+        <StackItem>
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <Badge Color="Color.Info" IsPill="true">实时</Badge>
+                <span class="text-info fw-semibold fs-5">
+                    ⚡️ 家庭用电: @(_powerConsumption?.ToString("F1"))瓦
+                </span>
+            </div>
+        </StackItem>
+    </Stack>
+</div>
+
+@code {
+    private double? _powerConsumption;
+    private List<NumericSensorEntity>? _powerSensors;
+    private readonly List<IDisposable> _disposables = [];
+
+    protected override void OnInitialized()
+    {
+        _powerSensors =
+        [
+            Sensors.Bedroom3IkeaPlugPower,
+            Sensors.Bedroom4IkeaPlugPower,
+            Sensors.KitchenIkeaPlugPower,
+            Sensors.WaterHeaterSwitchPower,
+            Sensors.LivingRoomIkeaPlugPower,
+            Sensors.MasterBedroomIkeaPlugPower,
+            Sensors.ZhiNengChaZuoCurrentConsumption
+        ];
+
+        _powerConsumption = _powerSensors.Sum(e => e.State);
+        _disposables.Add(_powerSensors.StateAllChanges().SubscribeAsync(async _ =>
+        {
+            await InvokeAsync(() =>
+            {
+                _powerConsumption = _powerSensors.Sum(e => e.State);
+                StateHasChanged();
+            });
+        }));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        while (await periodicTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+
+}

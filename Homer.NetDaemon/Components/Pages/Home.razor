@@ -9,24 +9,16 @@
 
 @if (GoogleHomeDashboardOptions.Value.Secret != Secret)
 {
-  <span class="p-2">Nothing here!</span>
+    <span class="p-2">Nothing here!</span>
 }
 else
 {
-  <Carousel ShowControls="true" ShowIndicators="true" Width="100%">
-    <CarouselItem>
-      <HomeSlide1/>
-    </CarouselItem>
-
-    <CarouselItem>
-      <HomeSlide2/>
-    </CarouselItem>
-  </Carousel>
+    <HomeSlide1/>
 }
 
 @code {
 
-  [SupplyParameterFromQuery] private string Secret { get; set; } = null!;
-  [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
+    [SupplyParameterFromQuery] private string Secret { get; set; } = null!;
+    [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
 
 }

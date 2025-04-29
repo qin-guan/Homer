@@ -1,0 +1,65 @@
+@using global::NetDaemon.HassModel
+@using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Entities
+@implements IDisposable
+
+<div class="d-flex flex-column align-items-center justify-content-center gap-3">
+    @if (_isLoading)
+    {
+        <div style="min-height: 75px;">
+            <Spinner Color="Color.Warning" Size="Size.ExtraLarge"/>
+        </div>
+    }
+    else if (Switch.IsOn())
+    {
+        <button
+            @onclick="Toggle"
+            class="rounded-circle border border-3 border-warning d-flex justify-content-center align-items-center bg-warning text-dark fs-1"
+            style="min-width: 75px; min-height: 75px;">
+            <div class="rounded-circle border border-3 border-white" style="min-width: 30px; min-height: 30px"></div>
+        </button>
+    }
+    else
+    {
+        <button
+            @onclick="Toggle"
+            class="rounded-circle border border-3 border-warning text-warning-emphasis d-flex justify-content-center align-items-center fs-3 bg-white"
+            style="min-width: 75px; min-height: 75px;">
+            <div class="rounded-circle border border-3 border-warning" style="min-width: 30px; min-height: 30px;"></div>
+        </button>
+    }
+
+    <span class="fs-5">@Name</span>
+</div>
+
+@code {
+    [Parameter] public SwitchEntity Switch { get; set; } = null!;
+    [Parameter] public string Name { get; set; } = null!;
+
+    private bool _isLoading;
+    private readonly List<IDisposable> _disposables = [];
+
+    protected override void OnInitialized()
+    {
+        _disposables.Add(Switch.StateChanges().SubscribeAsync(async _ =>
+        {
+            await InvokeAsync(() =>
+            {
+                _isLoading = false;
+                StateHasChanged();
+            });
+        }));
+    }
+
+    private void Toggle(MouseEventArgs obj)
+    {
+        _isLoading = true;
+        Switch.Toggle();
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(d => d.Dispose());
+    }
+
+}
