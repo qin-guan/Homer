@@ -1,8 +1,12 @@
+@using global::NetDaemon.HassModel
+@using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Entities
 @inject SwitchEntities Switches
+@inject InputBooleanEntities InputBooleanEntities
+@implements IDisposable
 
 @* Container *@
-<div class="d-flex flex-column gap-2 m-1 mx-2 m bg-body-tertiary" style="font-family: Noto Sans SC, sans-serif;">
+<div class="d-flex flex-column gap-2 m-1 mx-2" style="font-family: Noto Sans SC, sans-serif;">
     <HomeSlide1TopBar></HomeSlide1TopBar>
 
     <div class="d-flex gap-2">
@@ -16,7 +20,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card" style="flex: 1">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -28,7 +32,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="d-flex gap-2">
         <div class="card" style="flex: 1">
             <div class="card-body">
@@ -36,7 +40,7 @@
                 <HomeSlide1BusTimings></HomeSlide1BusTimings>
             </div>
         </div>
-        
+
         <div class="card" style="flex: 1">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -49,4 +53,26 @@
         </div>
     </div>
 
+    <div class="d-flex gap-2 mt-1">
+        <BootstrapBlazorIcon Name=" @($"fs-1 fa-solid fa-restroom {(InputBooleanEntities.BathroomPresence.IsOff() ?  "text-success" : "text-danger")}")"></BootstrapBlazorIcon>
+    </div>
+
 </div>
+
+@code {
+    private IDisposable? _disposable;
+
+    protected override void OnInitialized()
+    {
+        _disposable = InputBooleanEntities.BathroomPresence.StateChanges().SubscribeAsync(async _ =>
+        {
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
+}
+
