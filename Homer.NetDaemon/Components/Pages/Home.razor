@@ -2,6 +2,7 @@
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
 @using Homer.NetDaemon.Components.Components
+@inject IHttpContextAccessor HC
 
 @rendermode InteractiveServer
 
@@ -13,6 +14,7 @@
 }
 else
 {
+    @HC.HttpContext.Connection.RemoteIpAddress.ToString()
     <HomeSlide1/>
 }
 
