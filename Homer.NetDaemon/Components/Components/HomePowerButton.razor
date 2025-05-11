@@ -6,35 +6,39 @@
 @rendermode InteractiveServer
 @inject SwitchEntities Switches
 
-<div class="d-flex flex-column align-items-center justify-content-center gap-3">
+<div class="d-flex flex-column gap-1 flex-grow-1">
     @if (_isLoading)
     {
-        <div style="min-height: 75px;">
-            <Spinner Color="Color.Warning" Size="BootstrapBlazor.Components.Size.ExtraLarge"/>
-        </div>
+        <button
+            @onclick="Toggle"
+            class="rounded-3 d-flex bg-secondary flex-grow-1 justify-content-center align-items-end border-0"
+            style="min-height: @(Height)px;">
+            <div class="rounded-circle bg-secondary-subtle"
+                 style="width: 5px; height: 5px; margin-bottom: 20px;"></div>
+        </button>
     }
     else if (Switch.IsOn())
     {
         <button
             @onclick="Toggle"
-            class="rounded-circle border border-3 border-warning d-flex justify-content-center align-items-center bg-warning text-dark fs-1"
-            style="min-width: @(Size)px; min-height: @(Size)px;">
-            <div class="rounded-circle border border-3 border-white"
-                 style="min-width: @(Size / 2)px; min-height: @(Size / 2)px"></div>
+            class="rounded-3 d-flex flex-grow-1 justify-content-center align-items-end bg-warning border-0"
+            style="min-height: @(Height)px;">
+            <div class="rounded-circle bg-warning-subtle"
+                 style="width: 8px; height: 8px; margin-bottom: 20px;"></div>
         </button>
     }
     else
     {
         <button
             @onclick="Toggle"
-            class="rounded-circle border border-3 border-warning text-warning-emphasis d-flex justify-content-center align-items-center fs-3 bg-white"
-            style="min-width: @(Size)px; min-height: @(Size)px;">
-            <div class="rounded-circle border border-3 border-warning"
-                 style="min-width: @(Size / 2)px; min-height: @(Size / 2)px;"></div>
+            class="rounded-3 d-flex bg-gray-100 flex-grow-1 justify-content-center align-items-end border-0"
+            style="min-height: @(Height)px;">
+            <div class="rounded-circle bg-primary"
+                 style="width: 5px; height: 5px; margin-bottom: 20px;"></div>
         </button>
     }
 
-    <span class="fs-4">@Name</span>
+    <span class="fs-5 text-center">@Name</span>
 </div>
 
 @code {
@@ -43,7 +47,7 @@
 
     private SwitchEntity Switch => Switches.EnumerateAll().Single(s => s.EntityId == SwitchId);
 
-    private const int Size = 90;
+    private const int Height = 150;
     private bool _isLoading;
     private readonly List<IDisposable> _disposables = [];
 
