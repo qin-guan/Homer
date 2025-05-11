@@ -1,7 +1,10 @@
 @using global::NetDaemon.HassModel
 @using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Entities
+
 @implements IDisposable
+@rendermode InteractiveServer
+@inject SwitchEntities Switches
 
 <div class="d-flex flex-column align-items-center justify-content-center gap-3">
     @if (_isLoading)
@@ -35,8 +38,10 @@
 </div>
 
 @code {
-    [Parameter] public SwitchEntity Switch { get; set; } = null!;
+    [Parameter] public string SwitchId { get; set; } = null!;
     [Parameter] public string Name { get; set; } = null!;
+
+    private SwitchEntity Switch => Switches.EnumerateAll().Single(s => s.EntityId == SwitchId);
 
     private const int Size = 90;
     private bool _isLoading;

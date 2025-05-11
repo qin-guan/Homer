@@ -1,0 +1,12 @@
+@using Homer.NetDaemon.Client.Components
+
+<div style="width: 100%">
+    <Stack IsRow="true" Justify="StackJustifyContent.Between" AlignItems="StackAlignItems.Center" class="p-1">
+        <StackItem>
+            <HomeTopBarClock @rendermode="InteractiveWebAssembly"/>
+        </StackItem>
+        <StackItem>
+            <HomeTopBarEnergyUsage @rendermode="InteractiveServer"></HomeTopBarEnergyUsage>
+        </StackItem>
+    </Stack>
+</div>

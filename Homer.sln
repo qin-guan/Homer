@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homer.NetDaemon.Client", "Homer.NetDaemon.Client\Homer.NetDaemon.Client.csproj", "{F99780C2-F611-4BCE-82E3-6C8F18E9A469}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,5 +31,9 @@ Global
 		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E420E7C2-26A7-43DF-B8C2-DAA171AD1520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F99780C2-F611-4BCE-82E3-6C8F18E9A469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F99780C2-F611-4BCE-82E3-6C8F18E9A469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F99780C2-F611-4BCE-82E3-6C8F18E9A469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F99780C2-F611-4BCE-82E3-6C8F18E9A469}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -86,7 +86,8 @@ builder.Services.AddSingleton<WaterHeaterTimerService>();
 
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 builder.Services.AddRazorPages();
 builder.Services.AddBootstrapBlazor();
 
@@ -99,19 +100,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseWebAssemblyDebugging();
 }
 
 // app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseRouting();
+app.UseStaticFiles();
 
 app.UseAntiforgery();
 
 app.MapDefaultEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode(o => o.ContentSecurityFrameAncestorsPolicy = null);
+    .AddInteractiveServerRenderMode(o => o.ContentSecurityFrameAncestorsPolicy = null)
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(Homer.NetDaemon.Client._Imports).Assembly);
 
 app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 

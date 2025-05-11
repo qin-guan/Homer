@@ -1,10 +1,13 @@
 ﻿@page "/"
+@using global::NetDaemon.HassModel
+@using global::NetDaemon.HassModel.Entities
+@using Homer.NetDaemon.Entities
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
 @using Homer.NetDaemon.Components.Components
-@inject IHttpContextAccessor HC
-
-@rendermode InteractiveServer
+@inject SwitchEntities Switches
+@inject InputBooleanEntities InputBooleanEntities
+@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
@@ -14,13 +17,78 @@
 }
 else
 {
-    @HC.HttpContext.Connection.RemoteIpAddress.ToString()
-    <HomeSlide1/>
+    @* Container *@
+    <div class="d-flex flex-column gap-2 m-1 mx-2" style="font-family: Noto Sans SC, sans-serif;">
+        <HomeTopBar></HomeTopBar>
+        
+        <div class="d-flex gap-2">
+            <div class="card" style="flex: 1">
+                <div class="card-body">
+                    <h4 class="fw-semibold" style="margin-bottom: 30px">开关</h4>
+                    <div class="d-flex justify-content-around">
+                        <HomePowerButton SwitchId="@Switches.BalconyLights.EntityId" Name="阳台灯"/>
+                        <HomePowerButton SwitchId="@Switches.Daikinap59921None.EntityId" Name="空调一"/>
+                        <HomePowerButton SwitchId="@Switches.Daikinap16703None.EntityId" Name="空调二"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="flex: 1">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="fw-semibold" style="margin-bottom: 30px">热水器</h4>
+                    </div>
+                    <div class="d-flex gap-4">
+                        <HomeWaterHeater/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <div class="card" style="flex: 1">
+                <div class="card-body">
+                    <h4 class="fw-semibold" style="margin-bottom: 30px">巴士</h4>
+                    <HomeBusTimings ></HomeBusTimings>
+                </div>
+            </div>
+
+            <div class="card" style="flex: 1">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="fw-semibold" style="margin-bottom: 30px">天气</h4>
+                    </div>
+                    <div class="d-flex gap-4">
+                        <HomeWeather/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-1">
+            <BootstrapBlazorIcon Name="@IconName"></BootstrapBlazorIcon>
+        </div>
+
+    </div>
 }
 
 @code {
 
     [SupplyParameterFromQuery] private string Secret { get; set; } = null!;
     [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
+
+    private IDisposable? _disposable;
+
+    private string IconName => $"fs-1 fa-solid fa-restroom {(InputBooleanEntities.BathroomPresence.IsOff() ? "text-success" : "text-danger")}";
+
+    protected override void OnInitialized()
+    {
+        _disposable = InputBooleanEntities.BathroomPresence.StateChanges().SubscribeAsync(async _ => { await InvokeAsync(StateHasChanged); });
+    }
+
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
 
 }

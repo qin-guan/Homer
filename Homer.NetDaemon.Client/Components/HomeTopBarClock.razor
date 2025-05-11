@@ -1,0 +1,24 @@
+@implements IDisposable
+
+<h1>@DateTime.Now.ToLongTimeString()</h1>
+
+@code {
+    private readonly List<IDisposable> _disposables = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        while (await periodicTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+
+}

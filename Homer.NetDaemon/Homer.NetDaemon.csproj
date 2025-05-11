@@ -9,18 +9,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BootstrapBlazor" Version="9.6.0" />
+        <PackageReference Include="BootstrapBlazor" Version="9.6.1" />
         <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-        <PackageReference Include="NetDaemon.AppModel" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Client" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Extensions.Logging" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Extensions.Mqtt" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Extensions.Tts" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.HassModel" Version="25.18.0" />
-        <PackageReference Include="NetDaemon.Runtime" Version="25.18.0" />
+        <PackageReference Include="NetDaemon.AppModel" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Client" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Extensions.Logging" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Extensions.Mqtt" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Extensions.Tts" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.HassModel" Version="25.18.1" />
+        <PackageReference Include="NetDaemon.Runtime" Version="25.18.1" />
         <PackageReference Include="R3" Version="1.3.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
@@ -35,12 +36,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Homer.NetDaemon.Client\Homer.NetDaemon.Client.csproj" />
         <ProjectReference Include="..\Homer.ServiceDefaults\Homer.ServiceDefaults.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Apps\SimplyGo\" />
-        <Folder Include="Entities\" />
     </ItemGroup>
 
 </Project>
