@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Services;
 using NetDaemon.AppModel;
@@ -15,10 +16,9 @@ public class RainyWeatherCloseBlinds(
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        _disposable = factory.CreateForecast().Subscribe(forecast =>
-        {
-            var bishan = forecast.Data.Items.First().Forecasts.First(f => f.Area == "Bishan");
-            if (bishan.Value is (
+        _disposable = factory.CreateForecast()
+            .Select(f => f.Data.Items.First().Forecasts.First(f => f.Area == "Bishan").Value)
+            .Where(v => v is
                 "Moderate Rain" or
                 "Heavy Rain" or
                 "Passing Showers" or
@@ -28,11 +28,13 @@ public class RainyWeatherCloseBlinds(
                 "Thundery Showers" or
                 "Heavy Thundery Showers" or
                 "Heavy Thundery Showers with Gusty Winds"
-                )) return;
-            
-            remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
-            logger.LogInformation("Closing blinds due to poor weather of {Weather}", bishan.Value);
-        });
+            )
+            .DistinctUntilChanged()
+            .Subscribe(forecast =>
+            {
+                remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
+                logger.LogInformation("Closing blinds due to poor weather of {Weather}", forecast);
+            });
     }
 
     public ValueTask DisposeAsync()
