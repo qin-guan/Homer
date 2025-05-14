@@ -9,7 +9,9 @@ namespace Homer.NetDaemon.Apps.Balcony;
 public class RainyWeatherCloseBlinds(
     DataMallObservableFactoryService factory,
     RemoteEntities remote,
-    ILogger<RainyWeatherCloseBlinds> logger)
+    NotifyServices notify,
+    ILogger<RainyWeatherCloseBlinds> logger
+)
     : IAsyncInitializable, IAsyncDisposable
 {
     private IDisposable? _disposable;
@@ -34,6 +36,7 @@ public class RainyWeatherCloseBlinds(
             {
                 remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
                 logger.LogInformation("Closing blinds due to poor weather of {Weather}", forecast);
+                notify.MobileAppQinsIphone($"Closing blinds due to poor weather of {forecast}");
             });
     }
 
