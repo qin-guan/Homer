@@ -18,7 +18,7 @@ public class RainyWeatherCloseBlinds(
         _disposable = factory.CreateForecast().Subscribe(forecast =>
         {
             var bishan = forecast.Data.Items.First().Forecasts.First(f => f.Area == "Bishan");
-            if (bishan.Value is not (
+            if (bishan.Value is (
                 "Moderate Rain" or
                 "Heavy Rain" or
                 "Passing Showers" or
