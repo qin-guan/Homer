@@ -1,13 +1,10 @@
 ﻿@page "/"
-@using global::NetDaemon.HassModel
-@using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Entities
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
 @using Homer.NetDaemon.Components.Components
 @inject SwitchEntities Switches
 @inject InputBooleanEntities InputBooleanEntities
-@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
@@ -22,24 +19,21 @@ else
             <HomeTopBar></HomeTopBar>
         </div>
 
-        <div class="row">
+        <div class="row pb-2 gx-1" style="height: 300px">
             <div class="col-12 col-md-6">
-                <div class="d-flex gap-3" style="height: 100%">
+                <div class="d-flex gap-1" style="height: 100%">
                     <HomePowerButton SwitchId="@Switches.BalconyLights.EntityId" Name="阳台灯"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap59921None.EntityId" Name="空调一"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap16703None.EntityId" Name="空调二"/>
                 </div>
             </div>
 
-            <div class="card col">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="fw-semibold" style="margin-bottom: 30px">热水器</h6>
-                    </div>
-                    <div class="d-flex gap-4">
-                        <HomeWaterHeater/>
-                    </div>
-                </div>
+            <div class="col-12 col-md-2 d-flex">
+                <HomeWaterHeater/>
+            </div>
+            
+            <div class="col-12 col-md-4 d-flex flex-column gap-2">
+                <HomeBalconyButtons/>
             </div>
         </div>
 
@@ -62,11 +56,6 @@ else
                 </div>
             </div>
         </div>
-
-        <div class="d-flex gap-2 mt-1">
-            <BootstrapBlazorIcon Name="@IconName"></BootstrapBlazorIcon>
-        </div>
-
     </div>
 }
 
@@ -74,19 +63,5 @@ else
 
     [SupplyParameterFromQuery] private string Secret { get; set; } = null!;
     [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
-
-    private IDisposable? _disposable;
-
-    private string IconName => $"fs-1 fa-solid fa-restroom {(InputBooleanEntities.BathroomPresence.IsOff() ? "text-success" : "text-danger")}";
-
-    protected override void OnInitialized()
-    {
-        _disposable = InputBooleanEntities.BathroomPresence.StateChanges().SubscribeAsync(async _ => { await InvokeAsync(StateHasChanged); });
-    }
-
-    public void Dispose()
-    {
-        _disposable?.Dispose();
-    }
-
+    
 }

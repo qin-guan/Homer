@@ -8,29 +8,39 @@
 
 @if (Switches.WaterHeaterSwitch.IsOn())
 {
-    <div class="d-flex flex-column justify-content-center align-items-center" style="flex: 1;">
+    <div class="d-flex flex-column justify-content-center align-items-center bo bg-white rounded-3" style="flex: 1;">
         <span class="fs-1 text-danger fw-bold">
-            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes)分
-            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds)秒
+            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes):
+            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds.ToString("D2"))
         </span>
         <span class="fs-4">倒计时</span>
     </div>
 }
 else
 {
-    <div class="d-flex gap-2 justify-content-around align-items-center" style="flex: 1;">
+    <div class="d-flex flex-column gap-1" style="flex: 1;">
         <button
             @onclick="TurnOnHeater(TimeSpan.FromMinutes(15))"
-            class="rounded-3 d-flex flex-grow-1 justify-content-center align-items-center bg-danger-subtle border-0"
-            style="min-height: 150px; min-width: 100px;">
-            <span class="text-danger-emphasis fs-4">15分钟</span>
+            class="rounded-3 d-flex justify-content-center align-items-center bg-danger-subtle border-0"
+            style="height: 100%; flex: 1;"
+        >
+            <span class="text-danger-emphasis fs-4">
+                15
+                <br/>
+                分钟
+            </span>
         </button>
 
         <button
             @onclick="TurnOnHeater(TimeSpan.FromMinutes(30))"
-            class="rounded-3 d-flex flex-grow-1 justify-content-center align-items-center bg-danger-subtle border-0"
-            style="min-height: 150px; min-width: 100px;">
-            <span class="text-danger-emphasis fs-4">30分钟</span>
+            class="rounded-3 d-flex justify-content-center align-items-center bg-danger-subtle border-0"
+            style="height: 100%; flex: 1;"
+        >
+            <span class="text-danger-emphasis fs-4">
+                30
+                <br/>
+                分钟
+            </span>
         </button>
     </div>
 }
