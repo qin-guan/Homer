@@ -8,7 +8,7 @@ namespace Homer.NetDaemon.Apps.Balcony;
 [NetDaemonApp]
 public class RainyWeatherCloseBlinds(
     DataMallObservableFactoryService factory,
-    RemoteEntities remote,
+    InputTextEntities textEntities,
     NotifyServices notify,
     ILogger<RainyWeatherCloseBlinds> logger
 )
@@ -34,8 +34,8 @@ public class RainyWeatherCloseBlinds(
             .DistinctUntilChanged()
             .Subscribe(forecast =>
             {
-                remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
                 logger.LogInformation("Closing blinds due to poor weather of {Weather}", forecast);
+                textEntities.BalconyBlindsState.SetValue("[3, 3, 3]");
                 notify.MobileAppQinsIphone($"Closing blinds due to poor weather of {forecast}");
             });
     }

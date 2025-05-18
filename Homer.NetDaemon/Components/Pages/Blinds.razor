@@ -1,7 +1,45 @@
 @page "/Blinds"
+@using global::NetDaemon.HassModel
+@using global::NetDaemon.HassModel.Entities
 @using Homer.NetDaemon.Components.Components
+@using Homer.NetDaemon.Entities
+@inject SwitchEntities SwitchEntities
+@implements IDisposable
 @rendermode InteractiveServer
 
-<div class="d-flex flex-column vh-100 p-3 gap-3">
+<div style="height: 20dvh; width: 100%" class="d-flex p-3">
+    @if (SwitchEntities.BalconyLights.IsOn())
+    {
+        <button style="flex: 1" class="outline-0 border-0 bg-warning rounded-3"
+                @onclick="SwitchEntities.BalconyLights.Toggle">
+            阳台
+        </button>
+    }
+    else
+    {
+        <button style="flex: 1" class="outline-0 border-0 bg-gray-100 rounded-3"
+                @onclick="SwitchEntities.BalconyLights.Toggle">
+            阳台
+        </button>
+    }
+</div>
+
+<div class="d-flex flex-column p-3 gap-3" style="height: 80dvh">
     <HomeBalconyButtons/>
 </div>
+
+@code {
+
+    private IDisposable? _disposable;
+
+    protected override void OnInitialized()
+    {
+        _disposable = SwitchEntities.BalconyLights.StateChanges().SubscribeAsync(async _ => { await InvokeAsync(StateHasChanged); });
+    }
+
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
+
+}

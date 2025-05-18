@@ -1,10 +1,7 @@
-@using System.Reactive.Concurrency
 @using System.Text.Json
 @using global::NetDaemon.HassModel
 @using Homer.NetDaemon.Entities
-@inject RemoteEntities RemoteEntities
 @inject InputTextEntities InputTextEntities
-@inject IScheduler Scheduler
 @rendermode InteractiveServer
 
 <div class="d-flex justify-content-around gap-2" style="flex: 1;">
@@ -31,23 +28,18 @@
 </div>
 
 <div class="d-flex justify-content-around gap-2" style="height: 50px;">
-    <button style="flex: 1;" class="border-0 rounded-3" @onclick="Down(3, 0)">
+    <button style="flex: 1;" class="border-0 rounded-3" @onclick="AllUp">
         <BootstrapBlazorIcon Name="fa-solid fa-chevron-up fs-3"></BootstrapBlazorIcon>
     </button>
 
-    <button style="flex: 1;" class="border-0 rounded-3" @onclick="Down(3, 4)">
+    <button style="flex: 1;" class="border-0 rounded-3" @onclick="AllDown">
         <BootstrapBlazorIcon Name="fa-solid fa-chevron-down fs-3"></BootstrapBlazorIcon>
     </button>
 </div>
 
 @code {
 
-    private static readonly List<string> BlindNames = ["One", "Two", "Three", "All"];
-    private static readonly List<int> DefaultBlindsState = [0, 0, 0];
-
-    private List<int> Blinds => string.IsNullOrWhiteSpace(InputTextEntities.BalconyBlindsState.State)
-        ? DefaultBlindsState
-        : JsonSerializer.Deserialize<List<int>>(InputTextEntities.BalconyBlindsState.State)!;
+    private List<int> Blinds => JsonSerializer.Deserialize<List<int>>(InputTextEntities.BalconyBlindsState.State);
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,18 +50,23 @@
     {
         return (_) =>
         {
-            var diff = Math.Abs(pos - Blinds[blind]);
-            if (diff == 0) return;
-
-            var op = pos > Blinds[blind] ? "Down" : "Up";
-            RemoteEntities.LivingRoomRemote.SendCommand($"{BlindNames[blind]} {op}", "Balcony Blinds");
-            Scheduler.Schedule(TimeSpan.FromSeconds(10 * diff), () => { RemoteEntities.LivingRoomRemote.SendCommand($"{BlindNames[blind]} Stop", "Balcony Blinds"); });
-            var state = new List<int>(Blinds)
+            var clone = new List<int>(Blinds)
             {
                 [blind] = pos
             };
-            InputTextEntities.BalconyBlindsState.SetValue(JsonSerializer.Serialize(state));
+            
+            InputTextEntities.BalconyBlindsState.SetValue(JsonSerializer.Serialize(clone));
         };
+    }
+
+    void AllUp()
+    {
+        InputTextEntities.BalconyBlindsState.SetValue("[0, 0, 0]");
+    }
+
+    void AllDown()
+    {
+        InputTextEntities.BalconyBlindsState.SetValue("[3, 3, 3]");
     }
 
 }
