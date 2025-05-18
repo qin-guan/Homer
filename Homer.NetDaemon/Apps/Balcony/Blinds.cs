@@ -38,7 +38,7 @@ public class Blinds(InputTextEntities textEntities, RemoteEntities remote, ISche
             {
                 var diff = old[idx] - desired[idx];
                 if (diff is 0) continue;
-                var op = diff < 0 ? "Up" : "Down";
+                var op = diff > 0 ? "Up" : "Down";
                 var blind = _blindNames[idx];
 
                 var lockAsync = await AsyncKeyedLocker.LockAsync(blind, cancellationToken);
