@@ -1,4 +1,5 @@
 using System.Reflection;
+using AsyncKeyedLock;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
@@ -83,6 +84,7 @@ builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
 builder.Services.AddSingleton<DataMallObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
+builder.Services.AddSingleton<AsyncKeyedLocker<string>>();
 
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorComponents()

@@ -11,14 +11,14 @@
     @if (SwitchEntities.BalconyLights.IsOn())
     {
         <button style="flex: 1" class="outline-0 border-0 bg-warning rounded-3"
-                @onclick="SwitchEntities.BalconyLights.Toggle">
+                @onclick="() => SwitchEntities.BalconyLights.Toggle()">
             阳台
         </button>
     }
     else
     {
         <button style="flex: 1" class="outline-0 border-0 bg-gray-100 rounded-3"
-                @onclick="SwitchEntities.BalconyLights.Toggle">
+                @onclick="() => SwitchEntities.BalconyLights.Toggle()">
             阳台
         </button>
     }

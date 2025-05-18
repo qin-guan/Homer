@@ -7,11 +7,16 @@ using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps.Balcony;
 
+[Focus]
 [NetDaemonApp]
-public class Blinds(InputTextEntities textEntities, RemoteEntities remote, IScheduler scheduler) : IAsyncInitializable
+public class Blinds(
+    InputTextEntities textEntities,
+    RemoteEntities remote,
+    IScheduler scheduler,
+    AsyncKeyedLocker<string> locker
+) : IAsyncInitializable
 {
     private readonly List<string> _blindNames = ["One", "Two", "Three"];
-    private static readonly AsyncKeyedLocker<string> AsyncKeyedLocker = new();
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -24,33 +29,58 @@ public class Blinds(InputTextEntities textEntities, RemoteEntities remote, ISche
 
             if (desired.All(v => v == 3))
             {
+                var tasks = _blindNames.Select(async name =>
+                    await locker.LockAsync(name, cancellationToken));
+
+                var locks = await Task.WhenAll(tasks);
+
                 remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
+
+                await Task.Delay(TimeSpan.FromSeconds(30));
+
+                foreach (var disposable in locks)
+                {
+                    disposable.Dispose();
+                }
+
                 return;
             }
 
             if (desired.All(v => v == 0))
             {
+                var tasks = _blindNames.Select(async name =>
+                    await locker.LockAsync(name, cancellationToken));
+
+                var locks = await Task.WhenAll(tasks);
+
                 remote.LivingRoomRemote.SendCommand("All Up", "Balcony Blinds");
+
+                await Task.Delay(TimeSpan.FromSeconds(30));
+
+                foreach (var disposable in locks)
+                {
+                    disposable.Dispose();
+                }
+
                 return;
             }
 
-            for (var idx = 0; idx < desired.Count; idx++)
-            {
-                var diff = old[idx] - desired[idx];
-                if (diff is 0) continue;
-                var op = diff > 0 ? "Up" : "Down";
-                var blind = _blindNames[idx];
-
-                var lockAsync = await AsyncKeyedLocker.LockAsync(blind, cancellationToken);
-                remote.LivingRoomRemote.SendCommand($"{_blindNames[idx]} {op}", "Balcony Blinds");
-
-                var idx1 = idx;
-                scheduler.Schedule(TimeSpan.FromSeconds(7 * Math.Abs(diff)), () =>
+            await Parallel.ForEachAsync(
+                desired.Select((v, idx) => new { Value = v, Idx = idx }),
+                cancellationToken,
+                async (val, ct2) =>
                 {
-                    remote.LivingRoomRemote.SendCommand($"{_blindNames[idx1]} Stop", "Balcony Blinds");
-                    lockAsync.Dispose();
+                    var diff = old[val.Idx] - val.Value;
+                    if (diff == 0) return;
+
+                    var op = diff > 0 ? "Up" : "Down";
+                    var blind = _blindNames[val.Idx];
+
+                    using var lockAsync = await locker.LockAsync(blind, ct2);
+                    remote.LivingRoomRemote.SendCommand($"{blind} {op}", "Balcony Blinds");
+                    await Task.Delay(TimeSpan.FromSeconds(10 * Math.Abs(diff)), ct2);
+                    remote.LivingRoomRemote.SendCommand($"{blind} Stop", "Balcony Blinds");
                 });
-            }
         });
     }
 }
