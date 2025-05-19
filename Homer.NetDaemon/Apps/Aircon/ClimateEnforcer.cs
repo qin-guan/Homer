@@ -16,7 +16,7 @@ public class ClimateEnforcer
                 .Where(s => s.Old.IsOff())
                 .Subscribe(_ =>
                 {
-                    aircon.SetTemperature(25);
+                    aircon.SetTemperature(26);
                 });
         }
     }
