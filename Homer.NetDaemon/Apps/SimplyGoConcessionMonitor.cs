@@ -33,7 +33,7 @@ public class SimplyGoConcessionMonitor(
 
         _accessToken = res.Data.AccessToken;
 
-        scheduler.ScheduleAsync(TimeSpan.FromMinutes(1), async (_, ct) =>
+        scheduler.ScheduleAsync(TimeSpan.FromMinutes(15), async (_, ct) =>
         {
             string? startDate = null;
             string? endDate = null;
