@@ -94,11 +94,6 @@ public class SimplyGoConcessionMonitor(
 
             var diff = _currentTotal - total;
 
-            if (diff is 0)
-            {
-                return;
-            }
-
             _currentTotal = total;
             notify.MobileAppQinsIphone($"Latest trip: {diff}. Total saved: {total}");
         });
