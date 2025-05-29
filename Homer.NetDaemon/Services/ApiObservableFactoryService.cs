@@ -6,7 +6,7 @@ using Homer.NetDaemon.Services.DgsForecast.Forecast;
 
 namespace Homer.NetDaemon.Services;
 
-public class DataMallObservableFactoryService(IDataMallApi dataMallApi, IDgsForecast dgsForecast)
+public class ApiObservableFactoryService(IDataMallApi dataMallApi, IDgsForecast dgsForecast)
 {
     public IObservable<BusArrivalResponse> CreateWithBusStopCode(string code)
     {

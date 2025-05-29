@@ -8,7 +8,7 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Notify;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class Offline
 {

@@ -1,11 +1,10 @@
 using Homer.NetDaemon.Services.DataMall.BusArrival;
-using WebApiClientCore;
-using WebApiClientCore.Attributes;
+using Refit;
 
 namespace Homer.NetDaemon.Services.DataMall;
 
 public interface IDataMallApi
 {
-    [HttpGet("/ltaodataservice/v3/BusArrival")]
-    public Task<BusArrivalResponse> GetBusArrivalAsync([PathQuery] [AliasAs("BusStopCode")] string busStopCode);
+    [Get("/ltaodataservice/v3/BusArrival")]
+    public Task<BusArrivalResponse> GetBusArrivalAsync([Query] [AliasAs("BusStopCode")] string busStopCode);
 }

@@ -1,10 +1,10 @@
 using Homer.NetDaemon.Services.DgsForecast.Forecast;
-using WebApiClientCore.Attributes;
+using Refit;
 
 namespace Homer.NetDaemon.Services.DgsForecast;
 
 public interface IDgsForecast
 {
-    [HttpGet("/v2/real-time/api/two-hr-forecast")]
+    [Get("/v2/real-time/api/two-hr-forecast")]
     public Task<ForecastResponse> GetForecastAsync();
 }

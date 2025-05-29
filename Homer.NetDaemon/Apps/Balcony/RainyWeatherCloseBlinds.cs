@@ -7,7 +7,7 @@ namespace Homer.NetDaemon.Apps.Balcony;
 
 [NetDaemonApp]
 public class RainyWeatherCloseBlinds(
-    DataMallObservableFactoryService factory,
+    ApiObservableFactoryService factory,
     InputTextEntities textEntities,
     NotifyServices notify,
     ILogger<RainyWeatherCloseBlinds> logger

@@ -7,7 +7,7 @@ using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps.Balcony;
 
-[Focus]
+// [Focus]
 [NetDaemonApp]
 public class Blinds(
     InputTextEntities textEntities,

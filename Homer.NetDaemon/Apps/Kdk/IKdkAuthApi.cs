@@ -1,14 +1,14 @@
-using WebApiClientCore.Attributes;
+using Refit;
 
 namespace Homer.NetDaemon.Apps.Kdk;
 
 public interface IKdkAuthApi
 {
-    [HttpPost("/oauth/token")]
+    [Post("/oauth/token")]
     public Task<KdkAuthPostTokenResponse>
-        TokenAsync([FormContent] KdkAuthPostTokenRequest data);
+        TokenAsync([Body] KdkAuthPostTokenRequest data);
     
-    [HttpPost("/oauth/token")]
+    [Post("/oauth/token")]
     public Task<HttpResponseMessage>
-        DebugTokenAsync([FormContent] KdkAuthPostTokenRequest data);
+        DebugTokenAsync([Body] KdkAuthPostTokenRequest data);
 }
