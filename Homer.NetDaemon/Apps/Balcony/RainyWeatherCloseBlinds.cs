@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Text.Json;
@@ -22,7 +23,14 @@ public class RainyWeatherCloseBlinds(
 {
     private List<IDisposable> _disposables = [];
 
-    record ActionData(string Action, DateTime Time);
+    private enum ActionDataTimeSpan
+    {
+        Now,
+        ThirtyMinutes,
+        SixtyMinutes,
+    }
+
+    private record ActionData(string Action, ActionDataTimeSpan Time);
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -73,21 +81,23 @@ public class RainyWeatherCloseBlinds(
                         new
                         {
                             title = $"现在",
-                            action = JsonSerializer.Serialize(new ActionData("close_blinds", DateTime.Now))
+                            action = JsonSerializer.Serialize(new ActionData("close_blinds", ActionDataTimeSpan.Now))
                         },
                         new
                         {
                             title =
-                                $"等30分钟 ({TimeOnly.FromDateTime(DateTime.Now.AddMinutes(30)).ToShortTimeString()})",
-                            action = JsonSerializer.Serialize(new
-                                ActionData("close_blinds", DateTime.Now.AddMinutes(30)))
+                                $"等30分钟",
+                            action = JsonSerializer.Serialize(new ActionData(
+                                "close_blinds",
+                                ActionDataTimeSpan.ThirtyMinutes
+                            ))
                         },
                         new
                         {
                             title =
-                                $"等60分钟 ({TimeOnly.FromDateTime(DateTime.Now.AddMinutes(60)).ToShortTimeString()})",
+                                $"等60分钟",
                             action = JsonSerializer.Serialize(new
-                                ActionData("close_blinds", DateTime.Now.AddMinutes(60)))
+                                ActionData("close_blinds", ActionDataTimeSpan.SixtyMinutes))
                         },
                         new
                         {
@@ -97,19 +107,19 @@ public class RainyWeatherCloseBlinds(
                 };
 
                 notify.MobileAppQinsIphone(
-                    $"一小时后会下雨 ({forecast})",
+                    $"快要下雨了！ ({forecast})",
                     "主人想关阳台窗帘吗？",
                     data: data
                 );
 
                 notify.MobileAppGuanXiujiSIphone(
-                    $"一小时后会下雨 ({forecast})",
+                    $"快要下雨了！ ({forecast})",
                     "主人想关阳台窗帘吗？",
                     data: data
                 );
 
                 notify.MobileAppQinBosIphone16ProMax(
-                    $"一小时后会下雨 ({forecast})",
+                    $"快要下雨了！ ({forecast})",
                     "主人想关阳台窗帘吗？",
                     data: data
                 );
@@ -138,7 +148,22 @@ public class RainyWeatherCloseBlinds(
             {
                 ArgumentNullException.ThrowIfNull(e);
 
-                scheduler.Schedule(e.Time, () => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); });
+                switch (e.Time)
+                {
+                    case ActionDataTimeSpan.Now:
+                        textEntities.BalconyBlindsState.SetValue("[3, 3, 3]");
+                        break;
+                    case ActionDataTimeSpan.ThirtyMinutes:
+                        scheduler.Schedule(TimeSpan.FromMinutes(30),
+                            () => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); });
+                        break;
+                    case ActionDataTimeSpan.SixtyMinutes:
+                        scheduler.Schedule(TimeSpan.FromMinutes(60),
+                            () => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); });
+                        break;
+                    default: throw new InvalidEnumArgumentException();
+                }
+
                 notify.MobileAppQinsIphone(
                     "clear_notification",
                     data: clear
@@ -154,16 +179,24 @@ public class RainyWeatherCloseBlinds(
                     data: clear
                 );
 
+                var time = e.Time switch
+                {
+                    ActionDataTimeSpan.Now => TimeOnly.FromDateTime(DateTime.Now),
+                    ActionDataTimeSpan.ThirtyMinutes => TimeOnly.FromDateTime(DateTime.Now.AddMinutes(30)),
+                    ActionDataTimeSpan.SixtyMinutes => TimeOnly.FromDateTime(DateTime.Now.AddMinutes(60)),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
                 notify.MobileAppQinsIphone(
-                    $"我将在 {e.Time.ToShortTimeString()} 关阳台窗帘"
+                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
                 );
 
                 notify.MobileAppGuanXiujiSIphone(
-                    $"我将在 {e.Time.ToShortTimeString()} 关阳台窗帘"
+                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
                 );
 
                 notify.MobileAppQinBosIphone16ProMax(
-                    $"我将在 {e.Time.ToShortTimeString()} 关阳台窗帘"
+                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
                 );
             });
     }
