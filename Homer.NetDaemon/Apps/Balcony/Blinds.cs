@@ -34,7 +34,7 @@ public class Blinds(
 
                 var locks = await Task.WhenAll(tasks);
 
-                remote.LivingRoomRemote.SendCommand("All Down", "Balcony Blinds");
+                remote.BalconyRemote.SendCommand("All Down", "Balcony Blinds");
 
                 await Task.Delay(TimeSpan.FromSeconds(30));
 
@@ -53,7 +53,7 @@ public class Blinds(
 
                 var locks = await Task.WhenAll(tasks);
 
-                remote.LivingRoomRemote.SendCommand("All Up", "Balcony Blinds");
+                remote.BalconyRemote.SendCommand("All Up", "Balcony Blinds");
 
                 await Task.Delay(TimeSpan.FromSeconds(30));
 
@@ -77,9 +77,9 @@ public class Blinds(
                     var blind = _blindNames[val.Idx];
 
                     using var lockAsync = await locker.LockAsync(blind, ct2);
-                    remote.LivingRoomRemote.SendCommand($"{blind} {op}", "Balcony Blinds");
+                    remote.BalconyRemote.SendCommand($"{blind} {op}", "Balcony Blinds");
                     await Task.Delay(TimeSpan.FromSeconds(10 * Math.Abs(diff)), ct2);
-                    remote.LivingRoomRemote.SendCommand($"{blind} Stop", "Balcony Blinds");
+                    remote.BalconyRemote.SendCommand($"{blind} Stop", "Balcony Blinds");
                 });
         });
     }
