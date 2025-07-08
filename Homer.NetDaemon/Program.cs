@@ -6,6 +6,7 @@ using AsyncKeyedLock;
 using Homer.NetDaemon.Apps.Kdk;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
+using Homer.NetDaemon.Hubs;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
 using Homer.NetDaemon.Services.DataMall;
@@ -27,6 +28,8 @@ using Refit;
 //     .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 builder.Host.UseNetDaemonAppSettings();
 builder.Host.UseNetDaemonRuntime();
@@ -156,6 +159,8 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode(o => o.ContentSecurityFrameAncestorsPolicy = null)
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(Homer.NetDaemon.Client._Imports).Assembly);
+
+app.MapHub<PrinterHub>("/hub");
 
 app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 

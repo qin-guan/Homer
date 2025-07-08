@@ -8,6 +8,7 @@
     <File Path="docker-compose.yml" />
   </Folder>
   <Project Path="Homer.AppHost/Homer.AppHost.csproj" />
+  <Project Path="Homer.Kiosk/Homer.Kiosk.csproj" />
   <Project Path="Homer.NetDaemon.Client/Homer.NetDaemon.Client.csproj" />
   <Project Path="Homer.NetDaemon/Homer.NetDaemon.csproj" />
   <Project Path="Homer.ServiceDefaults/Homer.ServiceDefaults.csproj" />
