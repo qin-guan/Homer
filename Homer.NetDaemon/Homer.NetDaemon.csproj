@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AsyncKeyedLock" Version="7.1.6" />
-        <PackageReference Include="BootstrapBlazor" Version="9.8.0" />
+        <PackageReference Include="BootstrapBlazor" Version="9.8.1" />
         <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
