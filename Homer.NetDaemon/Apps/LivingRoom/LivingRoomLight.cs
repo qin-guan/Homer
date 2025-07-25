@@ -20,7 +20,7 @@ public class LivingRoomLight : IAsyncInitializable
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
     private bool WithinTooBrightRange => _lightSensor.State is > 50 and < 55;
-    private bool TooBright => _lightSensor.State > 60;
+    private bool TooBright => _lightSensor.State > 30;
     private bool TooDark => _lightSensor.State < 10;
     private bool ManualOverride => _laundryMode.IsOn();
 
