@@ -20,13 +20,13 @@
     {
         _powerSensors =
         [
+            Sensors.Bedroom2IkeaPlugPower,
             Sensors.Bedroom3IkeaPlugPower,
             Sensors.Bedroom4IkeaPlugPower,
-            Sensors.KitchenIkeaPlugPower,
-            Sensors.WaterHeaterSwitchPower,
-            Sensors.LivingRoomIkeaPlugPower,
             Sensors.MasterBedroomIkeaPlugPower,
-            Sensors.ZhiNengChaZuoCurrentConsumption
+            Sensors.LivingRoomIkeaPlugPower,
+            Sensors.WashingMachineCurrentConsumption,
+            Sensors.DishwasherPlugCurrentConsumption,
         ];
 
         _powerConsumption = _powerSensors.Sum(e => e.State);

@@ -1,25 +1,35 @@
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
+using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
 // [Focus]
 [NetDaemonApp]
-public class LivingRoomGoogleHome : IAsyncInitializable
+public class LivingRoomGoogleHome(
+    MediaPlayerEntities mediaPlayerEntities,
+    BinarySensorEntities binarySensorEntities,
+    IScheduler scheduler
+) : IAsyncInitializable
 {
-    private readonly MediaPlayerEntities _mediaPlayerEntities;
-
-    public LivingRoomGoogleHome(MediaPlayerEntities mediaPlayerEntities, INetDaemonScheduler scheduler)
+    public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        _mediaPlayerEntities = mediaPlayerEntities;
-
-        scheduler.RunEvery(TimeSpan.FromMinutes(30), () =>
+        if (mediaPlayerEntities.Nesthub1cef.IsOff())
         {
-            mediaPlayerEntities.Nesthub1cef.TurnOff();
-            
-            scheduler.RunIn(TimeSpan.FromMinutes(1), () =>
+            mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+            {
+                MediaContentId = "google-home",
+                MediaContentType = "lovelace"
+            });
+        }
+
+        binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor1.StateChanges()
+            .Where(s => s.Entity.IsOn())
+            .Subscribe(_ =>
             {
                 mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
                 {
@@ -27,19 +37,10 @@ public class LivingRoomGoogleHome : IAsyncInitializable
                     MediaContentType = "lovelace"
                 });
             });
-        });
-    }
 
-    public Task InitializeAsync(CancellationToken cancellationToken)
-    {
-        if (_mediaPlayerEntities.Nesthub1cef.IsOff())
-        {
-            _mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
-            {
-                MediaContentId = "google-home",
-                MediaContentType = "lovelace"
-            });
-        }
+        binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor1.StateChanges()
+            .WhenStateIsFor(s => s.IsOff(), TimeSpan.FromMinutes(3), scheduler)
+            .Subscribe(_ => { mediaPlayerEntities.Nesthub1cef.TurnOff(); });
 
         return Task.CompletedTask;
     }
