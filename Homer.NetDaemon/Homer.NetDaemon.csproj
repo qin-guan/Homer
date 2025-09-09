@@ -10,8 +10,8 @@
 
     <ItemGroup>
         <PackageReference Include="AsyncKeyedLock" Version="7.1.6" />
-        <PackageReference Include="BootstrapBlazor" Version="9.9.1" />
-        <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.1.0" />
+        <PackageReference Include="BootstrapBlazor" Version="9.10.0" />
+        <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.8" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
         <PackageReference Include="NetDaemon.AppModel" Version="25.18.1" />
@@ -27,8 +27,8 @@
         <PackageReference Include="Refit" Version="8.0.0" />
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
-        <PackageReference Include="System.Reactive" Version="6.0.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+        <PackageReference Include="System.Reactive" Version="6.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -38,6 +38,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
+      <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.2" />
         <ProjectReference Include="..\Homer.NetDaemon.Client\Homer.NetDaemon.Client.csproj" />
         <ProjectReference Include="..\Homer.ServiceDefaults\Homer.ServiceDefaults.csproj" />
     </ItemGroup>
