@@ -31,6 +31,7 @@ public class LivingRoomGoogleHome(
             .Where(s => s.Entity.IsOn())
             .Subscribe(_ =>
             {
+                mediaPlayerEntities.Nesthub1cef.TurnOff();
                 mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
                 {
                     MediaContentId = "google-home",
@@ -43,7 +44,6 @@ public class LivingRoomGoogleHome(
             .Subscribe(_ =>
             {
                 mediaPlayerEntities.Nesthub1cef.TurnOff();
-                mediaPlayerEntities.Nesthub1cef.MediaStop();
             });
 
         return Task.CompletedTask;
