@@ -40,7 +40,11 @@ public class LivingRoomGoogleHome(
 
         binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor1.StateChanges()
             .WhenStateIsFor(s => s.IsOff(), TimeSpan.FromMinutes(3), scheduler)
-            .Subscribe(_ => { mediaPlayerEntities.Nesthub1cef.TurnOff(); });
+            .Subscribe(_ =>
+            {
+                mediaPlayerEntities.Nesthub1cef.TurnOff();
+                mediaPlayerEntities.Nesthub1cef.MediaStop();
+            });
 
         return Task.CompletedTask;
     }
