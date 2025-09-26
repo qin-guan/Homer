@@ -117,7 +117,6 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<KdkTimestampDelegatingHandler>();
@@ -141,8 +140,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseWebAssemblyDebugging();
 }
 
