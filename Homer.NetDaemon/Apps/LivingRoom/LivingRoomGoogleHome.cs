@@ -8,7 +8,6 @@ using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
-// [Focus]
 [NetDaemonApp]
 public class LivingRoomGoogleHome(
     MediaPlayerEntities mediaPlayerEntities,
@@ -18,32 +17,26 @@ public class LivingRoomGoogleHome(
 {
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        if (mediaPlayerEntities.Nesthub1cef.IsOff())
+        mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
         {
-            mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
+            Media = new
             {
-                MediaContentId = "google-home",
-                MediaContentType = "lovelace"
-            });
-        }
+                media_content_id = "google-home",
+                media_content_type = "lovelace"
+            }
+        });
 
         binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor1.StateChanges()
-            .Where(s => s.Entity.IsOn())
             .Subscribe(_ =>
             {
-                mediaPlayerEntities.Nesthub1cef.TurnOff();
                 mediaPlayerEntities.Nesthub1cef.PlayMedia(new MediaPlayerPlayMediaParameters
                 {
-                    MediaContentId = "google-home",
-                    MediaContentType = "lovelace"
+                    Media = new
+                    {
+                        media_content_id = "google-home",
+                        media_content_type = "lovelace"
+                    }
                 });
-            });
-
-        binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor1.StateChanges()
-            .WhenStateIsFor(s => s.IsOff(), TimeSpan.FromMinutes(3), scheduler)
-            .Subscribe(_ =>
-            {
-                mediaPlayerEntities.Nesthub1cef.TurnOff();
             });
 
         return Task.CompletedTask;

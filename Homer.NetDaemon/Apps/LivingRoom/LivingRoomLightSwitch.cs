@@ -13,7 +13,7 @@ public class LivingRoomLightSwitch
         SensorEntities sensorEntities,
         SwitchEntities switchEntities,
         RemoteEntities remoteEntities,
-        InputBooleanEntities inputBooleanEntities,
+        LightEntities lightEntities,
         EventEntities eventEntities
     )
     {
@@ -26,7 +26,7 @@ public class LivingRoomLightSwitch
                 eventsProcessedMeter.Add(1);
                 return e.Entity.Attributes?.EventType == "single_center";
             })
-            .Subscribe(e => { inputBooleanEntities.LivingRoomFanLights.Toggle(); });
+            .Subscribe(e => { lightEntities.LivingRoomKdk.Toggle(); });
 
         eventEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>

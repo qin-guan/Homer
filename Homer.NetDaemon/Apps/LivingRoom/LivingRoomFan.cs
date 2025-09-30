@@ -13,7 +13,7 @@ public class LivingRoomFan : IAsyncInitializable
     private readonly ILogger<LivingRoomFan> _logger;
 
     private readonly List<BinarySensorEntity> _presenceEntities;
-    private readonly InputBooleanEntity _fan;
+    private readonly FanEntity _fan;
     private readonly InputBooleanEntity _laundryMode;
     private readonly NumericSensorEntity _temperatureSensor;
 
@@ -27,7 +27,8 @@ public class LivingRoomFan : IAsyncInitializable
         BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
         InputBooleanEntities inputBooleanEntities,
-        RemoteEntities remoteEntities
+        RemoteEntities remoteEntities,
+        FanEntities fanEntities
     )
     {
         var eventsProcessedMeter =
@@ -48,7 +49,7 @@ public class LivingRoomFan : IAsyncInitializable
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor3,
         ];
 
-        _fan = inputBooleanEntities.LivingRoomFan;
+        _fan = fanEntities.LivingRoomKdk;
         _temperatureSensor = sensorEntities.Daikinap16703InsideTemperature;
 
         var triggerObservables = triggerEntities.Select(e => e.StateChanges()).Merge();

@@ -14,7 +14,7 @@ public class LivingRoomLight : IAsyncInitializable
 
     private readonly List<BinarySensorEntity> _triggerEntities;
     private readonly List<BinarySensorEntity> _presenceEntities;
-    private readonly InputBooleanEntity _light;
+    private readonly LightEntity _light;
     private readonly InputBooleanEntity _laundryMode;
     private readonly NumericSensorEntity _lightSensor;
 
@@ -30,7 +30,8 @@ public class LivingRoomLight : IAsyncInitializable
         BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
         InputBooleanEntities inputBooleanEntities,
-        RemoteEntities remoteEntities
+        RemoteEntities remoteEntities,
+        LightEntities lightEntities
     )
     {
         var eventsProcessedMeter =
@@ -61,7 +62,7 @@ public class LivingRoomLight : IAsyncInitializable
             binarySensorEntities.PresenceSensorFp2B4c4PresenceSensor8,
         ];
 
-        _light = inputBooleanEntities.LivingRoomFanLights;
+        _light = lightEntities.LivingRoomKdk;
         _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
