@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AsyncKeyedLock" Version="7.1.6" />
-        <PackageReference Include="BootstrapBlazor" Version="9.10.2" />
-        <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0-rc.1.25451.107" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.1.25451.107" />
+        <PackageReference Include="AsyncKeyedLock" Version="7.1.7" />
+        <PackageReference Include="BootstrapBlazor" Version="9.11.3-beta06" />
+        <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.1.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0-rc.2.25502.107" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="NetDaemon.AppModel" Version="25.36.0" />
         <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="25.36.0" />
         <PackageReference Include="NetDaemon.Client" Version="25.36.0" />
@@ -27,7 +27,7 @@
         <PackageReference Include="Refit" Version="8.0.0" />
         <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-        <PackageReference Include="System.Reactive" Version="6.0.2" />
+        <PackageReference Include="System.Reactive" Version="6.1.0" />
     </ItemGroup>
 
     <ItemGroup>
