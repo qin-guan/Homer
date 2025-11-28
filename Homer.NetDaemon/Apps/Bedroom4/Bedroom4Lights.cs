@@ -46,27 +46,6 @@ public class Bedroom4Lights : Occupancy
     {
         _sensorEntities = sensorEntities;
 
-        eventEntities.Bedroom4LightsAction.StateChanges()
-            .SubscribeAsync(async e =>
-            {
-                logger.LogInformation("Bedroom 4 light action");
-
-                if (switchEntities.Bedroom4Lights.IsOff())
-                {
-                    logger.LogInformation("Bedroom 4 light action turning on presence");
-                    inputBooleanEntities.Bedroom4Presence.TurnOn();
-                }
-                else
-                {
-                    logger.LogInformation("Bedroom 4 light action turning off presence");
-                    inputBooleanEntities.Bedroom4Light.TurnOff();
-                    inputBooleanEntities.Bedroom4Fan.TurnOff();
-
-                    await Task.Delay(3000);
-
-                    switchEntities.Bedroom4Lights.TurnOff();
-                }
-            });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges().DistinctUntilChanged()
             .SubscribeAsync(async _ =>

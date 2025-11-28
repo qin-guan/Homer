@@ -4,9 +4,7 @@
         <Platform Name="x64" />
         <Platform Name="x86" />
     </Configurations>
-    <Folder Name="/Solution Items/">
-        <File Path="docker-compose.yml" />
-    </Folder>
+    <Folder Name="/Solution Items/" />
     <Project Path="Homer.NetDaemon.Client/Homer.NetDaemon.Client.csproj" />
     <Project Path="Homer.NetDaemon/Homer.NetDaemon.csproj" />
     <Project Path="Homer.ServiceDefaults/Homer.ServiceDefaults.csproj" />
