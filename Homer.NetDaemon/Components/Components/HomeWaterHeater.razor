@@ -6,44 +6,32 @@
 @rendermode InteractiveServer
 @implements IDisposable
 
-@if (Switches.WaterHeaterSwitch.IsOn())
-{
-    <div class="d-flex flex-column justify-content-center align-items-center bo bg-white rounded-3" style="flex: 1;">
-        <span class="fs-1 text-danger fw-bold">
-            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes):
-            @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds.ToString("D2"))
-        </span>
-        <span class="fs-4">倒计时</span>
-    </div>
-}
-else
-{
-    <div class="d-flex flex-column gap-1" style="flex: 1;">
-        <button
-            @onclick="TurnOnHeater(TimeSpan.FromMinutes(15))"
-            class="rounded-3 d-flex justify-content-center align-items-center bg-danger-subtle border-0"
-            style="height: 100%; flex: 1;"
-        >
-            <span class="text-danger-emphasis fs-4">
-                15
-                <br/>
-                分钟
+<div class="d-flex flex-column justify-content-center align-items-center bg-white rounded-3 p-3" style="flex: 1;">
+    @if (Switches.WaterHeaterSwitch.IsOn())
+    {
+        <span class="fs-1 text-danger fw-bold">开</span>
+        <span class="fs-6 text-muted">热水器</span>
+        @if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
+        {
+            <span class="fs-4 text-danger mt-2">
+                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes):
+                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds.ToString("D2"))
             </span>
-        </button>
-
-        <button
-            @onclick="TurnOnHeater(TimeSpan.FromMinutes(30))"
-            class="rounded-3 d-flex justify-content-center align-items-center bg-danger-subtle border-0"
-            style="height: 100%; flex: 1;"
-        >
-            <span class="text-danger-emphasis fs-4">
-                30
-                <br/>
-                分钟
-            </span>
-        </button>
-    </div>
-}
+            <span class="fs-6 text-muted">倒计时</span>
+        }
+    }
+    else
+    {
+        <span class="fs-1 text-secondary">关</span>
+        <span class="fs-6 text-muted">热水器</span>
+    }
+    
+    @if (WaterHeaterTimerService.LastTurnedOnDateTime is not null)
+    {
+        <span class="fs-6 text-muted mt-2">上次开启:</span>
+        <span class="fs-6">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToString("HH:mm")</span>
+    }
+</div>
 
 @code {
 
@@ -68,23 +56,6 @@ else
     public void Dispose()
     {
         _disposables.ForEach(e => e.Dispose());
-    }
-
-    protected Action TurnOnHeater(TimeSpan timeSpan)
-    {
-        return () =>
-        {
-            WaterHeaterTimerService.ScheduledTurnOffDateTime = DateTime.Now + timeSpan;
-            Switches.WaterHeaterSwitch.TurnOn();
-            Channels.Channels.TurnOffWaterHeaterSwitch.Writer.TryWrite(timeSpan);
-            _disposables.Add(
-                Observable.Interval(TimeSpan.FromSeconds(1))
-                    .TakeUntil(
-                        DateTime.SpecifyKind(DateTime.Now + timeSpan, DateTimeKind.Utc)
-                    )
-                    .Subscribe(_ => InvokeAsync(StateHasChanged))
-            );
-        };
     }
 
 }
