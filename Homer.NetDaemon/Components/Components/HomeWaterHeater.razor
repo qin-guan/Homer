@@ -29,7 +29,7 @@
     @if (WaterHeaterTimerService.LastTurnedOnDateTime is not null)
     {
         <span class="fs-6 text-muted mt-2">上次开启:</span>
-        <span class="fs-6">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToString("HH:mm")</span>
+        <span class="fs-6">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToLocalTime().ToString("HH:mm")</span>
     }
 </div>
 

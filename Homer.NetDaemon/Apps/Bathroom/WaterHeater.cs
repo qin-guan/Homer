@@ -166,7 +166,7 @@ public class WaterHeater
             
             // Turn on heater (if not already on from other bathroom)
             _switchEntities.WaterHeaterSwitch.TurnOn();
-            _waterHeaterTimerService.LastTurnedOnDateTime = DateTime.Now;
+            _waterHeaterTimerService.LastTurnedOnDateTime = DateTime.UtcNow;
             
             // Cancel any scheduled turn-off since shower is active
             _scheduledTurnOff?.Dispose();
