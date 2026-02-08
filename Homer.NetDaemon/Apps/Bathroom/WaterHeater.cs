@@ -169,8 +169,15 @@ public class WaterHeater
     
     private int CalculateHeaterDuration(TimeSpan showerDuration)
     {
+        // Handle edge case where shower duration couldn't be determined
+        if (showerDuration <= TimeSpan.Zero)
+        {
+            _logger.LogWarning("Shower duration unknown, using default heating duration of {Minutes} minutes", MinHeaterOnDurationMinutes);
+            return MinHeaterOnDurationMinutes;
+        }
+        
         // Strategy: Heater duration should roughly match shower duration
-        // Since it takes ~15 minutes of heating for a 5-10 minute shower (1.5x-3x ratio)
+        // Since it takes ~15 minutes of heating for a 5-10 minute shower (1.5x ratio)
         // We use a 1.5x multiplier and cap between min and max
         var calculatedMinutes = (int)Math.Ceiling(showerDuration.TotalMinutes * 1.5);
         
