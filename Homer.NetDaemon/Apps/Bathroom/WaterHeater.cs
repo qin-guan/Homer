@@ -1,6 +1,7 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
+using Homer.NetDaemon.Services;
 using NetDaemon.AppModel;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
@@ -20,6 +21,8 @@ public class WaterHeater
     private readonly ILogger<WaterHeater> _logger;
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
+    private readonly BathroomStatusService _bathroomStatusService;
+    private readonly WaterHeaterTimerService _waterHeaterTimerService;
     private IDisposable? _scheduledTurnOff;
     
     // Track state for each bathroom separately
@@ -46,11 +49,15 @@ public class WaterHeater
         SwitchEntities switchEntities, 
         BinarySensorEntities motionSensors,
         InputBooleanEntities inputBooleanEntities,
+        BathroomStatusService bathroomStatusService,
+        WaterHeaterTimerService waterHeaterTimerService,
         IScheduler scheduler)
     {
         _logger = logger;
         _switchEntities = switchEntities;
         _scheduler = scheduler;
+        _bathroomStatusService = bathroomStatusService;
+        _waterHeaterTimerService = waterHeaterTimerService;
         
         // Setup monitoring for regular bathroom
         var bathroomPresence = inputBooleanEntities.BathroomPresence;
@@ -98,7 +105,8 @@ public class WaterHeater
         {
             if (presence.IsOn())
             {
-                // Presence detected, start periodic monitoring for shower
+                // Presence detected, update status and start periodic monitoring for shower
+                UpdateBathroomStatus(bathroomName, presence, state);
                 state.PeriodicCheck?.Dispose();
                 
                 // Schedule periodic checks starting after initial delay
@@ -117,8 +125,10 @@ public class WaterHeater
                 
                 if (state.IsShoweringDetected)
                 {
-                    OnShowerEnded(bathroomName, state);
+                    OnShowerEnded(bathroomName, presence, state);
                 }
+                
+                UpdateBathroomStatus(bathroomName, presence, state);
             }
         });
     }
@@ -151,8 +161,12 @@ public class WaterHeater
             state.ShowerStartTime = DateTime.UtcNow;
             state.FirstMotionAfterShowerStart = null;
             
+            // Update status
+            UpdateBathroomStatus(bathroomName, presence, state);
+            
             // Turn on heater (if not already on from other bathroom)
             _switchEntities.WaterHeaterSwitch.TurnOn();
+            _waterHeaterTimerService.LastTurnedOnDateTime = DateTime.UtcNow;
             
             // Cancel any scheduled turn-off since shower is active
             _scheduledTurnOff?.Dispose();
@@ -165,12 +179,12 @@ public class WaterHeater
             if (timeSinceFirstMotion > TimeSpan.FromSeconds(ShowerEndGracePeriodSeconds))
             {
                 // Sustained motion detected - end of shower
-                OnShowerEnded(bathroomName, state);
+                OnShowerEnded(bathroomName, presence, state);
             }
         }
     }
     
-    private void OnShowerEnded(string bathroomName, BathroomShowerState state)
+    private void OnShowerEnded(string bathroomName, InputBooleanEntity presence, BathroomShowerState state)
     {
         // Calculate shower duration
         var showerDuration = state.ShowerStartTime.HasValue 
@@ -185,6 +199,9 @@ public class WaterHeater
         state.IsShoweringDetected = false;
         state.FirstMotionAfterShowerStart = null;
         state.ShowerStartTime = null;
+        
+        // Update status
+        UpdateBathroomStatus(bathroomName, presence, state);
         
         // Check if any shower is still active in either bathroom
         if (_bathroomState.IsShoweringDetected || _masterBathroomState.IsShoweringDetected)
@@ -210,5 +227,34 @@ public class WaterHeater
             _switchEntities.WaterHeaterSwitch.TurnOff();
             _scheduledTurnOff = null;
         });
+    }
+    
+    private void UpdateBathroomStatus(string bathroomName, InputBooleanEntity presence, BathroomShowerState state)
+    {
+        BathroomState status;
+        
+        // Determine the bathroom status based on presence and showering state
+        if (state.IsShoweringDetected)
+        {
+            status = BathroomState.Showering;
+        }
+        else if (presence.IsOn())
+        {
+            status = BathroomState.Occupied;
+        }
+        else
+        {
+            status = BathroomState.Unoccupied;
+        }
+        
+        // Update the service
+        if (bathroomName == "Bathroom")
+        {
+            _bathroomStatusService.BathroomStatus = status;
+        }
+        else if (bathroomName == "Master Bathroom")
+        {
+            _bathroomStatusService.MasterBathroomStatus = status;
+        }
     }
 }

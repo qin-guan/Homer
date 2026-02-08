@@ -124,6 +124,7 @@ builder.Services.AddTransient<KdkAuthorizationDelegatingHandler>();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
 builder.Services.AddSingleton<ApiObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
+builder.Services.AddSingleton<BathroomStatusService>();
 builder.Services.AddSingleton<AsyncKeyedLocker<string>>();
 
 builder.Services.AddServerSideBlazor();

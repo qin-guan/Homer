@@ -1,0 +1,58 @@
+@using System.Reactive.Linq
+@using Homer.NetDaemon.Services
+@using Homer.NetDaemon.Entities
+
+@rendermode InteractiveServer
+@implements IDisposable
+
+<div class="d-flex flex-column gap-2" style="flex: 1;">
+    <div class="d-flex flex-column justify-content-center align-items-center bg-white rounded-3 p-2" style="flex: 1;">
+        @{
+            var bathroomStatus = BathroomStatusService.BathroomStatus;
+            var (icon, text, colorClass) = GetBathroomDisplayInfo(bathroomStatus);
+        }
+        <span class="fs-1 @colorClass">@icon</span>
+        <span class="fs-6 @colorClass fw-semibold">@text</span>
+        <span class="fs-6 text-muted">浴室</span>
+    </div>
+    
+    <div class="d-flex flex-column justify-content-center align-items-center bg-white rounded-3 p-2" style="flex: 1;">
+        @{
+            var masterBathroomStatus = BathroomStatusService.MasterBathroomStatus;
+            var (masterIcon, masterText, masterColorClass) = GetBathroomDisplayInfo(masterBathroomStatus);
+        }
+        <span class="fs-1 @masterColorClass">@masterIcon</span>
+        <span class="fs-6 @masterColorClass fw-semibold">@masterText</span>
+        <span class="fs-6 text-muted">主浴室</span>
+    </div>
+</div>
+
+@code {
+    [Inject] public BathroomStatusService BathroomStatusService { get; set; } = null!;
+    [Inject] public InputBooleanEntities InputBooleanEntities { get; set; } = null!;
+    
+    private readonly List<IDisposable> _disposables = [];
+
+    protected override void OnInitialized()
+    {
+        // Subscribe to presence changes to refresh the UI
+        _disposables.Add(InputBooleanEntities.BathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+        _disposables.Add(InputBooleanEntities.MasterBathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+    }
+
+    public void Dispose()
+    {
+        _disposables.ForEach(e => e.Dispose());
+    }
+    
+    private (string Icon, string Text, string ColorClass) GetBathroomDisplayInfo(BathroomState status)
+    {
+        return status switch
+        {
+            BathroomState.Showering => ("🚿", "淋浴中", "text-primary"),
+            BathroomState.Occupied => ("🚽", "使用中", "text-warning"),
+            BathroomState.Unoccupied => ("✓", "空闲", "text-success"),
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Unexpected bathroom state")
+        };
+    }
+}
