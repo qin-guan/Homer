@@ -38,9 +38,6 @@
         // Subscribe to presence changes to refresh the UI
         _disposables.Add(InputBooleanEntities.BathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
         _disposables.Add(InputBooleanEntities.MasterBathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
-        
-        // Refresh every second for real-time updates
-        _disposables.Add(Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(_ => InvokeAsync(StateHasChanged)));
     }
 
     public void Dispose()
