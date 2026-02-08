@@ -52,7 +52,7 @@
             BathroomState.Showering => ("🚿", "淋浴中", "text-primary"),
             BathroomState.Occupied => ("🚽", "使用中", "text-warning"),
             BathroomState.Unoccupied => ("✓", "空闲", "text-success"),
-            _ => ("?", "未知", "text-secondary")
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Unexpected bathroom state")
         };
     }
 }
