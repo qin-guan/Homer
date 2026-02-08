@@ -21,11 +21,19 @@ public class WaterHeater
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
     private IDisposable? _scheduledTurnOff;
-    private IDisposable? _periodicCheck;
-    private bool _isShoweringDetected = false;
-    private DateTime? _lastMotionTime = null;
-    private DateTime? _firstMotionAfterShowerStart = null;
-    private DateTime? _showerStartTime = null;
+    
+    // Track state for each bathroom separately
+    private readonly BathroomShowerState _bathroomState = new();
+    private readonly BathroomShowerState _masterBathroomState = new();
+    
+    private class BathroomShowerState
+    {
+        public IDisposable? PeriodicCheck { get; set; }
+        public bool IsShoweringDetected { get; set; }
+        public DateTime? LastMotionTime { get; set; }
+        public DateTime? FirstMotionAfterShowerStart { get; set; }
+        public DateTime? ShowerStartTime { get; set; }
+    }
     
     public WaterHeater(
         ILogger<WaterHeater> logger,
@@ -38,69 +46,89 @@ public class WaterHeater
         _switchEntities = switchEntities;
         _scheduler = scheduler;
         
+        // Setup monitoring for regular bathroom
         var bathroomPresence = inputBooleanEntities.BathroomPresence;
-        var motionSensorsList = new[]
+        var bathroomMotionSensors = new[]
         {
             motionSensors.BathroomTuyaPresencePresence,
             motionSensors.BathroomSinkMotionOccupancy
         };
+        SetupBathroomMonitoring("Bathroom", bathroomPresence, bathroomMotionSensors, _bathroomState);
         
+        // Setup monitoring for master bathroom
+        var masterBathroomPresence = inputBooleanEntities.MasterBathroomPresence;
+        var masterBathroomMotionSensors = new[]
+        {
+            motionSensors.MasterBathroomSinkMotionOccupancy,
+            motionSensors.MasterBathroomToiletMotionOccupancy
+        };
+        SetupBathroomMonitoring("Master Bathroom", masterBathroomPresence, masterBathroomMotionSensors, _masterBathroomState);
+    }
+    
+    private void SetupBathroomMonitoring(
+        string bathroomName,
+        InputBooleanEntity presence,
+        BinarySensorEntity[] motionSensors,
+        BathroomShowerState state)
+    {
         // Track motion sensor changes
-        Observable.Merge(motionSensorsList.Select(m => m.StateChanges()))
+        Observable.Merge(motionSensors.Select(m => m.StateChanges()))
             .Where(e => e.New.IsOn())
             .Subscribe(_ => 
             {
-                _lastMotionTime = DateTime.UtcNow;
+                state.LastMotionTime = DateTime.UtcNow;
                 
-                if (_isShoweringDetected)
+                if (state.IsShoweringDetected)
                 {
                     // Track first motion after shower starts for grace period
-                    _firstMotionAfterShowerStart ??= DateTime.UtcNow;
+                    state.FirstMotionAfterShowerStart ??= DateTime.UtcNow;
                 }
                 
-                CheckShoweringState(bathroomPresence, motionSensorsList);
+                CheckShoweringState(bathroomName, presence, motionSensors, state);
             });
         
         // Monitor bathroom presence changes
-        bathroomPresence.StateChanges().Subscribe(_ => 
+        presence.StateChanges().Subscribe(_ => 
         {
-            if (bathroomPresence.IsOn())
+            if (presence.IsOn())
             {
                 // Presence detected, start periodic monitoring for shower
-                _periodicCheck?.Dispose();
+                state.PeriodicCheck?.Dispose();
                 
                 // Schedule periodic checks starting after initial delay
-                var checkState = (presence: bathroomPresence, sensors: motionSensorsList);
-                _periodicCheck = _scheduler.SchedulePeriodic(
+                var checkState = (name: bathroomName, presence, sensors: motionSensors, state);
+                state.PeriodicCheck = _scheduler.SchedulePeriodic(
                     checkState,
                     TimeSpan.FromSeconds(PeriodicCheckIntervalSeconds),
-                    state => CheckShoweringState(state.presence, state.sensors)
+                    s => CheckShoweringState(s.name, s.presence, s.sensors, s.state)
                 );
             }
             else
             {
                 // Presence ended, stop monitoring
-                _periodicCheck?.Dispose();
-                _periodicCheck = null;
+                state.PeriodicCheck?.Dispose();
+                state.PeriodicCheck = null;
                 
-                if (_isShoweringDetected)
+                if (state.IsShoweringDetected)
                 {
-                    OnShowerEnded();
+                    OnShowerEnded(bathroomName, state);
                 }
             }
         });
     }
     
     private void CheckShoweringState(
-        InputBooleanEntity bathroomPresence, 
-        BinarySensorEntity[] motionSensors)
+        string bathroomName,
+        InputBooleanEntity presence, 
+        BinarySensorEntity[] motionSensors,
+        BathroomShowerState state)
     {
-        var presenceOn = bathroomPresence.IsOn();
+        var presenceOn = presence.IsOn();
         var anyMotion = motionSensors.Any(m => m.IsOn());
         
         // Calculate time since last motion (null means no motion detected yet)
-        var timeSinceLastMotion = _lastMotionTime.HasValue 
-            ? DateTime.UtcNow - _lastMotionTime.Value 
+        var timeSinceLastMotion = state.LastMotionTime.HasValue 
+            ? DateTime.UtcNow - state.LastMotionTime.Value 
             : TimeSpan.MaxValue;
         
         // User is showering if:
@@ -109,51 +137,62 @@ public class WaterHeater
         // 3. It's been at least ShowerDetectionThresholdSeconds since last motion (gives time to enter shower)
         var isShowering = presenceOn && !anyMotion && timeSinceLastMotion > TimeSpan.FromSeconds(ShowerDetectionThresholdSeconds);
         
-        if (isShowering && !_isShoweringDetected)
+        if (isShowering && !state.IsShoweringDetected)
         {
             // Start of shower detected
-            _logger.LogInformation("Shower detected - turning on water heater");
-            _isShoweringDetected = true;
-            _showerStartTime = DateTime.UtcNow;
-            _firstMotionAfterShowerStart = null;
+            _logger.LogInformation("{BathroomName} shower detected - turning on water heater", bathroomName);
+            state.IsShoweringDetected = true;
+            state.ShowerStartTime = DateTime.UtcNow;
+            state.FirstMotionAfterShowerStart = null;
+            
+            // Turn on heater (if not already on from other bathroom)
             _switchEntities.WaterHeaterSwitch.TurnOn();
             
-            // Cancel any scheduled turn-off
+            // Cancel any scheduled turn-off since shower is active
             _scheduledTurnOff?.Dispose();
             _scheduledTurnOff = null;
         }
-        else if (_isShoweringDetected && anyMotion && _firstMotionAfterShowerStart.HasValue)
+        else if (state.IsShoweringDetected && anyMotion && state.FirstMotionAfterShowerStart.HasValue)
         {
             // Check if motion has been sustained for the grace period
-            var timeSinceFirstMotion = DateTime.UtcNow - _firstMotionAfterShowerStart.Value;
+            var timeSinceFirstMotion = DateTime.UtcNow - state.FirstMotionAfterShowerStart.Value;
             if (timeSinceFirstMotion > TimeSpan.FromSeconds(ShowerEndGracePeriodSeconds))
             {
                 // Sustained motion detected - end of shower
-                OnShowerEnded();
+                OnShowerEnded(bathroomName, state);
             }
         }
     }
     
-    private void OnShowerEnded()
+    private void OnShowerEnded(string bathroomName, BathroomShowerState state)
     {
         // Calculate shower duration
-        var showerDuration = _showerStartTime.HasValue 
-            ? DateTime.UtcNow - _showerStartTime.Value 
+        var showerDuration = state.ShowerStartTime.HasValue 
+            ? DateTime.UtcNow - state.ShowerStartTime.Value 
             : TimeSpan.Zero;
         
-        // Calculate adaptive heater duration based on shower length
-        // Longer showers use more hot water and need more recovery time
-        // Base formula: heater time roughly equals shower time, capped between min and max
-        var heaterDurationMinutes = CalculateHeaterDuration(showerDuration);
+        _logger.LogInformation(
+            "{BathroomName} shower ended after {ShowerMinutes:F1} minutes", 
+            bathroomName,
+            showerDuration.TotalMinutes);
+        
+        state.IsShoweringDetected = false;
+        state.FirstMotionAfterShowerStart = null;
+        state.ShowerStartTime = null;
+        
+        // Check if any shower is still active in either bathroom
+        if (_bathroomState.IsShoweringDetected || _masterBathroomState.IsShoweringDetected)
+        {
+            _logger.LogInformation("Another shower is still active - keeping water heater on");
+            return;
+        }
+        
+        // Calculate adaptive heater duration based on all recent shower activity
+        var heaterDurationMinutes = CalculateHeaterDurationForAllShowers();
         
         _logger.LogInformation(
-            "Shower ended after {ShowerMinutes:F1} minutes - scheduling water heater turn off in {HeaterMinutes} minutes", 
-            showerDuration.TotalMinutes, 
+            "All showers ended - scheduling water heater turn off in {HeaterMinutes} minutes", 
             heaterDurationMinutes);
-        
-        _isShoweringDetected = false;
-        _firstMotionAfterShowerStart = null;
-        _showerStartTime = null;
         
         // Cancel any existing scheduled turn-off
         _scheduledTurnOff?.Dispose();
@@ -167,21 +206,11 @@ public class WaterHeater
         });
     }
     
-    private int CalculateHeaterDuration(TimeSpan showerDuration)
+    private int CalculateHeaterDurationForAllShowers()
     {
-        // Handle edge case where shower duration couldn't be determined
-        if (showerDuration <= TimeSpan.Zero)
-        {
-            _logger.LogWarning("Shower duration unknown, using default heating duration of {Minutes} minutes", MinHeaterOnDurationMinutes);
-            return MinHeaterOnDurationMinutes;
-        }
-        
-        // Strategy: Heater duration should roughly match shower duration
-        // Since it takes ~15 minutes of heating for a 5-10 minute shower (1.5x ratio)
-        // We use a 1.5x multiplier and cap between min and max
-        var calculatedMinutes = (int)Math.Ceiling(showerDuration.TotalMinutes * 1.5);
-        
-        // Ensure duration is within reasonable bounds
-        return Math.Clamp(calculatedMinutes, MinHeaterOnDurationMinutes, MaxHeaterOnDurationMinutes);
+        // When overlapping or sequential showers occur from both bathrooms,
+        // use maximum duration to ensure adequate water heating recovery.
+        // This conservative approach ensures hot water availability for next user(s).
+        return MaxHeaterOnDurationMinutes;
     }
 }
