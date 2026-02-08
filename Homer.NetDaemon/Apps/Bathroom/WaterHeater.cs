@@ -11,13 +11,18 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class WaterHeater
 {
+    private const int ShowerDetectionThresholdSeconds = 30;
+    private const int InitialShowerCheckDelaySeconds = 45;
+    private const int HeaterOnDurationMinutes = 15;
+    private const int PeriodicCheckIntervalSeconds = 30;
+    
     private readonly ILogger<WaterHeater> _logger;
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
     private IDisposable? _scheduledTurnOff;
     private IDisposable? _showerDetectionTimer;
     private bool _isShoweringDetected = false;
-    private DateTime _lastMotionTime = DateTime.MinValue;
+    private DateTime _lastMotionTime = DateTime.Now;
     
     public WaterHeater(
         ILogger<WaterHeater> logger,
@@ -53,7 +58,7 @@ public class WaterHeater
             {
                 // Presence detected, start monitoring for shower
                 _showerDetectionTimer?.Dispose();
-                _showerDetectionTimer = _scheduler.Schedule(TimeSpan.FromSeconds(45), () =>
+                _showerDetectionTimer = _scheduler.Schedule(TimeSpan.FromSeconds(InitialShowerCheckDelaySeconds), () =>
                 {
                     CheckShoweringState(bathroomPresence, motionSensorsList);
                 });
@@ -72,7 +77,7 @@ public class WaterHeater
         });
         
         // Periodically check for showering state when presence is on
-        _scheduler.SchedulePeriodic(TimeSpan.FromSeconds(30), () =>
+        _scheduler.SchedulePeriodic(TimeSpan.FromSeconds(PeriodicCheckIntervalSeconds), () =>
         {
             if (bathroomPresence.IsOn())
             {
@@ -92,8 +97,8 @@ public class WaterHeater
         // User is showering if:
         // 1. Presence is detected (person is in bathroom)
         // 2. No motion sensors are currently triggered
-        // 3. It's been at least 30 seconds since last motion (gives time to enter shower)
-        var isShowering = presenceOn && !anyMotion && timeSinceLastMotion > TimeSpan.FromSeconds(30);
+        // 3. It's been at least ShowerDetectionThresholdSeconds since last motion (gives time to enter shower)
+        var isShowering = presenceOn && !anyMotion && timeSinceLastMotion > TimeSpan.FromSeconds(ShowerDetectionThresholdSeconds);
         
         if (isShowering && !_isShoweringDetected)
         {
@@ -106,7 +111,7 @@ public class WaterHeater
             _scheduledTurnOff?.Dispose();
             _scheduledTurnOff = null;
         }
-        else if ((!isShowering || !presenceOn) && _isShoweringDetected && anyMotion)
+        else if (_isShoweringDetected && anyMotion)
         {
             // End of shower detected (motion resumed after showering)
             OnShowerEnded();
@@ -115,16 +120,16 @@ public class WaterHeater
     
     private void OnShowerEnded()
     {
-        _logger.LogInformation("Shower ended - scheduling water heater turn off in 15 minutes");
+        _logger.LogInformation("Shower ended - scheduling water heater turn off in {Minutes} minutes", HeaterOnDurationMinutes);
         _isShoweringDetected = false;
         
         // Cancel any existing scheduled turn-off
         _scheduledTurnOff?.Dispose();
         
-        // Schedule turn-off after 15 minutes to allow heating for next user
-        _scheduledTurnOff = _scheduler.Schedule(TimeSpan.FromMinutes(15), () =>
+        // Schedule turn-off after HeaterOnDurationMinutes to allow heating for next user
+        _scheduledTurnOff = _scheduler.Schedule(TimeSpan.FromMinutes(HeaterOnDurationMinutes), () =>
         {
-            _logger.LogInformation("Turning off water heater after 15 minute heating period");
+            _logger.LogInformation("Turning off water heater after {Minutes} minute heating period", HeaterOnDurationMinutes);
             _switchEntities.WaterHeaterSwitch.TurnOff();
             _scheduledTurnOff = null;
         });
