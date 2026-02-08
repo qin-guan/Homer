@@ -26,13 +26,19 @@ public class WaterHeater
     private readonly BathroomShowerState _bathroomState = new();
     private readonly BathroomShowerState _masterBathroomState = new();
     
-    private class BathroomShowerState
+    private class BathroomShowerState : IDisposable
     {
         public IDisposable? PeriodicCheck { get; set; }
         public bool IsShoweringDetected { get; set; }
         public DateTime? LastMotionTime { get; set; }
         public DateTime? FirstMotionAfterShowerStart { get; set; }
         public DateTime? ShowerStartTime { get; set; }
+        
+        public void Dispose()
+        {
+            PeriodicCheck?.Dispose();
+            PeriodicCheck = null;
+        }
     }
     
     public WaterHeater(
@@ -187,8 +193,8 @@ public class WaterHeater
             return;
         }
         
-        // Calculate adaptive heater duration based on all recent shower activity
-        var heaterDurationMinutes = CalculateHeaterDurationForAllShowers();
+        // Use maximum duration to ensure adequate recovery when multiple bathrooms used
+        var heaterDurationMinutes = MaxHeaterOnDurationMinutes;
         
         _logger.LogInformation(
             "All showers ended - scheduling water heater turn off in {HeaterMinutes} minutes", 
@@ -204,13 +210,5 @@ public class WaterHeater
             _switchEntities.WaterHeaterSwitch.TurnOff();
             _scheduledTurnOff = null;
         });
-    }
-    
-    private int CalculateHeaterDurationForAllShowers()
-    {
-        // When overlapping or sequential showers occur from both bathrooms,
-        // use maximum duration to ensure adequate water heating recovery.
-        // This conservative approach ensures hot water availability for next user(s).
-        return MaxHeaterOnDurationMinutes;
     }
 }
