@@ -12,7 +12,6 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 public class WaterHeater
 {
     private const int ShowerDetectionThresholdSeconds = 30;
-    private const int InitialShowerCheckDelaySeconds = 45;
     private const int HeaterOnDurationMinutes = 15;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
@@ -49,12 +48,12 @@ public class WaterHeater
             .Where(e => e.New.IsOn())
             .Subscribe(_ => 
             {
-                _lastMotionTime = DateTime.Now;
+                _lastMotionTime = DateTime.UtcNow;
                 
                 if (_isShoweringDetected)
                 {
                     // Track first motion after shower starts for grace period
-                    _firstMotionAfterShowerStart ??= DateTime.Now;
+                    _firstMotionAfterShowerStart ??= DateTime.UtcNow;
                 }
                 
                 CheckShoweringState(bathroomPresence, motionSensorsList);
@@ -99,7 +98,7 @@ public class WaterHeater
         
         // Calculate time since last motion (null means no motion detected yet)
         var timeSinceLastMotion = _lastMotionTime.HasValue 
-            ? DateTime.Now - _lastMotionTime.Value 
+            ? DateTime.UtcNow - _lastMotionTime.Value 
             : TimeSpan.MaxValue;
         
         // User is showering if:
@@ -123,7 +122,7 @@ public class WaterHeater
         else if (_isShoweringDetected && anyMotion && _firstMotionAfterShowerStart.HasValue)
         {
             // Check if motion has been sustained for the grace period
-            var timeSinceFirstMotion = DateTime.Now - _firstMotionAfterShowerStart.Value;
+            var timeSinceFirstMotion = DateTime.UtcNow - _firstMotionAfterShowerStart.Value;
             if (timeSinceFirstMotion > TimeSpan.FromSeconds(ShowerEndGracePeriodSeconds))
             {
                 // Sustained motion detected - end of shower
