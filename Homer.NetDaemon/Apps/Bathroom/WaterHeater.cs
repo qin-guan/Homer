@@ -15,14 +15,16 @@ public class WaterHeater
     private const int InitialShowerCheckDelaySeconds = 45;
     private const int HeaterOnDurationMinutes = 15;
     private const int PeriodicCheckIntervalSeconds = 30;
+    private const int ShowerEndGracePeriodSeconds = 10;
     
     private readonly ILogger<WaterHeater> _logger;
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
     private IDisposable? _scheduledTurnOff;
-    private IDisposable? _showerDetectionTimer;
+    private IDisposable? _periodicCheck;
     private bool _isShoweringDetected = false;
-    private DateTime _lastMotionTime = DateTime.Now;
+    private DateTime? _lastMotionTime = null;
+    private DateTime? _firstMotionAfterShowerStart = null;
     
     public WaterHeater(
         ILogger<WaterHeater> logger,
@@ -48,6 +50,13 @@ public class WaterHeater
             .Subscribe(_ => 
             {
                 _lastMotionTime = DateTime.Now;
+                
+                if (_isShoweringDetected)
+                {
+                    // Track first motion after shower starts for grace period
+                    _firstMotionAfterShowerStart ??= DateTime.Now;
+                }
+                
                 CheckShoweringState(bathroomPresence, motionSensorsList);
             });
         
@@ -56,32 +65,27 @@ public class WaterHeater
         {
             if (bathroomPresence.IsOn())
             {
-                // Presence detected, start monitoring for shower
-                _showerDetectionTimer?.Dispose();
-                _showerDetectionTimer = _scheduler.Schedule(TimeSpan.FromSeconds(InitialShowerCheckDelaySeconds), () =>
-                {
-                    CheckShoweringState(bathroomPresence, motionSensorsList);
-                });
+                // Presence detected, start periodic monitoring for shower
+                _periodicCheck?.Dispose();
+                
+                // Schedule periodic checks starting after initial delay
+                var checkState = (presence: bathroomPresence, sensors: motionSensorsList);
+                _periodicCheck = _scheduler.SchedulePeriodic(
+                    checkState,
+                    TimeSpan.FromSeconds(PeriodicCheckIntervalSeconds),
+                    state => CheckShoweringState(state.presence, state.sensors)
+                );
             }
             else
             {
-                // Presence ended
-                _showerDetectionTimer?.Dispose();
-                _showerDetectionTimer = null;
+                // Presence ended, stop monitoring
+                _periodicCheck?.Dispose();
+                _periodicCheck = null;
                 
                 if (_isShoweringDetected)
                 {
                     OnShowerEnded();
                 }
-            }
-        });
-        
-        // Periodically check for showering state when presence is on
-        _scheduler.SchedulePeriodic(TimeSpan.FromSeconds(PeriodicCheckIntervalSeconds), () =>
-        {
-            if (bathroomPresence.IsOn())
-            {
-                CheckShoweringState(bathroomPresence, motionSensorsList);
             }
         });
     }
@@ -92,7 +96,11 @@ public class WaterHeater
     {
         var presenceOn = bathroomPresence.IsOn();
         var anyMotion = motionSensors.Any(m => m.IsOn());
-        var timeSinceLastMotion = DateTime.Now - _lastMotionTime;
+        
+        // Calculate time since last motion (null means no motion detected yet)
+        var timeSinceLastMotion = _lastMotionTime.HasValue 
+            ? DateTime.Now - _lastMotionTime.Value 
+            : TimeSpan.MaxValue;
         
         // User is showering if:
         // 1. Presence is detected (person is in bathroom)
@@ -105,16 +113,22 @@ public class WaterHeater
             // Start of shower detected
             _logger.LogInformation("Shower detected - turning on water heater");
             _isShoweringDetected = true;
+            _firstMotionAfterShowerStart = null;
             _switchEntities.WaterHeaterSwitch.TurnOn();
             
             // Cancel any scheduled turn-off
             _scheduledTurnOff?.Dispose();
             _scheduledTurnOff = null;
         }
-        else if (_isShoweringDetected && anyMotion)
+        else if (_isShoweringDetected && anyMotion && _firstMotionAfterShowerStart.HasValue)
         {
-            // End of shower detected (motion resumed after showering)
-            OnShowerEnded();
+            // Check if motion has been sustained for the grace period
+            var timeSinceFirstMotion = DateTime.Now - _firstMotionAfterShowerStart.Value;
+            if (timeSinceFirstMotion > TimeSpan.FromSeconds(ShowerEndGracePeriodSeconds))
+            {
+                // Sustained motion detected - end of shower
+                OnShowerEnded();
+            }
         }
     }
     
@@ -122,6 +136,7 @@ public class WaterHeater
     {
         _logger.LogInformation("Shower ended - scheduling water heater turn off in {Minutes} minutes", HeaterOnDurationMinutes);
         _isShoweringDetected = false;
+        _firstMotionAfterShowerStart = null;
         
         // Cancel any existing scheduled turn-off
         _scheduledTurnOff?.Dispose();
