@@ -12,7 +12,8 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 public class WaterHeater
 {
     private const int ShowerDetectionThresholdSeconds = 30;
-    private const int HeaterOnDurationMinutes = 15;
+    private const int MinHeaterOnDurationMinutes = 10;
+    private const int MaxHeaterOnDurationMinutes = 20;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
     
@@ -24,6 +25,7 @@ public class WaterHeater
     private bool _isShoweringDetected = false;
     private DateTime? _lastMotionTime = null;
     private DateTime? _firstMotionAfterShowerStart = null;
+    private DateTime? _showerStartTime = null;
     
     public WaterHeater(
         ILogger<WaterHeater> logger,
@@ -112,6 +114,7 @@ public class WaterHeater
             // Start of shower detected
             _logger.LogInformation("Shower detected - turning on water heater");
             _isShoweringDetected = true;
+            _showerStartTime = DateTime.UtcNow;
             _firstMotionAfterShowerStart = null;
             _switchEntities.WaterHeaterSwitch.TurnOn();
             
@@ -133,19 +136,45 @@ public class WaterHeater
     
     private void OnShowerEnded()
     {
-        _logger.LogInformation("Shower ended - scheduling water heater turn off in {Minutes} minutes", HeaterOnDurationMinutes);
+        // Calculate shower duration
+        var showerDuration = _showerStartTime.HasValue 
+            ? DateTime.UtcNow - _showerStartTime.Value 
+            : TimeSpan.Zero;
+        
+        // Calculate adaptive heater duration based on shower length
+        // Longer showers use more hot water and need more recovery time
+        // Base formula: heater time roughly equals shower time, capped between min and max
+        var heaterDurationMinutes = CalculateHeaterDuration(showerDuration);
+        
+        _logger.LogInformation(
+            "Shower ended after {ShowerMinutes:F1} minutes - scheduling water heater turn off in {HeaterMinutes} minutes", 
+            showerDuration.TotalMinutes, 
+            heaterDurationMinutes);
+        
         _isShoweringDetected = false;
         _firstMotionAfterShowerStart = null;
+        _showerStartTime = null;
         
         // Cancel any existing scheduled turn-off
         _scheduledTurnOff?.Dispose();
         
-        // Schedule turn-off after HeaterOnDurationMinutes to allow heating for next user
-        _scheduledTurnOff = _scheduler.Schedule(TimeSpan.FromMinutes(HeaterOnDurationMinutes), () =>
+        // Schedule turn-off after calculated duration to allow heating for next user
+        _scheduledTurnOff = _scheduler.Schedule(TimeSpan.FromMinutes(heaterDurationMinutes), () =>
         {
-            _logger.LogInformation("Turning off water heater after {Minutes} minute heating period", HeaterOnDurationMinutes);
+            _logger.LogInformation("Turning off water heater after {Minutes} minute heating period", heaterDurationMinutes);
             _switchEntities.WaterHeaterSwitch.TurnOff();
             _scheduledTurnOff = null;
         });
+    }
+    
+    private int CalculateHeaterDuration(TimeSpan showerDuration)
+    {
+        // Strategy: Heater duration should roughly match shower duration
+        // Since it takes ~15 minutes of heating for a 5-10 minute shower (1.5x-3x ratio)
+        // We use a 1.5x multiplier and cap between min and max
+        var calculatedMinutes = (int)Math.Ceiling(showerDuration.TotalMinutes * 1.5);
+        
+        // Ensure duration is within reasonable bounds
+        return Math.Clamp(calculatedMinutes, MinHeaterOnDurationMinutes, MaxHeaterOnDurationMinutes);
     }
 }
