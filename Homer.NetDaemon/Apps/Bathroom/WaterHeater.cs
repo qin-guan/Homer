@@ -13,7 +13,7 @@ public class WaterHeater
 {
     private const int ShowerDetectionThresholdSeconds = 30;
     private const int MinHeaterOnDurationMinutes = 10;
-    private const int MaxHeaterOnDurationMinutes = 20;
+    private const int MaxHeaterOnDurationMinutes = 18;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
     
