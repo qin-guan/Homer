@@ -250,7 +250,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         if (!_light.IsOn())
             return;
 
-        // Using LocalDateTime to match the local timezone of the smart home system
+        // Using LocalDateTime to match the local timezone of the smart home system (Singapore Time - UTC+8)
         var currentTime = TimeOnly.FromDateTime(_scheduler.Now.LocalDateTime);
         var isDay = _sun.State == "above_horizon";
         var temperature = _temperatureSensor.State;
@@ -264,7 +264,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
             _logger.LogInformation("Evening/Night time, setting warm color temperature ({ColorTemp}K)", targetColorTemp);
         }
         // Hot weather - cool light to create psychological cooling effect
-        else if (temperature >= TemperatureHot)
+        else if (temperature.HasValue && temperature >= TemperatureHot)
         {
             targetColorTemp = ColorTempCool;
             _logger.LogInformation("Hot weather, setting cool color temperature ({ColorTemp}K)", targetColorTemp);
