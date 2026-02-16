@@ -255,16 +255,12 @@ public class WaterHeater
                 }
 
                 var onDuration = DateTime.UtcNow - turnedOnAt;
-                if (onDuration <= TimeSpan.FromHours(MaxContinuousHeaterOnDurationHours))
-                {
-                    return;
-                }
-
                 _switchEntities.WaterHeaterSwitch.TurnOff();
                 _maxContinuousOnTurnOff = null;
 
+                var hourLabel = MaxContinuousHeaterOnDurationHours == 1 ? "hour" : "hours";
                 var message =
-                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationHours} hour). Turned on at {turnedOnAt.ToLocalTime():yyyy-MM-dd HH:mm:ss}.";
+                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationHours} {hourLabel}). Turned on at {turnedOnAt:yyyy-MM-dd HH:mm:ss} UTC.";
                 _logger.LogWarning(message);
                 _notifyServices.Notify(message, "Water heater safety turn-off");
             });
