@@ -88,7 +88,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
             {
                 var item = f.Data.Items.FirstOrDefault();
                 if (item == null) return null;
-                var forecast = item.Forecasts.FirstOrDefault(f => f.Area == "Bishan");
+                var forecast = item.Forecasts.FirstOrDefault(fc => fc.Area == "Bishan");
                 return forecast?.Value;
             })
             .Where(forecast => forecast != null)
@@ -122,7 +122,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
 
     private void AdjustFanSpeedBasedOnTemperature(double? temperature)
     {
-        if (!temperature.HasValue || !_fan.IsOn())
+        if (!temperature.HasValue)
             return;
 
         var temp = temperature.Value;
@@ -132,21 +132,29 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         {
             targetPercentage = 100; // Maximum speed
             _logger.LogInformation("Very hot ({Temp}°C), setting fan to 100%", temp);
+            if (!_fan.IsOn()) _fan.TurnOn();
+            _fan.SetPercentage(targetPercentage);
         }
         else if (temp >= TemperatureHot)
         {
             targetPercentage = 75;
             _logger.LogInformation("Hot ({Temp}°C), setting fan to 75%", temp);
+            if (!_fan.IsOn()) _fan.TurnOn();
+            _fan.SetPercentage(targetPercentage);
         }
         else if (temp >= TemperatureWarm)
         {
             targetPercentage = 50;
             _logger.LogInformation("Warm ({Temp}°C), setting fan to 50%", temp);
+            if (!_fan.IsOn()) _fan.TurnOn();
+            _fan.SetPercentage(targetPercentage);
         }
         else if (temp >= TemperatureCool)
         {
             targetPercentage = 25;
             _logger.LogInformation("Cool ({Temp}°C), setting fan to 25%", temp);
+            if (!_fan.IsOn()) _fan.TurnOn();
+            _fan.SetPercentage(targetPercentage);
         }
         else
         {
@@ -155,8 +163,6 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
             _fan.TurnOff();
             return;
         }
-
-        _fan.SetPercentage(targetPercentage);
     }
 
     private void AdjustFanBasedOnWeather(string forecast)
@@ -244,6 +250,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         if (!_light.IsOn())
             return;
 
+        // Using LocalDateTime to match the local timezone of the smart home system
         var currentTime = TimeOnly.FromDateTime(_scheduler.Now.LocalDateTime);
         var isDay = _sun.State == "above_horizon";
         var temperature = _temperatureSensor.State;
