@@ -126,42 +126,36 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
             return;
 
         var temp = temperature.Value;
-        int targetPercentage;
 
         if (temp >= TemperatureVeryHot)
         {
-            targetPercentage = 100; // Maximum speed
             _logger.LogInformation("Very hot ({Temp}°C), setting fan to 100%", temp);
-            if (!_fan.IsOn()) _fan.TurnOn();
-            _fan.SetPercentage(targetPercentage);
+            _fan.TurnOn();
+            _fan.SetPercentage(100);
         }
         else if (temp >= TemperatureHot)
         {
-            targetPercentage = 75;
             _logger.LogInformation("Hot ({Temp}°C), setting fan to 75%", temp);
-            if (!_fan.IsOn()) _fan.TurnOn();
-            _fan.SetPercentage(targetPercentage);
+            _fan.TurnOn();
+            _fan.SetPercentage(75);
         }
         else if (temp >= TemperatureWarm)
         {
-            targetPercentage = 50;
             _logger.LogInformation("Warm ({Temp}°C), setting fan to 50%", temp);
-            if (!_fan.IsOn()) _fan.TurnOn();
-            _fan.SetPercentage(targetPercentage);
+            _fan.TurnOn();
+            _fan.SetPercentage(50);
         }
         else if (temp >= TemperatureCool)
         {
-            targetPercentage = 25;
             _logger.LogInformation("Cool ({Temp}°C), setting fan to 25%", temp);
-            if (!_fan.IsOn()) _fan.TurnOn();
-            _fan.SetPercentage(targetPercentage);
+            _fan.TurnOn();
+            _fan.SetPercentage(25);
         }
         else
         {
             // Too cold, turn off fan
             _logger.LogInformation("Cold ({Temp}°C), turning fan off", temp);
             _fan.TurnOff();
-            return;
         }
     }
 
@@ -250,7 +244,8 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         if (!_light.IsOn())
             return;
 
-        // Using LocalDateTime to match the local timezone of the smart home system (Singapore Time - UTC+8)
+        // Using LocalDateTime assuming the system is configured to Singapore Time (UTC+8).
+        // If the system timezone differs, the time-based logic will not work as expected.
         var currentTime = TimeOnly.FromDateTime(_scheduler.Now.LocalDateTime);
         var isDay = _sun.State == "above_horizon";
         var temperature = _temperatureSensor.State;
