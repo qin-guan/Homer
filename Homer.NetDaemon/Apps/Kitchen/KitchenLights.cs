@@ -42,8 +42,7 @@ public class KitchenLights : IAsyncInitializable
         ILogger<KitchenLights> logger,
         IScheduler scheduler,
         BinarySensorEntities binarySensorEntities,
-        SwitchEntities switchEntities,
-        SensorEntities sensorEntities
+        SwitchEntities switchEntities
     )
     {
         var eventsProcessedMeter =
@@ -70,8 +69,6 @@ public class KitchenLights : IAsyncInitializable
         [
             switchEntities.KitchenLightsLeft,
         ];
-
-        var lightSensor = sensorEntities.ScreekHumanSensor2a872668Illuminance;
 
         var triggerObservables = _triggerEntities.Select(e => e.StateChanges()).Merge();
         var presenceObservables = _presenceEntities.Select(e => e.StateChanges()).Merge().DistinctUntilChanged();
@@ -100,8 +97,6 @@ public class KitchenLights : IAsyncInitializable
             })
             .Subscribe(_ =>
             {
-                if (lightSensor.State > 0.4) return;
-
                 switch (LightingPreference())
                 {
                     case KitchenLightingPreference.All:
