@@ -21,7 +21,8 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
     private readonly NumericSensorEntity _temperatureSensor;
     private readonly NumericSensorEntity _lightSensor;
     private readonly SunEntity _sun;
-    private readonly InputBooleanEntity _manualOverride;
+    private readonly InputBooleanEntity _laundryModeSwitch;  // Used as manual override
+    private readonly IScheduler _scheduler;
     private readonly List<IDisposable> _disposables = [];
 
     // Weather-based fan speed thresholds
@@ -39,6 +40,13 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
     private const int ColorTempWarm = 2700;  // Warm white for evening
     private const int ColorTempNeutral = 4000;  // Neutral for day
     private const int ColorTempCool = 5500;  // Cool white for hot weather
+
+    // Time of day thresholds
+    private const int EveningStartHour = 18;  // 6 PM
+    private const int MorningStartHour = 6;   // 6 AM
+
+    // Minimum fan speed to maintain during rainy weather
+    private const int MinimumFanSpeedPercent = 25;
 
     public LivingRoomKdkIntelligentControl(
         ILogger<LivingRoomKdkIntelligentControl> logger,
@@ -61,11 +69,12 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         _temperatureSensor = sensorEntities.Daikinap16703InsideTemperature;
         _lightSensor = sensorEntities.PresenceSensorFp2B4c4LightSensorLightLevel;
         _sun = sunEntities.Sun;
-        _manualOverride = inputBooleanEntities.LiangYiMoShi;
+        _laundryModeSwitch = inputBooleanEntities.LiangYiMoShi;
+        _scheduler = scheduler;
 
         // Temperature-based fan speed control
         _disposables.Add(_temperatureSensor.StateChanges()
-            .Where(_ => !_manualOverride.IsOn())
+            .Where(_ => !_laundryModeSwitch.IsOn())
             .Throttle(TimeSpan.FromMinutes(2), scheduler)
             .Subscribe(e =>
             {
@@ -75,18 +84,25 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
 
         // Weather forecast-based adjustments
         _disposables.Add(apiFactory.CreateForecast()
-            .Select(f => f.Data.Items.First().Forecasts.First(f => f.Area == "Bishan").Value)
+            .Select(f =>
+            {
+                var item = f.Data.Items.FirstOrDefault();
+                if (item == null) return null;
+                var forecast = item.Forecasts.FirstOrDefault(f => f.Area == "Bishan");
+                return forecast?.Value;
+            })
+            .Where(forecast => forecast != null)
             .DistinctUntilChanged()
-            .Where(_ => !_manualOverride.IsOn())
+            .Where(_ => !_laundryModeSwitch.IsOn())
             .Subscribe(forecast =>
             {
                 eventsProcessedMeter.Add(1);
-                AdjustFanBasedOnWeather(forecast);
+                AdjustFanBasedOnWeather(forecast!);
             }));
 
         // Light sensor-based brightness and color temperature control
         _disposables.Add(_lightSensor.StateChanges()
-            .Where(_ => !_manualOverride.IsOn())
+            .Where(_ => !_laundryModeSwitch.IsOn())
             .Throttle(TimeSpan.FromMinutes(3), scheduler)
             .Subscribe(e =>
             {
@@ -96,7 +112,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
 
         // Sun position-based color temperature adjustments
         _disposables.Add(Observable.Interval(TimeSpan.FromMinutes(30), scheduler)
-            .Where(_ => !_manualOverride.IsOn())
+            .Where(_ => !_laundryModeSwitch.IsOn())
             .Subscribe(_ =>
             {
                 eventsProcessedMeter.Add(1);
@@ -160,11 +176,30 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
             "Heavy Thundery Showers with Gusty Winds"
         );
 
-        if (isRainy)
+        if (isRainy && _temperatureSensor.State.HasValue)
         {
-            // Reduce fan speed during rainy weather as it's typically cooler
-            _logger.LogInformation("Rainy weather detected ({Forecast}), reducing fan speed slightly", forecast);
-            _fan.DecreaseSpeed(percentageStep: 10);
+            // During rainy weather, set fan to a comfortable lower speed based on temperature
+            // Rain typically cools the environment, so we reduce speed but maintain minimum ventilation
+            var temperature = _temperatureSensor.State.Value;
+            int targetPercentage;
+
+            if (temperature >= TemperatureHot)
+            {
+                targetPercentage = 50;  // Still hot despite rain
+            }
+            else if (temperature >= TemperatureWarm)
+            {
+                targetPercentage = 35;  // Moderate speed
+            }
+            else
+            {
+                targetPercentage = MinimumFanSpeedPercent;  // Minimum ventilation
+            }
+
+            _logger.LogInformation(
+                "Rainy weather detected ({Forecast}), adjusting fan speed to {Percentage}% based on temperature {Temp}°C",
+                forecast, targetPercentage, temperature);
+            _fan.SetPercentage(targetPercentage);
         }
     }
 
@@ -209,14 +244,14 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         if (!_light.IsOn())
             return;
 
-        var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+        var currentTime = TimeOnly.FromDateTime(_scheduler.Now.LocalDateTime);
         var isDay = _sun.State == "above_horizon";
         var temperature = _temperatureSensor.State;
 
         int targetColorTemp;
 
-        // Evening (after 6 PM) - warm light
-        if (currentTime.Hour >= 18 || currentTime.Hour < 6)
+        // Evening (after 6 PM) or night (before 6 AM) - warm light
+        if (currentTime.Hour >= EveningStartHour || currentTime.Hour < MorningStartHour)
         {
             targetColorTemp = ColorTempWarm;
             _logger.LogInformation("Evening/Night time, setting warm color temperature ({ColorTemp}K)", targetColorTemp);
@@ -247,7 +282,7 @@ public class LivingRoomKdkIntelligentControl : IAsyncInitializable, IAsyncDispos
         _logger.LogInformation("Living Room KDK Intelligent Control initialized");
 
         // Perform initial adjustments
-        if (!_manualOverride.IsOn())
+        if (!_laundryModeSwitch.IsOn())
         {
             AdjustFanSpeedBasedOnTemperature(_temperatureSensor.State);
             AdjustLightBasedOnAmbient(_lightSensor.State);
