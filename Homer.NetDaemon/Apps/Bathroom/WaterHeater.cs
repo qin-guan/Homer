@@ -17,13 +17,16 @@ public class WaterHeater
     private const int MaxHeaterOnDurationMinutes = 18;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
+    private const int MaxContinuousHeaterOnDurationHours = 1;
     
     private readonly ILogger<WaterHeater> _logger;
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
     private readonly BathroomStatusService _bathroomStatusService;
     private readonly WaterHeaterTimerService _waterHeaterTimerService;
+    private readonly NotifyServices _notifyServices;
     private IDisposable? _scheduledTurnOff;
+    private IDisposable? _maxContinuousOnTurnOff;
     
     // Track state for each bathroom separately
     private readonly BathroomShowerState _bathroomState = new();
@@ -51,6 +54,7 @@ public class WaterHeater
         InputBooleanEntities inputBooleanEntities,
         BathroomStatusService bathroomStatusService,
         WaterHeaterTimerService waterHeaterTimerService,
+        NotifyServices notifyServices,
         IScheduler scheduler)
     {
         _logger = logger;
@@ -58,6 +62,7 @@ public class WaterHeater
         _scheduler = scheduler;
         _bathroomStatusService = bathroomStatusService;
         _waterHeaterTimerService = waterHeaterTimerService;
+        _notifyServices = notifyServices;
         
         // Setup monitoring for regular bathroom
         var bathroomPresence = inputBooleanEntities.BathroomPresence;
@@ -165,8 +170,14 @@ public class WaterHeater
             UpdateBathroomStatus(bathroomName, presence, state);
             
             // Turn on heater (if not already on from other bathroom)
+            var wasHeaterOn = _switchEntities.WaterHeaterSwitch.IsOn();
             _switchEntities.WaterHeaterSwitch.TurnOn();
-            _waterHeaterTimerService.LastTurnedOnDateTime = DateTime.UtcNow;
+            if (!wasHeaterOn)
+            {
+                var turnedOnAt = DateTime.UtcNow;
+                _waterHeaterTimerService.LastTurnedOnDateTime = turnedOnAt;
+                ScheduleMaxContinuousOnTurnOff(turnedOnAt);
+            }
             
             // Cancel any scheduled turn-off since shower is active
             _scheduledTurnOff?.Dispose();
@@ -225,8 +236,34 @@ public class WaterHeater
         {
             _logger.LogInformation("Turning off water heater after {Minutes} minute heating period", heaterDurationMinutes);
             _switchEntities.WaterHeaterSwitch.TurnOff();
+            _maxContinuousOnTurnOff?.Dispose();
+            _maxContinuousOnTurnOff = null;
             _scheduledTurnOff = null;
         });
+    }
+
+    private void ScheduleMaxContinuousOnTurnOff(DateTime turnedOnAt)
+    {
+        _maxContinuousOnTurnOff?.Dispose();
+        _maxContinuousOnTurnOff = _scheduler.Schedule(
+            TimeSpan.FromHours(MaxContinuousHeaterOnDurationHours),
+            () =>
+            {
+                if (!_switchEntities.WaterHeaterSwitch.IsOn() || _waterHeaterTimerService.LastTurnedOnDateTime != turnedOnAt)
+                {
+                    return;
+                }
+
+                var onDuration = DateTime.UtcNow - turnedOnAt;
+                _switchEntities.WaterHeaterSwitch.TurnOff();
+                _maxContinuousOnTurnOff = null;
+
+                var hourLabel = MaxContinuousHeaterOnDurationHours == 1 ? "hour" : "hours";
+                var message =
+                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationHours} {hourLabel}). Turned on at {turnedOnAt:yyyy-MM-dd HH:mm:ss} UTC.";
+                _logger.LogWarning(message);
+                _notifyServices.Notify(message, "Water heater safety turn-off");
+            });
     }
     
     private void UpdateBathroomStatus(string bathroomName, InputBooleanEntity presence, BathroomShowerState state)
