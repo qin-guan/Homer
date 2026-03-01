@@ -1,0 +1,52 @@
+<Project Sdk="Uno.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <UnoSingleProject>true</UnoSingleProject>
+
+    <!-- Display name -->
+    <ApplicationTitle>Homer.Kiosk</ApplicationTitle>
+    <!-- App Identifier -->
+    <ApplicationId>com.companyname.homer-kiosk</ApplicationId>
+    <!-- Versions -->
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <!-- Package Publisher -->
+    <ApplicationPublisher>Homer.Kiosk</ApplicationPublisher>
+    <!-- Package Description -->
+    <Description>Homer.Kiosk powered by Uno Platform.</Description>
+
+    <!--
+      UnoFeatures are used to quickly add and manage features enabled for your app.
+      https://aka.platform.uno/singleproject-features
+    -->
+    <UnoFeatures>
+      CSharpMarkup;
+      Material;
+      Dsp;
+      Hosting;
+      Toolkit;
+      Logging;
+      LoggingSerilog;
+      MVUX;
+      Configuration;
+      HttpRefit;
+      Serialization;
+      Localization;
+      Navigation;
+      ThemeService;
+      SkiaRenderer;
+    </UnoFeatures>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetDaemon.AppModel" />
+    <PackageReference Include="NetDaemon.Client" />
+    <PackageReference Include="NetDaemon.HassModel" />
+    <PackageReference Include="R3" />
+    <PackageReference Include="System.Reactive" />
+    <PackageReference Include="AsyncKeyedLock" />
+  </ItemGroup>
+
+</Project>
