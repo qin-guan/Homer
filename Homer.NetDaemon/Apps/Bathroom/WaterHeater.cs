@@ -12,9 +12,7 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class WaterHeater
 {
-    private const int ShowerDetectionThresholdSeconds = 30;
-    private const int MinHeaterOnDurationMinutes = 10;
-    private const int MaxHeaterOnDurationMinutes = 18;
+    private const int ShowerDetectionThresholdSeconds = 180;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
     private const int MaxContinuousHeaterOnDurationHours = 1;
@@ -68,7 +66,6 @@ public class WaterHeater
         var bathroomPresence = inputBooleanEntities.BathroomPresence;
         var bathroomMotionSensors = new[]
         {
-            motionSensors.BathroomTuyaPresencePresence,
             motionSensors.BathroomSinkMotionOccupancy
         };
         SetupBathroomMonitoring("Bathroom", bathroomPresence, bathroomMotionSensors, _bathroomState);
@@ -111,6 +108,7 @@ public class WaterHeater
             if (presence.IsOn())
             {
                 // Presence detected, update status and start periodic monitoring for shower
+                state.LastMotionTime = DateTime.UtcNow;
                 UpdateBathroomStatus(bathroomName, presence, state);
                 state.PeriodicCheck?.Dispose();
                 
@@ -221,20 +219,19 @@ public class WaterHeater
             return;
         }
         
-        // Use maximum duration to ensure adequate recovery when multiple bathrooms used
-        var heaterDurationMinutes = MaxHeaterOnDurationMinutes;
+        var heaterDuration = TimeSpan.FromMinutes(showerDuration.TotalMinutes);
         
         _logger.LogInformation(
-            "All showers ended - scheduling water heater turn off in {HeaterMinutes} minutes", 
-            heaterDurationMinutes);
+            "All showers ended - scheduling water heater turn off in {HeaterMinutes:F1} minutes",
+            heaterDuration.TotalMinutes);
         
         // Cancel any existing scheduled turn-off
         _scheduledTurnOff?.Dispose();
         
         // Schedule turn-off after calculated duration to allow heating for next user
-        _scheduledTurnOff = _scheduler.Schedule(TimeSpan.FromMinutes(heaterDurationMinutes), () =>
+        _scheduledTurnOff = _scheduler.Schedule(heaterDuration, () =>
         {
-            _logger.LogInformation("Turning off water heater after {Minutes} minute heating period", heaterDurationMinutes);
+            _logger.LogInformation("Turning off water heater after {Minutes:F1} minute heating period", heaterDuration.TotalMinutes);
             _switchEntities.WaterHeaterSwitch.TurnOff();
             _maxContinuousOnTurnOff?.Dispose();
             _maxContinuousOnTurnOff = null;
