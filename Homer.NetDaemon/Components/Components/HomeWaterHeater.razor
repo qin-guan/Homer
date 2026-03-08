@@ -11,11 +11,10 @@
     {
         <span class="fs-1 text-danger fw-bold">开</span>
         <span class="fs-6 text-muted">热水器</span>
-        @if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
+        @if (RemainingTime is { } remainingTime)
         {
             <span class="fs-4 text-danger mt-2">
-                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Minutes):
-                @((WaterHeaterTimerService.ScheduledTurnOffDateTime - DateTime.Now).Value.Seconds.ToString("D2"))
+                @(((int)remainingTime.TotalMinutes).ToString("D2")):@(remainingTime.Seconds.ToString("D2"))
             </span>
             <span class="fs-6 text-muted">倒计时</span>
         }
@@ -43,19 +42,29 @@
     protected override void OnInitialized()
     {
         _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
-        if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not null)
-        {
-            _disposables.Add(
-                Observable.Interval(TimeSpan.FromSeconds(1))
-                    .TakeUntil(WaterHeaterTimerService.ScheduledTurnOffDateTime.Value)
-                    .Subscribe(_ => InvokeAsync(StateHasChanged))
-            );
-        }
+        _disposables.Add(
+            Observable.Interval(TimeSpan.FromSeconds(1))
+                .Subscribe(_ => InvokeAsync(StateHasChanged))
+        );
     }
 
     public void Dispose()
     {
         _disposables.ForEach(e => e.Dispose());
+    }
+
+    private TimeSpan? RemainingTime
+    {
+        get
+        {
+            if (WaterHeaterTimerService.ScheduledTurnOffDateTime is not { } scheduledTurnOffDateTime)
+            {
+                return null;
+            }
+
+            var remainingTime = scheduledTurnOffDateTime - DateTime.Now;
+            return remainingTime > TimeSpan.Zero ? remainingTime : null;
+        }
     }
 
 }
