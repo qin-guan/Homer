@@ -10,10 +10,10 @@
 
     <ItemGroup>
         <PackageReference Include="AsyncKeyedLock" Version="8.0.2" />
-        <PackageReference Include="BootstrapBlazor" Version="10.3.1" />
+        <PackageReference Include="BootstrapBlazor" Version="10.4.0" />
         <PackageReference Include="BootstrapBlazor.FontAwesome" Version="10.0.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.4" />
         <PackageReference Include="NetDaemon.AppModel" Version="26.3.0" />
         <PackageReference Include="NetDaemon.AppModel.SourceDeployedApps" Version="26.3.0" />
         <PackageReference Include="NetDaemon.Client" Version="26.3.0" />
