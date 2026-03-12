@@ -250,10 +250,22 @@ public class WaterHeater
 
     private void ReevaluateHeater(string reason)
     {
-        if (AnyBathroomOccupied || AnyShowerActive)
+        if (AnyShowerActive)
         {
             CancelScheduledTurnOff();
-            EnsureHeaterOn($"{reason} and the bathroom is in use");
+            EnsureHeaterOn($"{reason} and showering is active");
+            return;
+        }
+
+        if (AnyBathroomOccupied)
+        {
+            CancelScheduledTurnOff();
+
+            if (_switchEntities.WaterHeaterSwitch.IsOn())
+            {
+                _waterHeaterTimerService.ScheduledTurnOffDateTime = GetMaxContinuousTurnOffDateTime();
+            }
+
             return;
         }
 
