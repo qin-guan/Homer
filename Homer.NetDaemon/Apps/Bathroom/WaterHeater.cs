@@ -10,10 +10,10 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class WaterHeater
 {
-    private const int ShowerDetectionThresholdSeconds = 180;
+    private const int ShowerDetectionThresholdSeconds = 300;
     private const int PeriodicCheckIntervalSeconds = 30;
     private const int ShowerEndGracePeriodSeconds = 10;
-    private const int MaxContinuousHeaterOnDurationHours = 1;
+    private const int MaxContinuousHeaterOnDurationMinutes = 45;
     private const int BasePostShowerRecoveryMinutes = 15;
     private const double AdditionalRecoveryPerShowerMinute = 0.5;
 
@@ -88,7 +88,7 @@ public class WaterHeater
             var turnedOnAt = _waterHeaterTimerService.LastTurnedOnDateTime ?? DateTime.UtcNow;
             _waterHeaterTimerService.LastTurnedOnDateTime = turnedOnAt;
             _waterHeaterTimerService.ScheduledTurnOffDateTime =
-                turnedOnAt.AddHours(MaxContinuousHeaterOnDurationHours);
+                turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
             ScheduleMaxContinuousOnTurnOff(turnedOnAt);
         }
 
@@ -228,7 +228,7 @@ public class WaterHeater
     {
         _maxContinuousOnTurnOff?.Dispose();
         _maxContinuousOnTurnOff = _scheduler.Schedule(
-            TimeSpan.FromHours(MaxContinuousHeaterOnDurationHours),
+            TimeSpan.FromMinutes(MaxContinuousHeaterOnDurationMinutes),
             () =>
             {
                 if (!_switchEntities.WaterHeaterSwitch.IsOn() || _waterHeaterTimerService.LastTurnedOnDateTime != turnedOnAt)
@@ -240,9 +240,8 @@ public class WaterHeater
                 TurnHeaterOff(
                     $"the continuous runtime safeguard fired after {onDuration.TotalMinutes:F1} minutes");
 
-                var hourLabel = MaxContinuousHeaterOnDurationHours == 1 ? "hour" : "hours";
                 var message =
-                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationHours} {hourLabel}). Turned on at {turnedOnAt:yyyy-MM-dd HH:mm:ss} UTC.";
+                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationMinutes} minutes). Turned on at {turnedOnAt:yyyy-MM-dd HH:mm:ss} UTC.";
                 _logger.LogWarning(message);
                 _notifyServices.Notify(message, "Water heater safety turn-off");
             });
@@ -302,7 +301,7 @@ public class WaterHeater
         var turnedOnAt = DateTime.UtcNow;
         _waterHeaterTimerService.LastTurnedOnDateTime = turnedOnAt;
         _waterHeaterTimerService.ScheduledTurnOffDateTime =
-            turnedOnAt.AddHours(MaxContinuousHeaterOnDurationHours);
+            turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
         ScheduleMaxContinuousOnTurnOff(turnedOnAt);
     }
 
@@ -355,7 +354,7 @@ public class WaterHeater
     private DateTime GetMaxContinuousTurnOffDateTime()
     {
         var turnedOnAt = _waterHeaterTimerService.LastTurnedOnDateTime ?? DateTime.UtcNow;
-        return turnedOnAt.AddHours(MaxContinuousHeaterOnDurationHours);
+        return turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
     }
 
     private void ResetHeatingSession()
