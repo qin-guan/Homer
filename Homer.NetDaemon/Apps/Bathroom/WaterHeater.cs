@@ -1,6 +1,7 @@
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Services;
 using NetDaemon.AppModel;
+using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -10,42 +11,40 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 [NetDaemonApp]
 public class WaterHeater
 {
-    private const int ShowerDetectionThresholdSeconds = 300;
-    private const int PeriodicCheckIntervalSeconds = 30;
-    private const int ShowerEndGracePeriodSeconds = 10;
-    private const int MaxContinuousHeaterOnDurationMinutes = 45;
-    private const int BasePostShowerRecoveryMinutes = 15;
-    private const double AdditionalRecoveryPerShowerMinute = 0.5;
+    private const int DailyBudgetMinutes = 120;
+    private static readonly TimeSpan ShowerDetectionConfirmationDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan MaxHeaterRunDuration = TimeSpan.FromMinutes(20);
+    private const double PostShowerRecoveryMultiplier = 1.2;
 
     private readonly ILogger<WaterHeater> _logger;
     private readonly InputBooleanEntity _bathroomPresence;
     private readonly InputBooleanEntity _masterBathroomPresence;
+    private readonly InputNumberEntity _waterHeaterMinutesLeft;
     private readonly SwitchEntities _switchEntities;
     private readonly IScheduler _scheduler;
     private readonly BathroomStatusService _bathroomStatusService;
     private readonly WaterHeaterTimerService _waterHeaterTimerService;
-    private readonly NotifyServices _notifyServices;
+    private readonly object _gate = new();
     private IDisposable? _scheduledTurnOff;
-    private IDisposable? _maxContinuousOnTurnOff;
-    private bool _currentHeatingSessionHadShower;
-    private TimeSpan _currentHeatingSessionShowerDuration = TimeSpan.Zero;
+    private DateTime? _scheduledTurnOffDateTimeUtc;
+    private DateTime? _currentRunStartedAtUtc;
+    private DateTime? _postShowerRecoveryUntilUtc;
+    private double? _minutesLeftOverride;
+    private bool? _waterHeaterIsOnOverride;
 
-    // Track state for each bathroom separately
     private readonly BathroomShowerState _bathroomState = new();
     private readonly BathroomShowerState _masterBathroomState = new();
 
     private class BathroomShowerState : IDisposable
     {
-        public IDisposable? PeriodicCheck { get; set; }
+        public IDisposable? ShowerConfirmation { get; set; }
         public bool IsShoweringDetected { get; set; }
-        public DateTime? LastMotionTime { get; set; }
-        public DateTime? FirstMotionAfterShowerStart { get; set; }
-        public DateTime? ShowerStartTime { get; set; }
+        public DateTime? ShowerStartTimeUtc { get; set; }
 
         public void Dispose()
         {
-            PeriodicCheck?.Dispose();
-            PeriodicCheck = null;
+            ShowerConfirmation?.Dispose();
+            ShowerConfirmation = null;
         }
     }
 
@@ -54,9 +53,9 @@ public class WaterHeater
         SwitchEntities switchEntities, 
         BinarySensorEntities motionSensors,
         InputBooleanEntities inputBooleanEntities,
+        InputNumberEntities inputNumberEntities,
         BathroomStatusService bathroomStatusService,
         WaterHeaterTimerService waterHeaterTimerService,
-        NotifyServices notifyServices,
         IScheduler scheduler)
     {
         _logger = logger;
@@ -64,18 +63,65 @@ public class WaterHeater
         _scheduler = scheduler;
         _bathroomStatusService = bathroomStatusService;
         _waterHeaterTimerService = waterHeaterTimerService;
-        _notifyServices = notifyServices;
         _bathroomPresence = inputBooleanEntities.BathroomPresence;
         _masterBathroomPresence = inputBooleanEntities.MasterBathroomPresence;
+        _waterHeaterMinutesLeft = inputNumberEntities.WaterHeaterMinutesLeft;
 
-        // Setup monitoring for regular bathroom
+        // Mirror Home Assistant's helper locally so budget checks are immediate after service calls.
+        _waterHeaterMinutesLeft.StateAllChanges()
+            .Subscribe(e =>
+            {
+                if (e.New?.State is { } minutesLeft)
+                {
+                    lock (_gate)
+                    {
+                        _minutesLeftOverride = Math.Clamp(minutesLeft, 0, DailyBudgetMinutes);
+                    }
+                }
+            });
+
+        _switchEntities.WaterHeaterSwitch.StateChanges()
+            .Subscribe(e =>
+            {
+                lock (_gate)
+                {
+                    // Any external/manual turn-on must still have a budgeted off constraint.
+                    if (e.New.IsOn())
+                    {
+                        _waterHeaterIsOnOverride = true;
+
+                        if (!HasActiveTurnOffConstraint(DateTime.UtcNow))
+                        {
+                            _logger.LogWarning(
+                                "Water heater was turned on without a budgeted turn-off constraint. Turning it off.");
+                            TurnHeaterOffCore(
+                                "it was turned on without checking the water heater budget",
+                                refundUnusedAllocation: false);
+                        }
+
+                        return;
+                    }
+
+                    if (e.New.IsOff())
+                    {
+                        _waterHeaterIsOnOverride = false;
+                        ReleaseUnusedAllocation();
+                        ClearTurnOffConstraint();
+                        ReevaluateHeaterCore("the water heater turned off");
+                    }
+                }
+            });
+
+        // The daily allowance starts over at midnight.
+        _scheduler.ScheduleCron("0 0 * * *", ResetDailyBudget);
+
         var bathroomMotionSensors = new[]
         {
+            motionSensors.BathroomDoorMotionOccupancy,
             motionSensors.BathroomSinkMotionOccupancy
         };
         SetupBathroomMonitoring("Bathroom", _bathroomPresence, bathroomMotionSensors, _bathroomState);
 
-        // Setup monitoring for master bathroom
         var masterBathroomMotionSensors = new[]
         {
             motionSensors.MasterBathroomSinkMotionOccupancy,
@@ -83,16 +129,17 @@ public class WaterHeater
         };
         SetupBathroomMonitoring("Master Bathroom", _masterBathroomPresence, masterBathroomMotionSensors, _masterBathroomState);
 
-        if (_switchEntities.WaterHeaterSwitch.IsOn())
+        if (IsHeaterOn)
         {
-            var turnedOnAt = _waterHeaterTimerService.LastTurnedOnDateTime ?? DateTime.UtcNow;
-            _waterHeaterTimerService.LastTurnedOnDateTime = turnedOnAt;
-            _waterHeaterTimerService.ScheduledTurnOffDateTime =
-                turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
-            ScheduleMaxContinuousOnTurnOff(turnedOnAt);
+            TurnHeaterOffCore(
+                "it was already on when the app started without a budgeted turn-off constraint",
+                refundUnusedAllocation: false);
         }
 
-        ReevaluateHeater("the app started");
+        lock (_gate)
+        {
+            ReevaluateHeaterCore("the app started");
+        }
     }
 
     private void SetupBathroomMonitoring(
@@ -101,269 +148,427 @@ public class WaterHeater
         BinarySensorEntity[] motionSensors,
         BathroomShowerState state)
     {
-        // Track motion sensor changes
         Observable.Merge(motionSensors.Select(m => m.StateChanges()))
-            .Where(e => e.New.IsOn())
-            .Subscribe(_ =>
+            .Subscribe(e =>
             {
-                state.LastMotionTime = DateTime.UtcNow;
-
-                if (state.IsShoweringDetected)
+                lock (_gate)
                 {
-                    // Track first motion after shower starts for grace period
-                    state.FirstMotionAfterShowerStart ??= DateTime.UtcNow;
-                }
+                    if (state.IsShoweringDetected && e.New.IsOn())
+                    {
+                        OnShowerEnded(
+                            bathroomName,
+                            presence,
+                            state,
+                            $"{bathroomName} motion was detected after the shower started");
+                        return;
+                    }
 
-                CheckShoweringState(bathroomName, presence, motionSensors, state);
+                    EvaluateShowerState(bathroomName, presence, motionSensors, state);
+                }
             });
 
-        // Monitor bathroom presence changes
         presence.StateChanges().Subscribe(_ =>
         {
-            if (presence.IsOn())
+            lock (_gate)
             {
-                // Presence detected, update status and start periodic monitoring for shower
-                state.LastMotionTime = DateTime.UtcNow;
-                UpdateBathroomStatus(bathroomName, presence, state);
-                state.PeriodicCheck?.Dispose();
-
-                // Schedule periodic checks starting after initial delay
-                var checkState = (name: bathroomName, presence, sensors: motionSensors, state);
-                state.PeriodicCheck = _scheduler.SchedulePeriodic(
-                    checkState,
-                    TimeSpan.FromSeconds(PeriodicCheckIntervalSeconds),
-                    s => CheckShoweringState(s.name, s.presence, s.sensors, s.state)
-                );
-
-                ReevaluateHeater($"{bathroomName} became occupied");
-            }
-            else
-            {
-                // Presence ended, stop monitoring
-                state.PeriodicCheck?.Dispose();
-                state.PeriodicCheck = null;
-
-                if (state.IsShoweringDetected)
+                if (presence.IsOff())
                 {
-                    OnShowerEnded(bathroomName, presence, state);
+                    CancelShowerConfirmation(state);
+
+                    if (state.IsShoweringDetected)
+                    {
+                        OnShowerEnded(
+                            bathroomName,
+                            presence,
+                            state,
+                            $"{bathroomName} became unoccupied");
+                    }
+                    else
+                    {
+                        UpdateBathroomStatus(bathroomName, presence, state);
+                        ReevaluateHeaterCore($"{bathroomName} became unoccupied");
+                    }
+
+                    return;
                 }
-                
+
+                EvaluateShowerState(bathroomName, presence, motionSensors, state);
                 UpdateBathroomStatus(bathroomName, presence, state);
-                ReevaluateHeater($"{bathroomName} became unoccupied");
+                ReevaluateHeaterCore($"{bathroomName} became occupied");
             }
         });
+
+        EvaluateShowerState(bathroomName, presence, motionSensors, state);
     }
 
-    private void CheckShoweringState(
+    private void EvaluateShowerState(
         string bathroomName,
         InputBooleanEntity presence,
         BinarySensorEntity[] motionSensors,
         BathroomShowerState state)
     {
-        var presenceOn = presence.IsOn();
-        var anyMotion = motionSensors.Any(m => m.IsOn());
-
-        // Calculate time since last motion (null means no motion detected yet)
-        var timeSinceLastMotion = state.LastMotionTime.HasValue
-            ? DateTime.UtcNow - state.LastMotionTime.Value
-            : TimeSpan.MaxValue;
-
-        // User is showering if:
-        // 1. Presence is detected (person is in bathroom)
-        // 2. No motion sensors are currently triggered
-        // 3. It's been at least ShowerDetectionThresholdSeconds since last motion (gives time to enter shower)
-        var isShowering = presenceOn && !anyMotion && timeSinceLastMotion > TimeSpan.FromSeconds(ShowerDetectionThresholdSeconds);
-
-        if (isShowering && !state.IsShoweringDetected)
+        if (state.IsShoweringDetected)
         {
-            // Start of shower detected
-            _logger.LogInformation("{BathroomName} shower detected - turning on water heater", bathroomName);
-            state.IsShoweringDetected = true;
-            state.ShowerStartTime = DateTime.UtcNow;
-            state.FirstMotionAfterShowerStart = null;
-
-            // Update status
-            UpdateBathroomStatus(bathroomName, presence, state);
-
-            EnsureHeaterOn($"{bathroomName} showering was detected");
+            return;
         }
-        else if (state.IsShoweringDetected && anyMotion && state.FirstMotionAfterShowerStart.HasValue)
+
+        var showerCandidate = presence.IsOn() && motionSensors.All(m => m.IsOff());
+        // Presence without motion can mean the person is standing still in the shower.
+        if (!showerCandidate)
         {
-            // Check if motion has been sustained for the grace period
-            var timeSinceFirstMotion = DateTime.UtcNow - state.FirstMotionAfterShowerStart.Value;
-            if (timeSinceFirstMotion > TimeSpan.FromSeconds(ShowerEndGracePeriodSeconds))
-            {
-                // Sustained motion detected - end of shower
-                OnShowerEnded(bathroomName, presence, state);
-            }
+            CancelShowerConfirmation(state);
+            return;
         }
-    }
 
-    private void OnShowerEnded(string bathroomName, InputBooleanEntity presence, BathroomShowerState state)
-    {
-        // Calculate shower duration
-        var showerDuration = state.ShowerStartTime.HasValue
-            ? DateTime.UtcNow - state.ShowerStartTime.Value
-            : TimeSpan.Zero;
-        
+        if (state.ShowerConfirmation is not null)
+        {
+            return;
+        }
+
         _logger.LogInformation(
-            "{BathroomName} shower ended after {ShowerMinutes:F1} minutes", 
+            "{BathroomName} has presence with no shower motion. Confirming shower state in {Delay:g}",
             bathroomName,
-            showerDuration.TotalMinutes);
+            ShowerDetectionConfirmationDelay);
 
-        _currentHeatingSessionHadShower = true;
-        _currentHeatingSessionShowerDuration += showerDuration;
-        
-        state.IsShoweringDetected = false;
-        state.FirstMotionAfterShowerStart = null;
-        state.ShowerStartTime = null;
-
-        // Update status
-        UpdateBathroomStatus(bathroomName, presence, state);
-
-        ReevaluateHeater($"{bathroomName} shower ended after {showerDuration.TotalMinutes:F1} minutes");
-    }
-
-    private void ScheduleMaxContinuousOnTurnOff(DateTime turnedOnAt)
-    {
-        _maxContinuousOnTurnOff?.Dispose();
-        _maxContinuousOnTurnOff = _scheduler.Schedule(
-            TimeSpan.FromMinutes(MaxContinuousHeaterOnDurationMinutes),
-            () =>
+        state.ShowerConfirmation = _scheduler.Schedule(ShowerDetectionConfirmationDelay, () =>
+        {
+            lock (_gate)
             {
-                if (!_switchEntities.WaterHeaterSwitch.IsOn() || _waterHeaterTimerService.LastTurnedOnDateTime != turnedOnAt)
+                state.ShowerConfirmation = null;
+
+                if (state.IsShoweringDetected ||
+                    presence.IsOff() ||
+                    motionSensors.Any(m => m.IsOn()))
                 {
+                    UpdateBathroomStatus(bathroomName, presence, state);
+                    ReevaluateHeaterCore($"{bathroomName} shower confirmation was cancelled");
                     return;
                 }
 
-                var onDuration = DateTime.UtcNow - turnedOnAt;
-                TurnHeaterOff(
-                    $"the continuous runtime safeguard fired after {onDuration.TotalMinutes:F1} minutes");
-
-                var message =
-                    $"Water heater auto-turned off by safeguard after running for {onDuration.TotalMinutes:F1} minutes (max continuous on time: {MaxContinuousHeaterOnDurationMinutes} minutes). Turned on at {turnedOnAt:yyyy-MM-dd HH:mm:ss} UTC.";
-                _logger.LogWarning(message);
-                _notifyServices.Notify(message, "Water heater safety turn-off");
-            });
+                OnShowerStarted(bathroomName, presence, state);
+            }
+        });
     }
 
-    private void ReevaluateHeater(string reason)
+    private void OnShowerStarted(string bathroomName, InputBooleanEntity presence, BathroomShowerState state)
     {
+        _logger.LogInformation(
+            "{BathroomName} shower confirmed after {Delay:g}; turning on the water heater",
+            bathroomName,
+            ShowerDetectionConfirmationDelay);
+
+        state.IsShoweringDetected = true;
+        state.ShowerStartTimeUtc = DateTime.UtcNow;
+        UpdateBathroomStatus(bathroomName, presence, state);
+        ReevaluateHeaterCore($"{bathroomName} showering was detected");
+    }
+
+    private void OnShowerEnded(
+        string bathroomName,
+        InputBooleanEntity presence,
+        BathroomShowerState state,
+        string reason)
+    {
+        var now = DateTime.UtcNow;
+        var showerDuration = state.ShowerStartTimeUtc.HasValue
+            ? now - state.ShowerStartTimeUtc.Value
+            : TimeSpan.Zero;
+        var recoveryDuration = TimeSpan.FromMinutes(
+            Math.Max(0, showerDuration.TotalMinutes * PostShowerRecoveryMultiplier));
+        var recoveryUntil = now.Add(recoveryDuration);
+
+        _logger.LogInformation(
+            "{BathroomName} shower ended after {ShowerMinutes:F1} minutes. Keeping the water heater available for {RecoveryMinutes:F1} recovery minutes. Reason: {Reason}",
+            bathroomName,
+            showerDuration.TotalMinutes,
+            recoveryDuration.TotalMinutes,
+            reason);
+
+        CancelShowerConfirmation(state);
+        state.IsShoweringDetected = false;
+        state.ShowerStartTimeUtc = null;
+
+        if (recoveryDuration > TimeSpan.Zero &&
+            (_postShowerRecoveryUntilUtc is null || recoveryUntil > _postShowerRecoveryUntilUtc))
+        {
+            _postShowerRecoveryUntilUtc = recoveryUntil;
+        }
+
+        UpdateBathroomStatus(bathroomName, presence, state);
+        ReevaluateHeaterCore($"{bathroomName} shower ended");
+    }
+
+    private void ReevaluateHeaterCore(string reason)
+    {
+        // Active showers and post-shower recovery are the only reasons the heater may stay on.
         if (AnyShowerActive)
         {
-            CancelScheduledTurnOff();
-            EnsureHeaterOn($"{reason} and showering is active");
+            EnsureHeaterOnCore($"{reason} and a shower is active", MaxHeaterRunDuration);
             return;
         }
 
-        if (AnyBathroomOccupied)
+        var now = DateTime.UtcNow;
+        if (_postShowerRecoveryUntilUtc <= now)
         {
-            CancelScheduledTurnOff();
-
-            if (_switchEntities.WaterHeaterSwitch.IsOn())
-            {
-                _waterHeaterTimerService.ScheduledTurnOffDateTime = GetMaxContinuousTurnOffDateTime();
-            }
-
-            return;
+            _postShowerRecoveryUntilUtc = null;
         }
 
-        if (!_switchEntities.WaterHeaterSwitch.IsOn())
+        if (_postShowerRecoveryUntilUtc is { } recoveryUntil)
         {
-            _waterHeaterTimerService.ScheduledTurnOffDateTime = null;
-            ResetHeatingSession();
+            EnsureHeaterOnCore(
+                $"{reason} and post-shower recovery is active",
+                recoveryUntil - now);
             return;
         }
 
-        if (!_currentHeatingSessionHadShower)
+        if (IsHeaterOn)
         {
-            TurnHeaterOff($"{reason} and no shower was detected in this heating session");
-            return;
+            TurnHeaterOffCore($"{reason} and no shower or recovery is active", refundUnusedAllocation: true);
         }
-
-        SchedulePostShowerRecoveryTurnOff(reason);
     }
 
-    private void EnsureHeaterOn(string reason)
+    private void EnsureHeaterOnCore(string reason, TimeSpan requestedDuration)
     {
-        CancelScheduledTurnOff();
-
-        if (_switchEntities.WaterHeaterSwitch.IsOn())
+        if (requestedDuration <= TimeSpan.Zero)
         {
-            _waterHeaterTimerService.ScheduledTurnOffDateTime = GetMaxContinuousTurnOffDateTime();
             return;
         }
 
-        _logger.LogInformation("Turning on water heater because {Reason}", reason);
+        var now = DateTime.UtcNow;
+        if (!IsHeaterOn)
+        {
+            StartConstrainedRunCore(reason, requestedDuration, now);
+            return;
+        }
+
+        if (!HasActiveTurnOffConstraint(now))
+        {
+            TurnHeaterOffCore(
+                $"{reason}, but the water heater was already on without a valid budgeted turn-off constraint",
+                refundUnusedAllocation: false);
+            StartConstrainedRunCore(reason, requestedDuration, DateTime.UtcNow);
+            return;
+        }
+
+        var currentDeadline = _scheduledTurnOffDateTimeUtc!.Value;
+        var maxDeadline = (_currentRunStartedAtUtc ?? now).Add(MaxHeaterRunDuration);
+        var requestedDeadline = now.Add(requestedDuration);
+        var desiredDeadline = Min(requestedDeadline, maxDeadline);
+
+        if (desiredDeadline <= now)
+        {
+            TurnHeaterOffCore($"{reason}, but the constrained run has no time left", refundUnusedAllocation: false);
+            return;
+        }
+
+        if (desiredDeadline < currentDeadline)
+        {
+            var unusedAllocation = currentDeadline - desiredDeadline;
+            // Return time to the budget when a newer constraint shortens this run.
+            RefundBudget(unusedAllocation);
+            ScheduleTurnOffCore(
+                desiredDeadline,
+                $"{reason}; shortened to match the requested heater duration");
+            return;
+        }
+
+        if (desiredDeadline == currentDeadline)
+        {
+            return;
+        }
+
+        var extension = AllocateBudget(desiredDeadline - currentDeadline);
+        if (extension <= TimeSpan.Zero)
+        {
+            _logger.LogInformation(
+                "Water heater is already on, but no budget remains to extend it for {Reason}. Current constrained turn-off remains {TurnOffTime:u}",
+                reason,
+                currentDeadline);
+            return;
+        }
+
+        ScheduleTurnOffCore(
+            currentDeadline.Add(extension),
+            $"{reason}; extended within the remaining water heater budget");
+    }
+
+    private void StartConstrainedRunCore(string reason, TimeSpan requestedDuration, DateTime now)
+    {
+        var constrainedDuration = Min(requestedDuration, MaxHeaterRunDuration);
+        // Budget is deducted before the switch is turned on.
+        var allocatedDuration = AllocateBudget(constrainedDuration);
+
+        if (allocatedDuration <= TimeSpan.Zero)
+        {
+            _logger.LogInformation(
+                "Skipping water heater turn-on for {Reason} because Water Heater Minutes Left is {MinutesLeft:F2}",
+                reason,
+                GetBudgetMinutesLeft());
+            return;
+        }
+
+        _currentRunStartedAtUtc = now;
+        _waterHeaterTimerService.LastTurnedOnDateTime = now;
+        ScheduleTurnOffCore(now.Add(allocatedDuration), reason);
+
+        _logger.LogInformation(
+            "Turning on water heater for {AllocatedMinutes:F2} minutes because {Reason}. Water Heater Minutes Left is now {MinutesLeft:F2}",
+            allocatedDuration.TotalMinutes,
+            reason,
+            GetBudgetMinutesLeft());
+
+        _waterHeaterIsOnOverride = true;
         _switchEntities.WaterHeaterSwitch.TurnOn();
-
-        ResetHeatingSession();
-        var turnedOnAt = DateTime.UtcNow;
-        _waterHeaterTimerService.LastTurnedOnDateTime = turnedOnAt;
-        _waterHeaterTimerService.ScheduledTurnOffDateTime =
-            turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
-        ScheduleMaxContinuousOnTurnOff(turnedOnAt);
     }
 
-    private void TurnHeaterOff(string reason)
+    private TimeSpan AllocateBudget(TimeSpan requestedDuration)
     {
-        CancelScheduledTurnOff();
-        _maxContinuousOnTurnOff?.Dispose();
-        _maxContinuousOnTurnOff = null;
-        _waterHeaterTimerService.ScheduledTurnOffDateTime = null;
-
-        if (!_switchEntities.WaterHeaterSwitch.IsOn())
+        if (requestedDuration <= TimeSpan.Zero)
         {
-            ResetHeatingSession();
+            return TimeSpan.Zero;
+        }
+
+        var minutesLeft = GetBudgetMinutesLeft();
+        var allocatedMinutes = Math.Min(requestedDuration.TotalMinutes, minutesLeft);
+
+        if (allocatedMinutes <= 0)
+        {
+            return TimeSpan.Zero;
+        }
+
+        SetBudgetMinutesLeft(minutesLeft - allocatedMinutes);
+        return TimeSpan.FromMinutes(allocatedMinutes);
+    }
+
+    private void RefundBudget(TimeSpan unusedAllocation)
+    {
+        if (unusedAllocation <= TimeSpan.Zero)
+        {
+            return;
+        }
+
+        SetBudgetMinutesLeft(GetBudgetMinutesLeft() + unusedAllocation.TotalMinutes);
+    }
+
+    private void ReleaseUnusedAllocation()
+    {
+        if (_scheduledTurnOffDateTimeUtc is not { } scheduledTurnOff)
+        {
+            return;
+        }
+
+        var unusedAllocation = scheduledTurnOff - DateTime.UtcNow;
+        RefundBudget(unusedAllocation);
+    }
+
+    private void TurnHeaterOffCore(string reason, bool refundUnusedAllocation)
+    {
+        if (refundUnusedAllocation)
+        {
+            ReleaseUnusedAllocation();
+        }
+
+        ClearTurnOffConstraint();
+
+        if (!IsHeaterOn)
+        {
             return;
         }
 
         _logger.LogInformation("Turning off water heater because {Reason}", reason);
+        _waterHeaterIsOnOverride = false;
         _switchEntities.WaterHeaterSwitch.TurnOff();
-        ResetHeatingSession();
     }
 
-    private void SchedulePostShowerRecoveryTurnOff(string reason)
-    {
-        CancelScheduledTurnOff();
-
-        var recoveryMinutes =
-            BasePostShowerRecoveryMinutes +
-            (_currentHeatingSessionShowerDuration.TotalMinutes * AdditionalRecoveryPerShowerMinute);
-        var turnOffDelay = TimeSpan.FromMinutes(recoveryMinutes);
-        _waterHeaterTimerService.ScheduledTurnOffDateTime = DateTime.UtcNow.Add(turnOffDelay);
-
-        _logger.LogInformation(
-            "All bathrooms are clear. Keeping the water heater on for {Minutes:F0} minutes of recovery after {ShowerMinutes:F1} minutes of showering. Reason: {Reason}",
-            turnOffDelay.TotalMinutes,
-            _currentHeatingSessionShowerDuration.TotalMinutes,
-            reason);
-
-        _scheduledTurnOff = _scheduler.Schedule(
-            turnOffDelay,
-            () => TurnHeaterOff(
-                $"the post-shower recovery timer elapsed after {turnOffDelay.TotalMinutes:F0} minutes"));
-    }
-
-    private void CancelScheduledTurnOff()
+    private void ScheduleTurnOffCore(DateTime turnOffDateTimeUtc, string reason)
     {
         _scheduledTurnOff?.Dispose();
         _scheduledTurnOff = null;
+
+        // This scheduled action is the hard constraint paired with every allowed run.
+        _scheduledTurnOffDateTimeUtc = turnOffDateTimeUtc;
+        _waterHeaterTimerService.ScheduledTurnOffDateTime = turnOffDateTimeUtc;
+
+        var delay = turnOffDateTimeUtc - DateTime.UtcNow;
+        if (delay < TimeSpan.Zero)
+        {
+            delay = TimeSpan.Zero;
+        }
+
+        _logger.LogInformation(
+            "Scheduled water heater turn-off at {TurnOffTime:u}. Reason: {Reason}",
+            turnOffDateTimeUtc,
+            reason);
+
+        _scheduledTurnOff = _scheduler.Schedule(delay, () =>
+        {
+            lock (_gate)
+            {
+                if (_scheduledTurnOffDateTimeUtc != turnOffDateTimeUtc)
+                {
+                    return;
+                }
+
+                TurnHeaterOffCore(
+                    $"the budgeted turn-off constraint elapsed at {turnOffDateTimeUtc:u}",
+                    refundUnusedAllocation: false);
+            }
+        });
     }
 
-    private DateTime GetMaxContinuousTurnOffDateTime()
+    private void ClearTurnOffConstraint()
     {
-        var turnedOnAt = _waterHeaterTimerService.LastTurnedOnDateTime ?? DateTime.UtcNow;
-        return turnedOnAt.AddMinutes(MaxContinuousHeaterOnDurationMinutes);
+        _scheduledTurnOff?.Dispose();
+        _scheduledTurnOff = null;
+        _scheduledTurnOffDateTimeUtc = null;
+        _currentRunStartedAtUtc = null;
+        _waterHeaterTimerService.ScheduledTurnOffDateTime = null;
     }
 
-    private void ResetHeatingSession()
+    private bool HasActiveTurnOffConstraint(DateTime nowUtc)
     {
-        _currentHeatingSessionHadShower = false;
-        _currentHeatingSessionShowerDuration = TimeSpan.Zero;
+        return _scheduledTurnOff is not null &&
+               _scheduledTurnOffDateTimeUtc is { } scheduledTurnOff &&
+               scheduledTurnOff > nowUtc;
     }
 
-    private bool AnyBathroomOccupied => _bathroomPresence.IsOn() || _masterBathroomPresence.IsOn();
+    private void CancelShowerConfirmation(BathroomShowerState state)
+    {
+        state.ShowerConfirmation?.Dispose();
+        state.ShowerConfirmation = null;
+    }
+
+    private void ResetDailyBudget()
+    {
+        lock (_gate)
+        {
+            SetBudgetMinutesLeft(DailyBudgetMinutes);
+            _logger.LogInformation("Reset Water Heater Minutes Left to {Minutes}", DailyBudgetMinutes);
+        }
+    }
+
+    private double GetBudgetMinutesLeft()
+    {
+        var minutesLeft = _minutesLeftOverride ?? _waterHeaterMinutesLeft.State ?? 0;
+        return double.IsNaN(minutesLeft) || double.IsInfinity(minutesLeft)
+            ? 0
+            : Math.Clamp(minutesLeft, 0, DailyBudgetMinutes);
+    }
+
+    private void SetBudgetMinutesLeft(double minutesLeft)
+    {
+        var clamped = Math.Clamp(minutesLeft, 0, DailyBudgetMinutes);
+        var rounded = Math.Round(clamped, 2, MidpointRounding.AwayFromZero);
+
+        _minutesLeftOverride = rounded;
+        _waterHeaterMinutesLeft.SetValue(rounded);
+    }
+
+    private bool IsHeaterOn => _waterHeaterIsOnOverride ?? _switchEntities.WaterHeaterSwitch.IsOn();
+
+    private static TimeSpan Min(TimeSpan left, TimeSpan right) => left <= right ? left : right;
+
+    private static DateTime Min(DateTime left, DateTime right) => left <= right ? left : right;
 
     private bool AnyShowerActive => _bathroomState.IsShoweringDetected || _masterBathroomState.IsShoweringDetected;
 

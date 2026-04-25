@@ -62,7 +62,7 @@
                 return null;
             }
 
-            var remainingTime = scheduledTurnOffDateTime - DateTime.Now;
+            var remainingTime = scheduledTurnOffDateTime - DateTime.UtcNow;
             return remainingTime > TimeSpan.Zero ? remainingTime : null;
         }
     }
