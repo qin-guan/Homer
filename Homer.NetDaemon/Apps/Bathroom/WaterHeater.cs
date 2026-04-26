@@ -13,6 +13,9 @@ public class WaterHeater
 {
     private const int DailyBudgetMinutes = 120;
     private static readonly TimeSpan ShowerDetectionConfirmationDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan RecoveryShowerDurationThreshold = TimeSpan.FromMinutes(5);
+    // Five minutes is the anti-short-cycle floor; budget and max runtime still take priority.
+    private static readonly TimeSpan MinimumHeaterRunDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan MaxHeaterRunDuration = TimeSpan.FromMinutes(20);
     private const double PostShowerRecoveryMultiplier = 1.2;
 
@@ -273,8 +276,9 @@ public class WaterHeater
         var showerDuration = state.ShowerStartTimeUtc.HasValue
             ? now - state.ShowerStartTimeUtc.Value
             : TimeSpan.Zero;
-        var recoveryDuration = TimeSpan.FromMinutes(
-            Math.Max(0, showerDuration.TotalMinutes * PostShowerRecoveryMultiplier));
+        var recoveryDuration = showerDuration > RecoveryShowerDurationThreshold
+            ? TimeSpan.FromMinutes(Math.Max(0, showerDuration.TotalMinutes * PostShowerRecoveryMultiplier))
+            : TimeSpan.Zero;
         var recoveryUntil = now.Add(recoveryDuration);
 
         _logger.LogInformation(
@@ -315,16 +319,46 @@ public class WaterHeater
 
         if (_postShowerRecoveryUntilUtc is { } recoveryUntil)
         {
-            EnsureHeaterOnCore(
-                $"{reason} and post-shower recovery is active",
-                recoveryUntil - now);
-            return;
+            var remainingRecovery = recoveryUntil - now;
+            if (!IsHeaterOn && remainingRecovery < MinimumHeaterRunDuration)
+            {
+                _logger.LogInformation(
+                    "Skipping post-shower recovery because only {Minutes:F1} minutes remain, below the minimum heater run duration of {MinimumMinutes:F1} minutes",
+                    remainingRecovery.TotalMinutes,
+                    MinimumHeaterRunDuration.TotalMinutes);
+                _postShowerRecoveryUntilUtc = null;
+            }
+            else
+            {
+                EnsureHeaterOnCore(
+                    $"{reason} and post-shower recovery is active",
+                    remainingRecovery);
+                return;
+            }
         }
 
         if (IsHeaterOn)
         {
-            TurnHeaterOffCore($"{reason} and no shower or recovery is active", refundUnusedAllocation: true);
+            TurnHeaterOffAfterMinimumRunCore($"{reason} and no shower or recovery is active");
         }
+    }
+
+    private void TurnHeaterOffAfterMinimumRunCore(string reason)
+    {
+        var now = DateTime.UtcNow;
+        if (_currentRunStartedAtUtc is { } runStartedAt && HasActiveTurnOffConstraint(now))
+        {
+            var minimumTurnOff = runStartedAt.Add(MinimumHeaterRunDuration);
+            if (minimumTurnOff > now)
+            {
+                EnsureHeaterOnCore(
+                    $"{reason}; waiting for the minimum heater run duration",
+                    minimumTurnOff - now);
+                return;
+            }
+        }
+
+        TurnHeaterOffCore(reason, refundUnusedAllocation: true);
     }
 
     private void EnsureHeaterOnCore(string reason, TimeSpan requestedDuration)
@@ -353,7 +387,7 @@ public class WaterHeater
         var currentDeadline = _scheduledTurnOffDateTimeUtc!.Value;
         var maxDeadline = (_currentRunStartedAtUtc ?? now).Add(MaxHeaterRunDuration);
         var requestedDeadline = now.Add(requestedDuration);
-        var desiredDeadline = Min(requestedDeadline, maxDeadline);
+        var desiredDeadline = ApplyMinimumRunDurationFloor(now, Min(requestedDeadline, maxDeadline));
 
         if (desiredDeadline <= now)
         {
@@ -390,6 +424,19 @@ public class WaterHeater
         ScheduleTurnOffCore(
             currentDeadline.Add(extension),
             $"{reason}; extended within the remaining water heater budget");
+    }
+
+    private DateTime ApplyMinimumRunDurationFloor(DateTime nowUtc, DateTime desiredDeadlineUtc)
+    {
+        if (_currentRunStartedAtUtc is not { } runStartedAt)
+        {
+            return desiredDeadlineUtc;
+        }
+
+        var minimumDeadline = runStartedAt.Add(MinimumHeaterRunDuration);
+        return minimumDeadline > nowUtc && desiredDeadlineUtc < minimumDeadline
+            ? minimumDeadline
+            : desiredDeadlineUtc;
     }
 
     private void StartConstrainedRunCore(string reason, TimeSpan requestedDuration, DateTime now)
