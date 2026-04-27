@@ -15,9 +15,9 @@ public class WaterHeater
     private static readonly TimeSpan ShowerDetectionConfirmationDelay = TimeSpan.FromMinutes(1);
     private static readonly TimeSpan RecoveryShowerDurationThreshold = TimeSpan.FromMinutes(5);
     // Five minutes is the anti-short-cycle floor; budget and max runtime still take priority.
-    private static readonly TimeSpan MinimumHeaterRunDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan MinimumHeaterRunDuration = TimeSpan.FromMinutes(7);
     private static readonly TimeSpan MaxHeaterRunDuration = TimeSpan.FromMinutes(20);
-    private const double PostShowerRecoveryMultiplier = 1.2;
+    private const double PostShowerRecoveryMultiplier = 1.5;
 
     private readonly ILogger<WaterHeater> _logger;
     private readonly InputBooleanEntity _bathroomPresence;
