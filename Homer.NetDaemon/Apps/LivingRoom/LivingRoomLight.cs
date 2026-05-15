@@ -19,9 +19,7 @@ public class LivingRoomLight : IAsyncInitializable
     private readonly NumericSensorEntity _lightSensor;
 
     private bool Presence => _presenceEntities.Any(e => e.IsOn());
-    private bool WithinTooBrightRange => _lightSensor.State is > 50 and < 55;
-    private bool TooBright => _lightSensor.State > 30;
-    private bool TooDark => _lightSensor.State < 10;
+    private bool TooDark => _lightSensor.State < 5;
     private bool ManualOverride => _laundryMode.IsOn();
 
     public LivingRoomLight(
@@ -73,17 +71,6 @@ public class LivingRoomLight : IAsyncInitializable
             .Where(_ =>
             {
                 eventsProcessedMeter.Add(1);
-                return WithinTooBrightRange;
-            })
-            .Throttle(TimeSpan.FromMinutes(5), scheduler)
-            .Where(_ => WithinTooBrightRange)
-            .Subscribe(_ => { _light.TurnOff(); });
-
-        _lightSensor.StateChanges()
-            .Where(_ => !ManualOverride)
-            .Where(_ =>
-            {
-                eventsProcessedMeter.Add(1);
                 return TooDark && Presence;
             })
             .Throttle(TimeSpan.FromMinutes(5), scheduler)
@@ -99,7 +86,7 @@ public class LivingRoomLight : IAsyncInitializable
             })
             .Subscribe(_ =>
             {
-                if (!TooBright) _light.TurnOn();
+                if (TooDark) _light.TurnOn();
             });
 
         presenceObservables
