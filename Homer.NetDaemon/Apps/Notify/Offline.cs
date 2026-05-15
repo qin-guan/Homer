@@ -35,7 +35,7 @@ public class Offline
                 .Subscribe(e =>
                 {
                     offlineDevices.Add(id);
-                    notifyServices.MobileAppQinsIphone(
+                    notifyServices.MobileAppSamsungS26Ultra(
                         $"Device {e.Entity.Registration?.Device?.Name} is offline"
                     );
                 });
@@ -46,13 +46,13 @@ public class Offline
                 .Subscribe(e =>
                 {
                     offlineDevices.Remove(id);
-                    notifyServices.MobileAppQinsIphone(
+                    notifyServices.MobileAppSamsungS26Ultra(
                         $"Device {e.Entity.Registration?.Device?.Name} is back online"
                     );
                 });
         }
 
-        notifyServices.MobileAppQinsIphone(
+        notifyServices.MobileAppSamsungS26Ultra(
             $"Registered {devices.Length} devices for offline detection."
         );
     }

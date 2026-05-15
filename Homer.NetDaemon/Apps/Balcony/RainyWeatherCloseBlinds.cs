@@ -39,7 +39,7 @@ public class RainyWeatherCloseBlinds(
             tag = "close_blinds"
         };
 
-        notify.MobileAppQinsIphone(
+        notify.MobileAppSamsungS26Ultra(
             "clear_notification",
             data: clear
         );
@@ -106,7 +106,7 @@ public class RainyWeatherCloseBlinds(
                     }
                 };
 
-                notify.MobileAppQinsIphone(
+                notify.MobileAppSamsungS26Ultra(
                     $"快要下雨了！ ({forecast})",
                     "主人想关阳台窗帘吗？",
                     data: data
@@ -164,7 +164,7 @@ public class RainyWeatherCloseBlinds(
                     default: throw new InvalidEnumArgumentException();
                 }
 
-                notify.MobileAppQinsIphone(
+                notify.MobileAppSamsungS26Ultra(
                     "clear_notification",
                     data: clear
                 );
@@ -187,7 +187,7 @@ public class RainyWeatherCloseBlinds(
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                notify.MobileAppQinsIphone(
+                notify.MobileAppSamsungS26Ultra(
                     $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
                 );
 

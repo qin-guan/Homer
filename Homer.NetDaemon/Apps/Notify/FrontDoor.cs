@@ -18,7 +18,7 @@ public class FrontDoor
     {
         binarySensorEntities.FrontDoorContact.StateAllChanges().Subscribe((e) =>
         {
-            notifyServices.MobileAppQinsIphone(
+            notifyServices.MobileAppSamsungGalaxyS26Ultra(
                 $"Front door was {(e.New.IsOn() ? "opened" : "closed")}"
             );
         });

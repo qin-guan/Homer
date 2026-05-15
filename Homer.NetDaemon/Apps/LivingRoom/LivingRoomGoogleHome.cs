@@ -1,10 +1,6 @@
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.LivingRoom;
 
