@@ -69,6 +69,7 @@ public class WaterHeater
         _bathroomPresence = inputBooleanEntities.BathroomPresence;
         _masterBathroomPresence = inputBooleanEntities.MasterBathroomPresence;
         _waterHeaterMinutesLeft = inputNumberEntities.WaterHeaterMinutesLeft;
+        _waterHeaterTimerService.ManualOverrideRequested += OnManualOverrideRequested;
 
         // Mirror Home Assistant's helper locally so budget checks are immediate after service calls.
         _waterHeaterMinutesLeft.StateAllChanges()
@@ -202,6 +203,16 @@ public class WaterHeater
         });
 
         EvaluateShowerState(bathroomName, presence, motionSensors, state);
+    }
+
+    private void OnManualOverrideRequested(TimeSpan duration)
+    {
+        lock (_gate)
+        {
+            EnsureHeaterOnCore(
+                $"manual override requested for {duration.TotalMinutes:F0} minutes",
+                duration);
+        }
     }
 
     private void EvaluateShowerState(

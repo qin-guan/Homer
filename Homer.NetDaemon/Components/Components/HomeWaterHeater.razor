@@ -30,6 +30,21 @@
         <span class="fs-6 text-muted mt-2">上次开启:</span>
         <span class="fs-6">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToLocalTime().ToString("HH:mm")</span>
     }
+
+    <div class="d-flex gap-2 align-items-center mt-3 w-100">
+        <input class="form-control form-control-sm text-center"
+               type="number"
+               min="1"
+               max="25"
+               @bind="ManualOverrideMinutes"
+               @bind:event="oninput"
+               aria-label="Water heater manual override minutes" />
+        <button class="btn btn-danger btn-sm"
+                type="button"
+                @onclick="TurnOnForManualOverride">
+            开启
+        </button>
+    </div>
 </div>
 
 @code {
@@ -38,6 +53,7 @@
     [Inject] public WaterHeaterTimerService WaterHeaterTimerService { get; set; } = null!;
 
     private readonly List<IDisposable> _disposables = [];
+    private int ManualOverrideMinutes { get; set; } = 10;
 
     protected override void OnInitialized()
     {
@@ -65,6 +81,11 @@
             var remainingTime = scheduledTurnOffDateTime - DateTime.UtcNow;
             return remainingTime > TimeSpan.Zero ? remainingTime : null;
         }
+    }
+
+    private void TurnOnForManualOverride()
+    {
+        WaterHeaterTimerService.RequestManualOverride(ManualOverrideMinutes);
     }
 
 }
