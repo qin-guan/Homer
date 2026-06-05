@@ -17,7 +17,7 @@ public class WaterHeater
     // Five minutes is the anti-short-cycle floor; budget and max runtime still take priority.
     private static readonly TimeSpan MinimumHeaterRunDuration = TimeSpan.FromMinutes(7);
     private static readonly TimeSpan MaxHeaterRunDuration = TimeSpan.FromMinutes(25);
-    private const double PostShowerRecoveryMultiplier = 1.7;
+    private const double PostShowerRecoveryMultiplier = 1.4;
 
     private readonly ILogger<WaterHeater> _logger;
     private readonly InputBooleanEntity _bathroomPresence;
