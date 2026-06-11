@@ -58,6 +58,7 @@
     protected override void OnInitialized()
     {
         _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+        WaterHeaterTimerService.StateChanged += OnWaterHeaterTimerStateChanged;
         _disposables.Add(
             Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => InvokeAsync(StateHasChanged))
@@ -66,7 +67,13 @@
 
     public void Dispose()
     {
+        WaterHeaterTimerService.StateChanged -= OnWaterHeaterTimerStateChanged;
         _disposables.ForEach(e => e.Dispose());
+    }
+
+    private void OnWaterHeaterTimerStateChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private TimeSpan? RemainingTime
@@ -85,7 +92,19 @@
 
     private void TurnOnForManualOverride()
     {
-        WaterHeaterTimerService.RequestManualOverride(ManualOverrideMinutes);
+        var minutes = Math.Clamp(ManualOverrideMinutes, 1, 25);
+        if (WaterHeaterTimerService.RequestManualOverride(minutes))
+        {
+            return;
+        }
+
+        var duration = TimeSpan.FromMinutes(minutes);
+        var now = DateTime.UtcNow;
+
+        WaterHeaterTimerService.ScheduledTurnOffDateTime = now.Add(duration);
+        WaterHeaterTimerService.LastTurnedOnDateTime = now;
+        Switches.WaterHeaterSwitch.TurnOn();
+        Channels.Channels.TurnOffWaterHeaterSwitch.Writer.TryWrite(duration);
     }
 
 }
