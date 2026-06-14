@@ -17,7 +17,7 @@ public class SuspiciousAirconUsage
             .Subscribe(_ =>
             {
                 if (!aircons.All(e => e.IsOn())) return;
-                notifyServices.MobileAppSamsungS26Ultra("All aircons are on! Is this a mistake?", "Check aircon usage!");
+                notifyServices.MobileAppQinSS26Ultra("All aircons are on! Is this a mistake?", "Check aircon usage!");
             });
     }
 }

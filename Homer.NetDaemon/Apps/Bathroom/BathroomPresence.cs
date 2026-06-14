@@ -54,7 +54,7 @@ public class BathroomPresence : Occupancy
         inputDatetimeEntities.BathroomLastPresence,
         inputBooleanEntities.BathroomPresence,
         [contactSensors.BathroomDoorContact],
-        [motionSensors.BathroomTuyaPresencePresence, motionSensors.BathroomSinkMotionOccupancy],
+        [motionSensors.BathroomMotionOccupancy],
         TimeSpan.FromSeconds(30)
     )
     {
@@ -62,8 +62,7 @@ public class BathroomPresence : Occupancy
 
         _lightSensors =
         [
-            sensorEntities.BathroomSinkMotionIlluminance,
-            sensorEntities.BathroomDoorMotionIlluminance
+            sensorEntities.BathroomMotionIlluminance
         ];
 
         inputBooleanEntities.BathroomPresence.StateChanges()

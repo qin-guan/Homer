@@ -129,7 +129,7 @@ app.MapGet("/gc", () =>
 app.MapPost("/contact/qg",
     ([FromQuery] string content, NotifyServices notifyServices) =>
     {
-        notifyServices.MobileAppSamsungS26Ultra(content, "Message from the internet");
+        notifyServices.MobileAppQinSS26Ultra(content, "Message from the internet");
     });
 
 app.Run();

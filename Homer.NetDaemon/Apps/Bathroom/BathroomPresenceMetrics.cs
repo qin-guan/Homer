@@ -22,9 +22,7 @@ public class BathroomPresenceMetrics
 
         var sensorPresence = new List<BinarySensorEntity>
         {
-            binarySensorEntities.BathroomSinkMotionOccupancy,
-            binarySensorEntities.BathroomDoorMotionOccupancy,
-            binarySensorEntities.BathroomTuyaPresencePresence
+            binarySensorEntities.BathroomMotionOccupancy
         };
 
         var actualPresence = inputBooleanEntities.BathroomPresence;

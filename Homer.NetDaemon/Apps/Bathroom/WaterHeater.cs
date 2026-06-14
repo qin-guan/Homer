@@ -121,8 +121,7 @@ public class WaterHeater
 
         var bathroomMotionSensors = new[]
         {
-            motionSensors.BathroomDoorMotionOccupancy,
-            motionSensors.BathroomSinkMotionOccupancy
+            motionSensors.BathroomMotionOccupancy
         };
         SetupBathroomMonitoring("Bathroom", _bathroomPresence, bathroomMotionSensors, _bathroomState);
 
