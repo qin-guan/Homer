@@ -18,10 +18,7 @@
         {
             _disposables.Add(
                 Factory.CreateForecast()
-                    .Select(f => f.Data.Items)
-                    .SelectMany(i => i.First().Forecasts)
-                    .Where(f => f.Area == "Bishan")
-                    .Select(f => f.Value)
+                    .Select(f => Homer.NetDaemon.Services.OpenMeteo.OpenMeteoWmoMapper.GetWeatherDescription(f.Current.WeatherCode))
                     .Subscribe(forecast =>
                     {
                         InvokeAsync(() =>

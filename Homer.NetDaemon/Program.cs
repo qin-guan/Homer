@@ -7,7 +7,7 @@ using Homer.NetDaemon.Hubs;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
 using Homer.NetDaemon.Services.DataMall;
-using Homer.NetDaemon.Services.DgsForecast;
+using Homer.NetDaemon.Services.OpenMeteo;
 using Homer.ServiceDefaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -48,8 +48,8 @@ builder.Services.AddRefitClient<IDataMallApi>()
     });
 
 
-builder.Services.AddRefitClient<IDgsForecast>()
-    .ConfigureHttpClient(options => { options.BaseAddress = new Uri("https://api-open.data.gov.sg"); });
+builder.Services.AddRefitClient<IOpenMeteoApi>()
+    .ConfigureHttpClient(options => { options.BaseAddress = new Uri("https://api.open-meteo.com"); });
 
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddNetDaemonStateManager();

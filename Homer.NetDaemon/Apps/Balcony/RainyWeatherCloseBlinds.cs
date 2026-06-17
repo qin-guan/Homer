@@ -55,18 +55,9 @@ public class RainyWeatherCloseBlinds(
         );
 
         var observable = factory.CreateForecast()
-            .Select(f => f.Data.Items.First().Forecasts.First(f => f.Area == "Bishan").Value)
-            .Where(v => v is (
-                "Moderate Rain" or
-                "Heavy Rain" or
-                "Passing Showers" or
-                "Light Showers" or
-                "Showers" or
-                "Heavy Showers" or
-                "Thundery Showers" or
-                "Heavy Thundery Showers" or
-                "Heavy Thundery Showers with Gusty Winds")
-            )
+            .Select(f => f.Current.WeatherCode)
+            .Where(v => Homer.NetDaemon.Services.OpenMeteo.OpenMeteoWmoMapper.IsRainy(v))
+            .Select(v => Homer.NetDaemon.Services.OpenMeteo.OpenMeteoWmoMapper.GetWeatherDescription(v))
             .DistinctUntilChanged();
 
         _disposables.Add(observable
