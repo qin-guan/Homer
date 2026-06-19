@@ -1,35 +1,30 @@
 using Homer.NetDaemon.Entities;
-using NetDaemon.AppModel;
 
 namespace Homer.NetDaemon.Apps.Remotes;
 
-[NetDaemonApp]
-public class LivingRoomRemote(RemoteEntities remoteEntities) : IAsyncInitializable
+public class LivingRoomRemote(IServiceProvider serviceProvider) : BackgroundService
 {
-    public async Task InitializeAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _ = Task.Run(async () =>
-        {
-            while (await Channels.Channels.LivingRoomChannel.Reader.WaitToReadAsync(cancellationToken))
-            {
-                while (Channels.Channels.LivingRoomChannel.Reader.TryRead(out var item))
-                {
-                    switch (item)
-                    {
-                        case LivingRoomRemoteCommand.Dyson:
-                        {
-                            remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
-                            break;
-                        }
-                        default:
-                        {
-                            throw new Exception("Unhandled command.");
-                        }
-                    }
+        await using var scope = serviceProvider.CreateAsyncScope();
+        var remoteEntities = scope.ServiceProvider.GetRequiredService<RemoteEntities>();
 
-                    await Task.Delay(TimeSpan.FromSeconds(4), cancellationToken);
+        await foreach (var item in Channels.Channels.LivingRoomChannel.Reader.ReadAllAsync(stoppingToken))
+        {
+            switch (item)
+            {
+                case LivingRoomRemoteCommand.Dyson:
+                {
+                    remoteEntities.LivingRoomRemote.SendCommand("Power", "Dyson");
+                    break;
+                }
+                default:
+                {
+                    throw new Exception("Unhandled command.");
                 }
             }
-        }, cancellationToken);
+
+            await Task.Delay(TimeSpan.FromSeconds(4), stoppingToken);
+        }
     }
 }

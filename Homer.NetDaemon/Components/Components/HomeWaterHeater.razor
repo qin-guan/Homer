@@ -47,32 +47,51 @@
     </div>
 </div>
 
+
 @code {
 
     [Inject] public SwitchEntities Switches { get; set; } = null!;
     [Inject] public WaterHeaterTimerService WaterHeaterTimerService { get; set; } = null!;
 
     private readonly List<IDisposable> _disposables = [];
+    private IDisposable? _timerDisposable;
     private int ManualOverrideMinutes { get; set; } = 10;
 
     protected override void OnInitialized()
     {
-        _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+        _disposables.Add(Switches.WaterHeaterSwitch.StateAllChanges().Subscribe(_ => 
+        {
+            ManageTimer();
+            InvokeAsync(StateHasChanged);
+        }));
         WaterHeaterTimerService.StateChanged += OnWaterHeaterTimerStateChanged;
-        _disposables.Add(
-            Observable.Interval(TimeSpan.FromSeconds(1))
-                .Subscribe(_ => InvokeAsync(StateHasChanged))
-        );
+        ManageTimer();
     }
 
     public void Dispose()
     {
         WaterHeaterTimerService.StateChanged -= OnWaterHeaterTimerStateChanged;
+        _timerDisposable?.Dispose();
         _disposables.ForEach(e => e.Dispose());
+    }
+
+    private void ManageTimer()
+    {
+        if (Switches.WaterHeaterSwitch.IsOn() && RemainingTime != null)
+        {
+            _timerDisposable ??= Observable.Interval(TimeSpan.FromSeconds(1))
+                .Subscribe(_ => InvokeAsync(StateHasChanged));
+        }
+        else
+        {
+            _timerDisposable?.Dispose();
+            _timerDisposable = null;
+        }
     }
 
     private void OnWaterHeaterTimerStateChanged()
     {
+        ManageTimer();
         _ = InvokeAsync(StateHasChanged);
     }
 
