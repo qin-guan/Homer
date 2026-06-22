@@ -14,49 +14,47 @@
 }
 else
 {
-    <div class="px-2" style="font-family: Noto Sans SC, sans-serif;">
-        <div class="row">
+    <div class="d-flex flex-column vh-100 overflow-hidden px-2 py-2 gap-2" style="font-family: Noto Sans SC, sans-serif;">
+        <div>
             <HomeTopBar></HomeTopBar>
         </div>
 
-        <div class="row pb-2 gx-1" style="height: 300px">
-            <div class="col-12 col-md-6">
-                <div class="d-flex gap-1" style="height: 100%">
+        <div class="row flex-grow-1 gx-2 m-0 pb-2">
+            <!-- Left column -->
+            <div class="col-12 col-md-5 d-flex flex-column gap-2 h-100">
+                <div class="d-flex gap-1 flex-grow-1" style="flex-basis: 50%;">
                     <HomePowerButton SwitchId="@Switches.BalconyLights.EntityId" Name="阳台灯"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap59921None.EntityId" Name="空调一"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap16703None.EntityId" Name="空调二"/>
                 </div>
-            </div>
 
-            <div class="col-12 col-md-2 d-flex">
-                <HomeWaterHeater/>
-            </div>
-            
-            <div class="col-12 col-md-2 d-flex">
-                <HomeToiletStatus/>
-            </div>
-            
-            <div class="col-12 col-md-2 d-flex flex-column gap-2">
-                <HomeBalconyButtons/>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="card col-12 col-md-6">
-                <div class="card-body">
-                    <h6 class="fw-semibold" style="margin-bottom: 30px">巴士</h6>
-                    <HomeBusTimings></HomeBusTimings>
+                <div class="card flex-grow-1 shadow-sm" style="flex-basis: 50%;">
+                    <div class="card-body d-flex flex-column h-100 p-2">
+                        <h6 class="fw-semibold mb-2">巴士</h6>
+                        <HomeBusTimings></HomeBusTimings>
+                    </div>
                 </div>
             </div>
 
-            <div class="card col">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="fw-semibold" style="margin-bottom: 30px">天气</h6>
-                    </div>
-                    <div class="d-flex gap-4">
+            <!-- Middle column -->
+            <div class="col-12 col-md-5 d-flex flex-column gap-2 h-100">
+                <div class="d-flex gap-2 flex-grow-1" style="flex-basis: 50%;">
+                    <HomeWaterHeater/>
+                    <HomeToiletStatus/>
+                </div>
+
+                <div class="card flex-grow-1 shadow-sm" style="flex-basis: 50%;">
+                    <div class="card-body d-flex flex-column h-100 p-2">
+                        <h6 class="fw-semibold mb-2">天气</h6>
                         <HomeWeather/>
                     </div>
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="col-12 col-md-2 d-flex flex-column gap-2 h-100">
+                <div class="flex-grow-1 d-flex flex-column">
+                    <HomeBalconyButtons/>
                 </div>
             </div>
         </div>
