@@ -6,32 +6,32 @@
 @rendermode InteractiveServer
 @implements IDisposable
 
-<div class="d-flex flex-column justify-content-center align-items-center bg-white rounded-3 p-3" style="flex: 1;">
+<div class="d-flex flex-column justify-content-center align-items-center bg-white rounded-3 p-2 shadow-sm" style="flex: 1;">
     @if (Switches.WaterHeaterSwitch.IsOn())
     {
-        <span class="fs-1 text-danger fw-bold">开</span>
+        <span class="fs-2 text-danger fw-bold">开</span>
         <span class="fs-6 text-muted">热水器</span>
         @if (RemainingTime is { } remainingTime)
         {
-            <span class="fs-4 text-danger mt-2">
+            <span class="fs-5 text-danger mt-1">
                 @(((int)remainingTime.TotalMinutes).ToString("D2")):@(remainingTime.Seconds.ToString("D2"))
             </span>
-            <span class="fs-6 text-muted">倒计时</span>
+            <span class="small text-muted">倒计时</span>
         }
     }
     else
     {
-        <span class="fs-1 text-secondary">关</span>
+        <span class="fs-2 text-secondary">关</span>
         <span class="fs-6 text-muted">热水器</span>
     }
     
     @if (WaterHeaterTimerService.LastTurnedOnDateTime is not null)
     {
-        <span class="fs-6 text-muted mt-2">上次开启:</span>
-        <span class="fs-6">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToLocalTime().ToString("HH:mm")</span>
+        <span class="small text-muted mt-1">上次开启:</span>
+        <span class="small">@WaterHeaterTimerService.LastTurnedOnDateTime.Value.ToLocalTime().ToString("HH:mm")</span>
     }
 
-    <div class="d-flex gap-2 align-items-center mt-3 w-100">
+    <div class="d-flex gap-1 align-items-center mt-auto w-100 pt-2">
         <input class="form-control form-control-sm text-center"
                type="number"
                min="1"

@@ -4,18 +4,18 @@
 @rendermode InteractiveServer
 @implements IDisposable
 
-<div class="d-flex flex-column gap-3">
+<div class="d-flex flex-column gap-2">
     @foreach (var (c, timings) in _items)
     {
         <div class="d-flex justify-content-between align-items-center" style="width: 100%">
-            <Badge Color="Color.Info" Class="fs-2">
+            <Badge Color="Color.Info" Class="fs-4">
                 @c
             </Badge>
 
             <div>
                 @foreach (var timing in timings.Where(t => t.HasValue))
                 {
-                    <span style="margin-left: 15px" class="fs-2">
+                    <span style="margin-left: 10px" class="fs-4">
                         @((timing - DateTime.Now)!.Value.TotalMinutes.ToString("N0"))分钟
                     </span>
                 }
