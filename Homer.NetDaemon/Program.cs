@@ -65,6 +65,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
 builder.Services.AddHostedService<Homer.NetDaemon.Apps.Remotes.LivingRoomRemote>();
+builder.Services.AddHostedService<Homer.NetDaemon.Apps.Balcony.Blinds>();
 builder.Services.AddSingleton<ApiObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
 builder.Services.AddSingleton<BathroomStatusService>();
