@@ -6,38 +6,35 @@
 @rendermode InteractiveServer
 @inject SwitchEntities Switches
 
-<div class="d-flex flex-column gap-1 flex-grow-1">
+<div class="d-flex flex-column gap-1 flex-grow-1 h-100 shadow-sm">
     @if (_isLoading)
     {
         <button
             @onclick="Toggle"
-            class="rounded-3 d-flex flex-column bg-secondary flex-grow-1 justify-content-between align-items-center border-0"
-            style="height: 100%">
-            <span class="fs-5 text-center" style="opacity: 50%">@Name</span>
+            class="rounded-3 d-flex flex-column bg-secondary flex-grow-1 justify-content-between align-items-center border-0 h-100 p-2">
+            <span class="fs-6 text-center" style="opacity: 50%">@Name</span>
             <div class="rounded-circle bg-secondary-subtle"
-                 style="width: 5px; height: 5px; margin-bottom: 20px;"></div>
+                 style="width: 5px; height: 5px; margin-bottom: 10px;"></div>
         </button>
     }
     else if (Switch.IsOn())
     {
         <button
             @onclick="Toggle"
-            class="rounded-3 d-flex flex-column flex-grow-1 justify-content-between align-items-center bg-warning border-0"
-            style="height: 100%">
-            <span class="fs-5 text-center" style="opacity: 50%">@Name</span>
+            class="rounded-3 d-flex flex-column flex-grow-1 justify-content-between align-items-center bg-warning border-0 h-100 p-2">
+            <span class="fs-6 text-center" style="opacity: 50%">@Name</span>
             <div class="rounded-circle bg-warning-subtle"
-                 style="width: 8px; height: 8px; margin-bottom: 20px;"></div>
+                 style="width: 8px; height: 8px; margin-bottom: 10px;"></div>
         </button>
     }
     else
     {
         <button
             @onclick="Toggle"
-            class="rounded-3 d-flex bg-gray-100 flex-grow-1 flex-column justify-content-between align-items-center border-0"
-            style="height: 100%">
-            <span class="fs-5 text-center" style="opacity: 50%">@Name</span>
+            class="rounded-3 d-flex bg-gray-100 flex-grow-1 flex-column justify-content-between align-items-center border-0 h-100 p-2">
+            <span class="fs-6 text-center" style="opacity: 50%">@Name</span>
             <div class="rounded-circle bg-primary"
-                 style="width: 5px; height: 5px; margin-bottom: 20px;"></div>
+                 style="width: 5px; height: 5px; margin-bottom: 10px;"></div>
         </button>
     }
 </div>
