@@ -118,7 +118,9 @@ public class RainyWeatherCloseBlinds(
 
         _disposables.Add(observable
             .Where(_ => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(21, 0), new TimeOnly(9, 0)))
-            .Subscribe(forecast => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); }));
+            .Subscribe(forecast => {
+                Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0));
+            }));
 
         context.Events.Where(e => e.DataElement?.TryGetProperty("actionName", out _) ?? false)
             .Select(e => e.DataElement?.GetProperty("actionName").GetString())
@@ -142,15 +144,15 @@ public class RainyWeatherCloseBlinds(
                 switch (e.Time)
                 {
                     case ActionDataTimeSpan.Now:
-                        textEntities.BalconyBlindsState.SetValue("[3, 3, 3]");
+                        Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0));
                         break;
                     case ActionDataTimeSpan.ThirtyMinutes:
                         scheduler.Schedule(TimeSpan.FromMinutes(30),
-                            () => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); });
+                            () => { Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0)); });
                         break;
                     case ActionDataTimeSpan.SixtyMinutes:
                         scheduler.Schedule(TimeSpan.FromMinutes(60),
-                            () => { textEntities.BalconyBlindsState.SetValue("[3, 3, 3]"); });
+                            () => { Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0)); });
                         break;
                     default: throw new InvalidEnumArgumentException();
                 }

@@ -1,74 +1,87 @@
 @using System.Text.Json
 @using global::NetDaemon.HassModel
 @using Homer.NetDaemon.Entities
+@using Homer.NetDaemon.Channels
 @inject InputTextEntities InputTextEntities
 @rendermode InteractiveServer
 
 <div class="d-flex flex-column h-100 gap-2 w-100">
-    <div class="d-flex justify-content-around gap-2" style="flex: 1;">
-        @foreach (var blind in Blinds.Select((b, idx) => new { Value = b, Index = idx }))
+    <div class="d-flex justify-content-around gap-2">
+        @for (int i = 0; i < 3; i++)
         {
-            <div class="d-flex flex-column gap-1" style="flex: 1;">
-                <button style="flex: 1;" class="border-0 rounded-3 shadow-sm" @onclick="Down(blind.Index, 0)">
-                    <BootstrapBlazorIcon Name="fa-solid fa-chevron-up fs-3"></BootstrapBlazorIcon>
-                </button>
-
-                @for (var i = 0; i < blind.Value; i++)
+            var idx = i;
+            <div class="d-flex flex-column align-items-center gap-1">
+                <input type="checkbox" class="form-check-input" style="width: 2rem; height: 2rem;"
+                       checked="@_selectedBlinds.Contains(idx)"
+                       @onchange="@(e => ToggleSelection(idx, e.Value))" />
+                <span>Blind @(idx + 1)</span>
+                @if (idx < Blinds.Count)
                 {
-                    <button style="flex: 1;" class="border-0 rounded-3 bg-warning shadow-sm"
-                            @onclick="Down(blind.Index, i+1)"></button>
-                }
-
-                @for (var i = 3; i > blind.Value; i--)
-                {
-                    <button style="flex: 1;" class="border-0 rounded-3 shadow-sm bg-white"
-                            @onclick="Down(blind.Index, blind.Value + (4-i))"></button>
+                    <span class="text-muted small">@Math.Round(Blinds[idx], 1)</span>
                 }
             </div>
         }
     </div>
 
     <div class="d-flex justify-content-around gap-2 mt-auto" style="height: 40px;">
-        <button style="flex: 1;" class="border-0 rounded-3 shadow-sm bg-white" @onclick="AllUp">
+        <button style="flex: 1;" class="btn btn-outline-primary rounded-3 shadow-sm bg-white" @onclick="() => SendCommand(BalconyBlindAction.Up)">
             <BootstrapBlazorIcon Name="fa-solid fa-chevron-up fs-4"></BootstrapBlazorIcon>
         </button>
-
-        <button style="flex: 1;" class="border-0 rounded-3 shadow-sm bg-white" @onclick="AllDown">
+        <button style="flex: 1;" class="btn btn-outline-danger rounded-3 shadow-sm bg-white" @onclick="() => SendCommand(BalconyBlindAction.Stop)">
+            <BootstrapBlazorIcon Name="fa-solid fa-stop fs-4"></BootstrapBlazorIcon>
+        </button>
+        <button style="flex: 1;" class="btn btn-outline-primary rounded-3 shadow-sm bg-white" @onclick="() => SendCommand(BalconyBlindAction.Down)">
             <BootstrapBlazorIcon Name="fa-solid fa-chevron-down fs-4"></BootstrapBlazorIcon>
+        </button>
+    </div>
+
+    <div class="d-flex justify-content-center mt-2">
+        <button class="btn btn-outline-secondary w-100 shadow-sm bg-white" @onclick="() => SendCommand(BalconyBlindAction.Calibrate)">
+            Calibrate Selected
         </button>
     </div>
 </div>
 
 @code {
+    private List<int> _selectedBlinds = [0, 1, 2];
 
-    private List<int> Blinds => JsonSerializer.Deserialize<List<int>>(InputTextEntities.BalconyBlindsState.State);
+    private List<double> Blinds
+    {
+        get
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<List<double>>(InputTextEntities.BalconyBlindsState.State ?? "[0,0,0]") ?? [0, 0, 0];
+            }
+            catch
+            {
+                return [0, 0, 0];
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         InputTextEntities.BalconyBlindsState.StateChanges().SubscribeAsync(async _ => { await InvokeAsync(StateHasChanged); });
     }
 
-    Action<MouseEventArgs> Down(int blind, int pos)
+    private void ToggleSelection(int index, object? isChecked)
     {
-        return (_) =>
+        var val = (bool?)isChecked ?? false;
+        if (val && !_selectedBlinds.Contains(index))
         {
-            var clone = new List<int>(Blinds)
-            {
-                [blind] = pos
-            };
-            
-            InputTextEntities.BalconyBlindsState.SetValue(JsonSerializer.Serialize(clone));
-        };
+            _selectedBlinds.Add(index);
+        }
+        else if (!val)
+        {
+            _selectedBlinds.Remove(index);
+        }
     }
 
-    void AllUp()
+    private async Task SendCommand(BalconyBlindAction action)
     {
-        InputTextEntities.BalconyBlindsState.SetValue("[0, 0, 0]");
-    }
+        if (_selectedBlinds.Count == 0) return;
 
-    void AllDown()
-    {
-        InputTextEntities.BalconyBlindsState.SetValue("[3, 3, 3]");
+        await BalconyBlindsChannel.Channel.Writer.WriteAsync(new BalconyBlindCommand(action, _selectedBlinds.ToList()));
     }
-
 }
