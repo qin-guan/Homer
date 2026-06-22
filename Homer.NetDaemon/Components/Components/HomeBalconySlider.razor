@@ -1,0 +1,156 @@
+@using System.Text.Json
+@using Homer.NetDaemon.Channels
+@using Homer.NetDaemon.Entities
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div class="d-flex w-100 h-100 justify-content-center align-items-center" style="touch-action: none;">
+    <div @ref="_sliderContainer"
+         class="rounded-4 position-relative overflow-hidden shadow-sm"
+         style="width: 120px; height: 100%; background-color: #f0f0f0; cursor: pointer; user-select: none;"
+         @onpointerdown="OnPointerDown"
+         @onpointermove="OnPointerMove"
+         @onpointerup="OnPointerUp"
+         @onpointercancel="OnPointerUp"
+         @onpointerleave="OnPointerUp">
+
+        @{
+            var fillPercentage = GetFillPercentage();
+            var fillHeight = $"{fillPercentage}%";
+        }
+        <div class="position-absolute w-100"
+             style="top: 0; left: 0; height: @fillHeight; background-color: @(SelectedBlinds.Any() ? "#ffffff" : "#e0e0e0"); transition: height 0.1s linear; pointer-events: none;">
+        </div>
+
+        @for (int i = 0; i < 3; i++)
+        {
+            if (i < BlindPositions.Count)
+            {
+                var posPercent = (BlindPositions[i] / 3.0) * 100;
+                var color = SelectedBlinds.Contains(i) ? "#0d6efd" : "#adb5bd";
+                <div class="position-absolute w-100" style="top: @(posPercent)%; height: 2px; background-color: @color; transform: translateY(-50%); pointer-events: none;"></div>
+
+                <div class="position-absolute text-muted" style="top: @(posPercent)%; left: 5px; transform: translateY(-50%); font-size: 0.6rem; pointer-events: none; opacity: 0.7;">
+                    @(i + 1)
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<double> BlindPositions { get; set; } = [0, 0, 0];
+    [Parameter] public List<int> SelectedBlinds { get; set; } = new();
+    [Parameter] public EventCallback<double> OnPositionSet { get; set; }
+
+    private ElementReference _sliderContainer;
+    private bool _isDragging;
+    private double? _dragPercentage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                window.getBoundingClientRect = (element) => {
+                    if (element) {
+                        return element.getBoundingClientRect();
+                    }
+                    return { top: 0, height: 0 };
+                };
+                window.elementRef = {
+                    setPointerCapture: (element, pointerId) => {
+                        if (element && element.setPointerCapture) {
+                            element.setPointerCapture(pointerId);
+                        }
+                    },
+                    releasePointerCapture: (element, pointerId) => {
+                        if (element && element.releasePointerCapture) {
+                            element.releasePointerCapture(pointerId);
+                        }
+                    }
+                };
+            ");
+        }
+    }
+
+    private double GetFillPercentage()
+    {
+        if (_dragPercentage.HasValue) return _dragPercentage.Value;
+
+        if (SelectedBlinds.Count == 0 || BlindPositions.Count == 0) return 0;
+
+        double sum = 0;
+        foreach (var idx in SelectedBlinds)
+        {
+            if (idx < BlindPositions.Count)
+                sum += BlindPositions[idx];
+        }
+
+        var avg = sum / SelectedBlinds.Count;
+        return (avg / 3.0) * 100;
+    }
+
+    private async Task OnPointerDown(PointerEventArgs e)
+    {
+        if (SelectedBlinds.Count == 0) return;
+        _isDragging = true;
+        await UpdateDragPosition(e);
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("elementRef.setPointerCapture", _sliderContainer, e.PointerId);
+        }
+        catch { /* ignore */ }
+    }
+
+    private async Task OnPointerMove(PointerEventArgs e)
+    {
+        if (!_isDragging) return;
+        await UpdateDragPosition(e);
+    }
+
+    private async Task OnPointerUp(PointerEventArgs e)
+    {
+        if (!_isDragging) return;
+        _isDragging = false;
+        await UpdateDragPosition(e);
+
+        if (_dragPercentage.HasValue)
+        {
+            var targetPosition = (_dragPercentage.Value / 100.0) * 3.0;
+            await OnPositionSet.InvokeAsync(targetPosition);
+        }
+
+        _dragPercentage = null;
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("elementRef.releasePointerCapture", _sliderContainer, e.PointerId);
+        }
+        catch { /* ignore */ }
+    }
+
+    private async Task UpdateDragPosition(PointerEventArgs e)
+    {
+        try
+        {
+            var rect = await JSRuntime.InvokeAsync<BoundingClientRect>("getBoundingClientRect", _sliderContainer);
+            var y = e.ClientY - rect.Top;
+            var height = rect.Height;
+
+            var percentage = (y / height) * 100;
+            _dragPercentage = Math.Clamp(percentage, 0, 100);
+        }
+        catch
+        {
+            _dragPercentage = null;
+        }
+    }
+
+    public class BoundingClientRect
+    {
+        public double Top { get; set; }
+        public double Height { get; set; }
+    }
+}
