@@ -6,8 +6,8 @@
 
 <div class="d-flex w-100 h-100 justify-content-center align-items-center" style="touch-action: none;">
     <div @ref="_sliderContainer"
-         class="rounded-4 position-relative overflow-hidden shadow-sm"
-         style="width: 120px; height: 100%; background-color: #f0f0f0; cursor: pointer; user-select: none;"
+         class="position-relative overflow-hidden"
+         style="width: 140px; height: 100%; max-height: 400px; background-color: #E1E2E8; border-radius: 40px; cursor: pointer; user-select: none;"
          @onpointerdown="OnPointerDown"
          @onpointermove="OnPointerMove"
          @onpointerup="OnPointerUp"
@@ -15,23 +15,80 @@
          @onpointerleave="OnPointerUp">
 
         @{
-            var fillPercentage = GetFillPercentage();
-            var fillHeight = $"{fillPercentage}%";
+            var currentPercentage = GetCurrentPercentage();
+            var targetPercentage = GetTargetPercentage(currentPercentage);
+
+            var minFill = Math.Min(currentPercentage, targetPercentage);
+            var maxFill = Math.Max(currentPercentage, targetPercentage);
+
+            var baseFillHeight = $"{minFill}%";
+            var movingFillHeight = $"{maxFill - minFill}%";
+            var movingFillTop = $"{minFill}%";
         }
+
+        <!-- Base Fill Area (Material Primary color) - Solid part -->
         <div class="position-absolute w-100"
-             style="top: 0; left: 0; height: @fillHeight; background-color: @(SelectedBlinds.Any() ? "#ffffff" : "#e0e0e0"); transition: height 0.1s linear; pointer-events: none;">
+             style="top: 0; left: 0; height: @baseFillHeight; background-color: @(SelectedBlinds.Any() ? "#0B57D0" : "#C4C7C5"); transition: height 0.1s linear; pointer-events: none;">
         </div>
 
+        <!-- Moving Indicator Area (Material Primary Container color) - Ghost part -->
+        @if (Math.Abs(maxFill - minFill) > 0.5 && SelectedBlinds.Any())
+        {
+            <div class="position-absolute w-100"
+                 style="top: @movingFillTop; left: 0; height: @movingFillHeight; background-color: #A8C7FA; transition: top 0.1s linear, height 0.1s linear; pointer-events: none;">
+            </div>
+        }
+
+        <!-- Dragging Indicator (when dragging, show a line where the finger is) -->
+        @if (_isDragging && _dragPercentage.HasValue && SelectedBlinds.Any())
+        {
+            <div class="position-absolute w-100" style="top: @(_dragPercentage.Value)%; height: 2px; background-color: rgba(11, 87, 208, 0.5); transform: translateY(-50%); pointer-events: none;"></div>
+        }
+
+        <!-- Position Indicators -->
         @for (int i = 0; i < 3; i++)
         {
             if (i < BlindPositions.Count)
             {
                 var posPercent = (BlindPositions[i] / 3.0) * 100;
-                var color = SelectedBlinds.Contains(i) ? "#0d6efd" : "#adb5bd";
-                <div class="position-absolute w-100" style="top: @(posPercent)%; height: 2px; background-color: @color; transform: translateY(-50%); pointer-events: none;"></div>
+                var isSelected = SelectedBlinds.Contains(i);
 
-                <div class="position-absolute text-muted" style="top: @(posPercent)%; left: 5px; transform: translateY(-50%); font-size: 0.6rem; pointer-events: none; opacity: 0.7;">
-                    @(i + 1)
+                // If it is inside the solid fill area, we need to invert the color
+                bool isInsideBaseFill = posPercent <= minFill;
+                bool isInsideMovingFill = posPercent > minFill && posPercent <= maxFill;
+
+                string lineColor;
+                string textColor;
+
+                if (isSelected)
+                {
+                    if (isInsideBaseFill)
+                    {
+                        lineColor = "#FFFFFF";
+                        textColor = "#FFFFFF";
+                    }
+                    else if (isInsideMovingFill)
+                    {
+                        lineColor = "#041E49";
+                        textColor = "#041E49";
+                    }
+                    else
+                    {
+                        lineColor = "#0B57D0";
+                        textColor = "#0B57D0";
+                    }
+                }
+                else
+                {
+                    lineColor = isInsideBaseFill ? "#F0F0F0" : "#74777F";
+                    textColor = isInsideBaseFill ? "#F0F0F0" : "#74777F";
+                }
+
+                <div class="position-absolute w-100 d-flex align-items-center" style="top: @(posPercent)%; transform: translateY(-50%); pointer-events: none; padding: 0 16px;">
+                    <div style="flex-grow: 1; height: 4px; background-color: @lineColor; border-radius: 2px; transition: background-color 0.1s linear;"></div>
+                    <span class="ms-3 fw-bold" style="color: @textColor; font-size: 1rem; transition: color 0.1s linear;">
+                        @(i + 1)
+                    </span>
                 </div>
             }
         }
@@ -46,6 +103,9 @@
     private ElementReference _sliderContainer;
     private bool _isDragging;
     private double? _dragPercentage;
+
+    // We remember the last set target to show the ghost "moving" state
+    private double? _targetPercentage;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -74,10 +134,8 @@
         }
     }
 
-    private double GetFillPercentage()
+    private double GetCurrentPercentage()
     {
-        if (_dragPercentage.HasValue) return _dragPercentage.Value;
-
         if (SelectedBlinds.Count == 0 || BlindPositions.Count == 0) return 0;
 
         double sum = 0;
@@ -91,10 +149,39 @@
         return (avg / 3.0) * 100;
     }
 
+    private double GetTargetPercentage(double currentPercentage)
+    {
+        if (_isDragging && _dragPercentage.HasValue)
+        {
+            return _dragPercentage.Value;
+        }
+
+        if (_targetPercentage.HasValue)
+        {
+            // If the current percentage has reached the target (within 2%), clear the target
+            if (Math.Abs(currentPercentage - _targetPercentage.Value) <= 2.0)
+            {
+                _targetPercentage = null;
+                return currentPercentage;
+            }
+            return _targetPercentage.Value;
+        }
+
+        return currentPercentage;
+    }
+
     private async Task OnPointerDown(PointerEventArgs e)
     {
         if (SelectedBlinds.Count == 0) return;
         _isDragging = true;
+
+        // Cache the bounding rect once on down to avoid JS interop overhead on move
+        try
+        {
+            _cachedRect = await JSRuntime.InvokeAsync<BoundingClientRect>("getBoundingClientRect", _sliderContainer);
+        }
+        catch { _cachedRect = null; }
+
         await UpdateDragPosition(e);
 
         try
@@ -104,25 +191,31 @@
         catch { /* ignore */ }
     }
 
-    private async Task OnPointerMove(PointerEventArgs e)
+    private BoundingClientRect? _cachedRect;
+
+    private Task OnPointerMove(PointerEventArgs e)
     {
-        if (!_isDragging) return;
-        await UpdateDragPosition(e);
+        if (!_isDragging) return Task.CompletedTask;
+        UpdateDragPositionSync(e);
+        return Task.CompletedTask;
     }
 
     private async Task OnPointerUp(PointerEventArgs e)
     {
         if (!_isDragging) return;
         _isDragging = false;
-        await UpdateDragPosition(e);
+
+        UpdateDragPositionSync(e);
 
         if (_dragPercentage.HasValue)
         {
+            _targetPercentage = _dragPercentage.Value;
             var targetPosition = (_dragPercentage.Value / 100.0) * 3.0;
             await OnPositionSet.InvokeAsync(targetPosition);
         }
 
         _dragPercentage = null;
+        _cachedRect = null;
 
         try
         {
@@ -133,19 +226,30 @@
 
     private async Task UpdateDragPosition(PointerEventArgs e)
     {
-        try
+        if (_cachedRect == null)
         {
-            var rect = await JSRuntime.InvokeAsync<BoundingClientRect>("getBoundingClientRect", _sliderContainer);
-            var y = e.ClientY - rect.Top;
-            var height = rect.Height;
+            try
+            {
+                _cachedRect = await JSRuntime.InvokeAsync<BoundingClientRect>("getBoundingClientRect", _sliderContainer);
+            }
+            catch
+            {
+                _dragPercentage = null;
+                return;
+            }
+        }
+        UpdateDragPositionSync(e);
+    }
 
-            var percentage = (y / height) * 100;
-            _dragPercentage = Math.Clamp(percentage, 0, 100);
-        }
-        catch
-        {
-            _dragPercentage = null;
-        }
+    private void UpdateDragPositionSync(PointerEventArgs e)
+    {
+        if (_cachedRect == null) return;
+
+        var y = e.ClientY - _cachedRect.Top;
+        var height = _cachedRect.Height;
+
+        var percentage = (y / height) * 100;
+        _dragPercentage = Math.Clamp(percentage, 0, 100);
     }
 
     public class BoundingClientRect

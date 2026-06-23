@@ -10,31 +10,37 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
-<div class="d-flex flex-column vh-100 vw-100 overflow-hidden bg-white" style="font-family: Noto Sans SC, sans-serif;">
+<div class="d-flex flex-column vh-100 vw-100 overflow-hidden" style="background-color: #F8FDFF; font-family: 'Roboto', 'Noto Sans SC', sans-serif;">
     <!-- Top Action Bar (Balcony Lights Toggle) -->
-    <div class="d-flex p-3 align-items-center justify-content-center" style="height: 10dvh;">
-        <button class="btn @(BalconyLightsIsOn ? "btn-warning" : "btn-light border") rounded-pill px-5 py-2 shadow-sm fw-bold"
-                @onclick="() => SwitchEntities.BalconyLights.Toggle()">
-            @(BalconyLightsIsOn ? "阳台灯 (On)" : "阳台灯 (Off)")
+    <div class="d-flex p-4 align-items-center justify-content-center" style="height: 15dvh;">
+        <button class="btn d-flex align-items-center justify-content-center gap-2 fw-bold fs-5"
+                style="height: 64px; min-width: 200px; border-radius: 32px; background-color: @(BalconyLightsIsOn ? "#FDF2CE" : "#E1E2E8"); color: @(BalconyLightsIsOn ? "#5A4C1F" : "#44474E"); border: none; transition: background-color 0.2s, box-shadow 0.2s; box-shadow: @(BalconyLightsIsOn ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");"
+                @onclick="ToggleLights">
+            <i class="fa-solid fa-lightbulb"></i>
+            @(BalconyLightsIsOn ? "阳台灯" : "阳台灯")
         </button>
     </div>
 
-    <!-- Blinds Selector -->
-    <div class="d-flex justify-content-center gap-3 p-3" style="height: 15dvh;">
+    <!-- Blinds Selector (Material Segmented Buttons / Chips style) -->
+    <div class="d-flex justify-content-center gap-3 p-2" style="height: 15dvh;">
         @for (int i = 0; i < 3; i++)
         {
             var idx = i;
             var isSelected = _selectedBlinds.Contains(idx);
-            <button class="btn @(isSelected ? "btn-primary" : "btn-outline-secondary") rounded-circle shadow-sm d-flex justify-content-center align-items-center fw-bold"
-                    style="width: 60px; height: 60px; font-size: 1.2rem; transition: all 0.2s ease-in-out;"
-                    @onclick="() => ToggleSelection(idx)">
-                @(idx + 1)
-            </button>
+            <div class="position-relative">
+                <input type="checkbox" class="btn-check" id="blind-@idx" autocomplete="off"
+                       checked="@isSelected" @onchange="@(e => ToggleSelection(idx, e.Value))">
+                <label class="btn d-flex justify-content-center align-items-center fw-bold"
+                       for="blind-@idx"
+                       style="width: 72px; height: 72px; font-size: 1.5rem; transition: all 0.2s ease-in-out; border-radius: 20px; background-color: @(isSelected ? "#C2E7FF" : "#E1E2E8"); color: @(isSelected ? "#001D35" : "#44474E"); border: none; box-shadow: @(isSelected ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");">
+                    @(idx + 1)
+                </label>
+            </div>
         }
     </div>
 
     <!-- Slider Area -->
-    <div class="flex-grow-1 d-flex justify-content-center p-4 pb-5" style="height: 75dvh;">
+    <div class="flex-grow-1 d-flex justify-content-center p-3 pb-5" style="height: 70dvh;">
         <HomeBalconySlider SelectedBlinds="@_selectedBlinds"
                            BlindPositions="@BlindsPositions"
                            OnPositionSet="HandlePositionSet" />
@@ -93,15 +99,25 @@
         }
     }
 
-    private void ToggleSelection(int index)
+    private void ToggleLights()
     {
-        if (_selectedBlinds.Contains(index))
+        try
         {
-            _selectedBlinds.Remove(index);
+            SwitchEntities.BalconyLights.Toggle();
         }
-        else
+        catch { /* ignored */ }
+    }
+
+    private void ToggleSelection(int index, object? isChecked)
+    {
+        bool val = (bool?)isChecked ?? false;
+        if (val && !_selectedBlinds.Contains(index))
         {
             _selectedBlinds.Add(index);
+        }
+        else if (!val && _selectedBlinds.Contains(index))
+        {
+            _selectedBlinds.Remove(index);
         }
     }
 
