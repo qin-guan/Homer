@@ -1,15 +1,15 @@
 Using launch settings from Homer.NetDaemon/Properties/launchSettings.json...
 Building...
+/app/Homer.NetDaemon/Options/SimplyGoOptions.cs(7,19): warning CS8618: Non-nullable property 'ApiKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
+/app/Homer.NetDaemon/Options/DataMallOptions.cs(5,19): warning CS8618: Non-nullable property 'AccountKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
+/app/Homer.NetDaemon/Options/GoogleHomeDashboardOptions.cs(5,19): warning CS8618: Non-nullable property 'Secret' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Apps/Balcony/RainyWeatherCloseBlinds.cs(16,23): warning CS9113: Parameter 'textEntities' is unread. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Apps/Balcony/RainyWeatherCloseBlinds.cs(19,17): warning CS9113: Parameter 'registry' is unread. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
-/app/Homer.NetDaemon/Apps/Balcony/RainyWeatherCloseBlinds.cs(132,67): warning CS8604: Possible null reference argument for parameter 'json' in 'ActionData? JsonSerializer.Deserialize<ActionData>(string json, JsonSerializerOptions? options = null)'. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
-/app/Homer.NetDaemon/Options/SimplyGoOptions.cs(7,19): warning CS8618: Non-nullable property 'ApiKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Options/KdkOptions.cs(6,19): warning CS8618: Non-nullable property 'RefreshToken' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Options/KdkOptions.cs(7,19): warning CS8618: Non-nullable property 'ApiKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
-/app/Homer.NetDaemon/Options/GoogleHomeDashboardOptions.cs(5,19): warning CS8618: Non-nullable property 'Secret' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
-/app/Homer.NetDaemon/Options/DataMallOptions.cs(5,19): warning CS8618: Non-nullable property 'AccountKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
-/app/Homer.NetDaemon/Services/OpenMeteo/IOpenMeteoApi.cs(15,27): warning CS8618: Non-nullable property 'Current' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
+/app/Homer.NetDaemon/Apps/Balcony/RainyWeatherCloseBlinds.cs(132,67): warning CS8604: Possible null reference argument for parameter 'json' in 'ActionData? JsonSerializer.Deserialize<ActionData>(string json, JsonSerializerOptions? options = null)'. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Apps/LivingRoom/LivingRoomGoogleHome.cs(11,16): warning CS9113: Parameter 'scheduler' is unread. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
+/app/Homer.NetDaemon/Services/OpenMeteo/IOpenMeteoApi.cs(15,27): warning CS8618: Non-nullable property 'Current' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Services/DataMall/BusArrival/BusArrivalResponse.cs(20,19): warning CS8618: Non-nullable property 'OriginCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Services/DataMall/BusArrival/BusArrivalResponse.cs(21,19): warning CS8618: Non-nullable property 'DestinationCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
 /app/Homer.NetDaemon/Services/DataMall/BusArrival/BusArrivalResponse.cs(24,19): warning CS8618: Non-nullable property 'Latitude' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/app/Homer.NetDaemon/Homer.NetDaemon.csproj]
@@ -45,30 +45,30 @@ info: NetDaemon.Runtime.Internal.NetDaemonRuntime[0]
       Home Assistant disconnected due to unknown error, set loglevel to debug to view details
 info: NetDaemon.Client.IHomeAssistantRunner[0]
       Client connection failed, retrying in 10 seconds...
+info: NetDaemon.Runtime.Internal.NetDaemonRuntime[0]
+      Home Assistant disconnected due to unknown error, set loglevel to debug to view details
+info: NetDaemon.Client.IHomeAssistantRunner[0]
+      Client connection failed, retrying in 20 seconds...
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/Blinds - - -
 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
       Failed to determine the https port for redirect.
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
       Executing endpoint '/Blinds (/Blinds)'
-info: NetDaemon.Runtime.Internal.NetDaemonRuntime[0]
-      Home Assistant disconnected due to unknown error, set loglevel to debug to view details
-info: NetDaemon.Client.IHomeAssistantRunner[0]
-      Client connection failed, retrying in 20 seconds...
 info: BootstrapBlazor.Components.JsonStringLocalizer[0]
       JsonStringLocalizer searched for 'ToastTitle' in 'BootstrapBlazor.Components.ErrorLogger' with culture 'en' not found.
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint '/Blinds (/Blinds)'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/Blinds - 200 - text/html;+charset=utf-8 690.3665ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - - -
+      Request starting HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://localhost:5141/Blinds - 200 - text/html;+charset=utf-8 588.8971ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - - -
+      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
       Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
@@ -82,41 +82,41 @@ info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - 200 1875 text/css 49.8608ms
+      Request finished HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - 200 1875 text/css 41.6707ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/Homer.NetDaemon.styles.css - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/Homer.NetDaemon.styles.css - 404 0 - 1.2837ms
+      Request finished HTTP/1.1 GET http://localhost:5141/Homer.NetDaemon.styles.css - 404 0 - 1.1869ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[16]
       Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5141/Homer.NetDaemon.styles.css, Response status code: 404
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor/10.7.1/staticwebassets/css/motronic.min.css'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js - - -
+info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
+      Sending file. Request path: '_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor/10.7.1/staticwebassets/css/motronic.min.css'
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
       Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css - 200 12447 text/css 59.8818ms
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor.fontawesome/10.0.1/staticwebassets/css/font-awesome.min.css'
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - 200 75744 text/css 68.7336ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css - 200 12447 text/css 47.8325ms
 info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
       Sending file. Request path: '_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js'. Physical path: '/app/Homer.NetDaemon/obj/Debug/net10.0/compressed/384tdka5d1-{0}-wvublzrdv8-wvublzrdv8.gz'
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js - 200 80539 text/javascript 13.3693ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js - 200 80539 text/javascript 10.6938ms
+info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
+      Sending file. Request path: '_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor.fontawesome/10.0.1/staticwebassets/css/font-awesome.min.css'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - 200 75744 text/css 44.9532ms
 info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
       Sending file. Request path: '_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor/10.7.1/staticwebassets/css/bootstrap.blazor.bundle.min.css'
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css - 200 566908 text/css 70.3551ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css - 200 566908 text/css 57.4962ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_framework/blazor.web.js - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
@@ -126,7 +126,7 @@ info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_framework/blazor.web.js - 200 55158 text/javascript 4.8898ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_framework/blazor.web.js - 200 55158 text/javascript 3.9566ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2 - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
@@ -136,7 +136,7 @@ info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2 - 200 114740 font/woff2 10.2575ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2 - 200 114740 font/woff2 6.6221ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 GET http://localhost:5141/_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
@@ -146,7 +146,7 @@ info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js - 200 1862 text/javascript 1.8897ms
+      Request finished HTTP/1.1 GET http://localhost:5141/_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js - 200 1862 text/javascript 1.4809ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/1.1 POST http://localhost:5141/_blazor/negotiate?negotiateVersion=1 - - 0
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
@@ -154,135 +154,23 @@ info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 POST http://localhost:5141/_blazor/negotiate?negotiateVersion=1 - 200 316 application/json 9.7747ms
+      Request finished HTTP/1.1 POST http://localhost:5141/_blazor/negotiate?negotiateVersion=1 - 200 316 application/json 8.5010ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_blazor?id=peFtPB0YhUta_Lvw9b8c8A - - -
+      Request starting HTTP/1.1 GET http://localhost:5141/_blazor?id=aXN26OjBfBCeXigabddl0w - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
       Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 GET http://localhost:5141/_blazor?id=aXN26OjBfBCeXigabddl0w - 101 - - 4950.1791ms
 info: NetDaemon.Runtime.Internal.NetDaemonRuntime[0]
       Home Assistant disconnected due to unknown error, set loglevel to debug to view details
 info: NetDaemon.Client.IHomeAssistantRunner[0]
       Client connection failed, retrying in 40 seconds...
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_blazor?id=peFtPB0YhUta_Lvw9b8c8A - 101 - - 35290.3418ms
 info: NetDaemon.Runtime.Internal.NetDaemonRuntime[0]
       Home Assistant disconnected due to unknown error, set loglevel to debug to view details
 info: NetDaemon.Client.IHomeAssistantRunner[0]
       Client connection failed, retrying in 80 seconds...
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/Blinds - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint '/Blinds (/Blinds)'
-info: BootstrapBlazor.Components.JsonStringLocalizer[0]
-      JsonStringLocalizer searched for 'ToastTitle' in 'BootstrapBlazor.Components.ErrorLogger' with culture '' not found.
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint '/Blinds (/Blinds)'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/Blinds - 200 - text/html;+charset=utf-8 65.9631ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor.fontawesome/10.0.1/staticwebassets/css/font-awesome.min.css'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/css/font-awesome.min.7mw5e8h29x.css - 200 75744 text/css 3.2551ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: 'app.dgcqyei9lb.css'. Physical path: '/app/Homer.NetDaemon/obj/Debug/net10.0/compressed/w24awtffz9-{0}-dgcqyei9lb-dgcqyei9lb.gz'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/app.dgcqyei9lb.css - 200 1875 text/css 0.9941ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/Homer.NetDaemon.styles.css - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/Homer.NetDaemon.styles.css - 404 0 - 0.2442ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[16]
-      Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5141/Homer.NetDaemon.styles.css, Response status code: 404
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_framework/blazor.web.js - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_framework/blazor.web.js'. Physical path: '/app/Homer.NetDaemon/obj/Debug/net10.0/compressed/jy6c0macvy-{0}-ax6tuj8tun-ax6tuj8tun.gz'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_framework/blazor.web.js - 200 55158 text/javascript 0.5868ms
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js'. Physical path: '/app/Homer.NetDaemon/obj/Debug/net10.0/compressed/384tdka5d1-{0}-wvublzrdv8-wvublzrdv8.gz'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js - 200 80539 text/javascript 4.7005ms
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor/10.7.1/staticwebassets/css/motronic.min.css'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/motronic.min.3mkwb5lvaz.css - 200 12447 text/css 9.5011ms
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor/10.7.1/staticwebassets/css/bootstrap.blazor.bundle.min.css'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.j9moevjkyc.css - 200 566908 text/css 18.6855ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2 - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2'. Physical path: '/home/jules/.nuget/packages/bootstrapblazor.fontawesome/10.0.1/staticwebassets/webfonts/fa-solid-900.woff2'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/BootstrapBlazor.FontAwesome/webfonts/fa-solid-900.woff2 - 200 114740 font/woff2 10.9787ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.StaticAssets.StaticAssetsInvoker[2]
-      Sending file. Request path: '_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js'. Physical path: '/home/jules/.nuget/packages/microsoft.dotnet.hotreload.webassembly.browser/10.0.103/staticwebassets/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_content/Microsoft.DotNet.HotReload.WebAssembly.Browser/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js - 200 1862 text/javascript 9.2051ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 POST http://localhost:5141/_blazor/negotiate?negotiateVersion=1 - - 0
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 POST http://localhost:5141/_blazor/negotiate?negotiateVersion=1 - 200 316 application/json 2.0581ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/1.1 GET http://localhost:5141/_blazor?id=2geQXXCoYkTGfI4T3iVz1Q - - -
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'Microsoft.AspNetCore.Routing.RouteEndpoint'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/1.1 GET http://localhost:5141/_blazor?id=2geQXXCoYkTGfI4T3iVz1Q - 101 - - 8376.6739ms
 info: Microsoft.Hosting.Lifetime[0]
       Application is shutting down...
 info: NetDaemon.Runtime.Internal.RuntimeService[0]
