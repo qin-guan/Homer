@@ -10,18 +10,19 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
-<div class="d-flex flex-column vh-100 vw-100 overflow-hidden" style="background-color: #f2f2f7; font-family: Noto Sans SC, sans-serif;">
+<div class="d-flex flex-column vh-100 vw-100 overflow-hidden" style="background-color: #F8FDFF; font-family: 'Roboto', 'Noto Sans SC', sans-serif;">
     <!-- Top Action Bar (Balcony Lights Toggle) -->
     <div class="d-flex p-4 align-items-center justify-content-center" style="height: 15dvh;">
-        <button class="btn rounded-pill px-5 py-3 shadow-sm fw-bold fs-4"
-                style="background-color: @(BalconyLightsIsOn ? "#ffcc00" : "#ffffff"); color: @(BalconyLightsIsOn ? "#000000" : "#333333"); border: none; transition: background-color 0.2s;"
+        <button class="btn d-flex align-items-center justify-content-center gap-2 fw-bold fs-5"
+                style="height: 64px; min-width: 200px; border-radius: 32px; background-color: @(BalconyLightsIsOn ? "#FDF2CE" : "#E1E2E8"); color: @(BalconyLightsIsOn ? "#5A4C1F" : "#44474E"); border: none; transition: background-color 0.2s, box-shadow 0.2s; box-shadow: @(BalconyLightsIsOn ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");"
                 @onclick="ToggleLights">
-            @(BalconyLightsIsOn ? "阳台灯 (On)" : "阳台灯 (Off)")
+            <i class="fa-solid fa-lightbulb"></i>
+            @(BalconyLightsIsOn ? "阳台灯" : "阳台灯")
         </button>
     </div>
 
-    <!-- Blinds Selector -->
-    <div class="d-flex justify-content-center gap-4 p-2" style="height: 15dvh;">
+    <!-- Blinds Selector (Material Segmented Buttons / Chips style) -->
+    <div class="d-flex justify-content-center gap-3 p-2" style="height: 15dvh;">
         @for (int i = 0; i < 3; i++)
         {
             var idx = i;
@@ -29,9 +30,9 @@
             <div class="position-relative">
                 <input type="checkbox" class="btn-check" id="blind-@idx" autocomplete="off"
                        checked="@isSelected" @onchange="@(e => ToggleSelection(idx, e.Value))">
-                <label class="btn btn-outline-primary rounded-circle shadow-sm d-flex justify-content-center align-items-center fw-bold"
+                <label class="btn d-flex justify-content-center align-items-center fw-bold"
                        for="blind-@idx"
-                       style="width: 70px; height: 70px; font-size: 1.5rem; transition: all 0.2s ease-in-out; border-width: 2px; background-color: @(isSelected ? "" : "#ffffff");">
+                       style="width: 72px; height: 72px; font-size: 1.5rem; transition: all 0.2s ease-in-out; border-radius: 20px; background-color: @(isSelected ? "#C2E7FF" : "#E1E2E8"); color: @(isSelected ? "#001D35" : "#44474E"); border: none; box-shadow: @(isSelected ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");">
                     @(idx + 1)
                 </label>
             </div>

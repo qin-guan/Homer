@@ -7,16 +7,3 @@
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
-
-/* Custom Checkbox Button Styling for Blinds Page */
-.btn-check:checked + .btn-outline-primary {
-    background-color: #007aff !important;
-    color: white !important;
-    border-color: #007aff !important;
-}
-
-.btn-check:not(:checked) + .btn-outline-primary {
-    background-color: white !important;
-    color: #007aff !important;
-    border-color: #007aff !important;
-}

@@ -6,8 +6,8 @@
 
 <div class="d-flex w-100 h-100 justify-content-center align-items-center" style="touch-action: none;">
     <div @ref="_sliderContainer"
-         class="position-relative overflow-hidden shadow"
-         style="width: 140px; height: 100%; max-height: 400px; background-color: #ffffff; border-radius: 40px; cursor: pointer; user-select: none;"
+         class="position-relative overflow-hidden"
+         style="width: 140px; height: 100%; max-height: 400px; background-color: #E1E2E8; border-radius: 40px; cursor: pointer; user-select: none;"
          @onpointerdown="OnPointerDown"
          @onpointermove="OnPointerMove"
          @onpointerup="OnPointerUp"
@@ -18,9 +18,9 @@
             var fillPercentage = GetFillPercentage();
             var fillHeight = $"{fillPercentage}%";
         }
-        <!-- Fill Area -->
+        <!-- Fill Area (Material Primary color) -->
         <div class="position-absolute w-100"
-             style="top: 0; left: 0; height: @fillHeight; background-color: @(SelectedBlinds.Any() ? "#007aff" : "#d1d1d6"); transition: height 0.1s linear; pointer-events: none; opacity: 0.9;">
+             style="top: 0; left: 0; height: @fillHeight; background-color: @(SelectedBlinds.Any() ? "#0B57D0" : "#C4C7C5"); transition: height 0.1s linear; pointer-events: none;">
         </div>
 
         <!-- Position Indicators -->
@@ -29,11 +29,27 @@
             if (i < BlindPositions.Count)
             {
                 var posPercent = (BlindPositions[i] / 3.0) * 100;
-                var color = SelectedBlinds.Contains(i) ? "#ffffff" : "#8e8e93";
+                var isSelected = SelectedBlinds.Contains(i);
 
-                <div class="position-absolute w-100 d-flex align-items-center" style="top: @(posPercent)%; transform: translateY(-50%); pointer-events: none; padding: 0 10px;">
-                    <div style="flex-grow: 1; height: 3px; background-color: @color; border-radius: 2px;"></div>
-                    <span class="ms-2 fw-bold" style="color: @color; font-size: 1rem; text-shadow: 0px 0px 2px rgba(0,0,0,0.3);">
+                // If it is inside the filled area, we need to invert the color
+                bool isInsideFill = posPercent <= fillPercentage;
+                string lineColor;
+                string textColor;
+
+                if (isSelected)
+                {
+                    lineColor = isInsideFill ? "#FFFFFF" : "#0B57D0";
+                    textColor = isInsideFill ? "#FFFFFF" : "#0B57D0";
+                }
+                else
+                {
+                    lineColor = isInsideFill ? "#F0F0F0" : "#74777F";
+                    textColor = isInsideFill ? "#F0F0F0" : "#74777F";
+                }
+
+                <div class="position-absolute w-100 d-flex align-items-center" style="top: @(posPercent)%; transform: translateY(-50%); pointer-events: none; padding: 0 16px;">
+                    <div style="flex-grow: 1; height: 4px; background-color: @lineColor; border-radius: 2px;"></div>
+                    <span class="ms-3 fw-bold" style="color: @textColor; font-size: 1rem;">
                         @(i + 1)
                     </span>
                 </div>
