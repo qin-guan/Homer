@@ -8,27 +8,47 @@
 
 <PageTitle>Home</PageTitle>
 
+<style>
+    .home-container {
+        font-family: Noto Sans SC, sans-serif;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    @@media (min-width: 768px) {
+        .home-container {
+            height: 100vh;
+            overflow: hidden;
+        }
+        .col-md-h-100 {
+            height: 100% !important;
+        }
+        .flex-md-50 {
+            flex-basis: 50% !important;
+        }
+    }
+</style>
+
 @if (GoogleHomeDashboardOptions.Value.Secret != Secret)
 {
     <span class="p-2">Nothing here!</span>
 }
 else
 {
-    <div class="d-flex flex-column vh-100 overflow-hidden px-2 py-2 gap-2" style="font-family: Noto Sans SC, sans-serif;">
+    <div class="d-flex flex-column px-2 py-2 gap-2 home-container">
         <div>
             <HomeTopBar></HomeTopBar>
         </div>
 
-        <div class="row flex-grow-1 gx-2 m-0 pb-2">
+        <div class="row flex-grow-1 gx-2 gy-2 gy-md-0 m-0 pb-2">
             <!-- Left column -->
-            <div class="col-12 col-md-5 d-flex flex-column gap-2 h-100">
-                <div class="d-flex gap-1 flex-grow-1" style="flex-basis: 50%;">
+            <div class="col-12 col-md-5 d-flex flex-column gap-2 col-md-h-100">
+                <div class="d-flex gap-1 flex-grow-1 flex-md-50">
                     <HomePowerButton SwitchId="@Switches.BalconyLights.EntityId" Name="阳台灯"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap59921None.EntityId" Name="空调一"/>
                     <HomePowerButton SwitchId="@Switches.Daikinap16703None.EntityId" Name="空调二"/>
                 </div>
 
-                <div class="card flex-grow-1 shadow-sm" style="flex-basis: 50%;">
+                <div class="card flex-grow-1 shadow-sm flex-md-50">
                     <div class="card-body d-flex flex-column h-100 p-2">
                         <h6 class="fw-semibold mb-2">巴士</h6>
                         <HomeBusTimings></HomeBusTimings>
@@ -37,13 +57,13 @@ else
             </div>
 
             <!-- Middle column -->
-            <div class="col-12 col-md-5 d-flex flex-column gap-2 h-100">
-                <div class="d-flex gap-2 flex-grow-1" style="flex-basis: 50%;">
+            <div class="col-12 col-md-5 d-flex flex-column gap-2 col-md-h-100">
+                <div class="d-flex gap-2 flex-grow-1 flex-md-50">
                     <HomeWaterHeater/>
                     <HomeToiletStatus/>
                 </div>
 
-                <div class="card flex-grow-1 shadow-sm" style="flex-basis: 50%;">
+                <div class="card flex-grow-1 shadow-sm flex-md-50">
                     <div class="card-body d-flex flex-column h-100 p-2">
                         <h6 class="fw-semibold mb-2">天气</h6>
                         <HomeWeather/>
@@ -52,7 +72,7 @@ else
             </div>
 
             <!-- Right column -->
-            <div class="col-12 col-md-2 d-flex flex-column gap-2 h-100">
+            <div class="col-12 col-md-2 d-flex flex-column gap-2 col-md-h-100">
                 <div class="flex-grow-1 d-flex flex-column">
                     <HomeBalconyButtons/>
                 </div>
