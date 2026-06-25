@@ -22,7 +22,7 @@
     </div>
 
     <!-- Blinds Selector (Material Segmented Buttons / Chips style) -->
-    <div class="d-flex justify-content-center gap-3 p-2" style="height: 15dvh;">
+    <div class="d-flex justify-content-center gap-4 p-2" style="height: 15dvh;">
         @for (int i = 0; i < 3; i++)
         {
             var idx = i;
@@ -32,7 +32,7 @@
                        checked="@isSelected" @onchange="@(e => ToggleSelection(idx, e.Value))">
                 <label class="btn d-flex justify-content-center align-items-center fw-bold"
                        for="blind-@idx"
-                       style="width: 72px; height: 72px; font-size: 1.5rem; transition: all 0.2s ease-in-out; border-radius: 20px; background-color: @(isSelected ? "#C2E7FF" : "#E1E2E8"); color: @(isSelected ? "#001D35" : "#44474E"); border: none; box-shadow: @(isSelected ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");">
+                       style="width: 80px; height: 80px; font-size: 1.75rem; transition: all 0.2s ease-in-out; border-radius: 24px; background-color: @(isSelected ? "#C2E7FF" : "#E1E2E8"); color: @(isSelected ? "#001D35" : "#44474E"); border: none; box-shadow: @(isSelected ? "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)" : "none");">
                     @(idx + 1)
                 </label>
             </div>
