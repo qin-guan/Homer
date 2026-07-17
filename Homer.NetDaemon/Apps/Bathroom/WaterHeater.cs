@@ -12,7 +12,7 @@ namespace Homer.NetDaemon.Apps.Bathroom;
 public class WaterHeater
 {
     private const int DailyBudgetMinutes = 120;
-    private static readonly TimeSpan ShowerDetectionConfirmationDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan ShowerDetectionConfirmationDelay = TimeSpan.FromMinutes(4);
     private static readonly TimeSpan RecoveryShowerDurationThreshold = TimeSpan.FromMinutes(5);
     // Five minutes is the anti-short-cycle floor; budget and max runtime still take priority.
     private static readonly TimeSpan MinimumHeaterRunDuration = TimeSpan.FromMinutes(7);
