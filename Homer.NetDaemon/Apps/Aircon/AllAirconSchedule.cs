@@ -14,7 +14,7 @@ public class AllAirconSchedule
         {
             foreach (var aircon in ce.EnumerateAll())
             {
-                if (aircon.EntityId == "climate.daikinap97235") continue;
+                if (aircon.EntityId == "climate.daikinap97235" || aircon.EntityId == "climate.daikinap25067") continue;
                 aircon.TurnOff();
             }
         });
