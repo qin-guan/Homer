@@ -314,11 +314,11 @@ public partial class LightEntities
     ///<summary>Living Room Ceiling Fan</summary>
     public LightEntity LivingRoomKdk => new(_haContext, "light.living_room_kdk");
     ///<summary>Bedroom 4 Presence Sensor Red Info Light</summary>
-    public LightEntity ScreekHumanSensor2a06ead0RedInfoLight => new(_haContext, "light.screek_human_sensor_2a_06ead0_red_info_light");
+    public LightEntity ScreekHumanSensor2a06ead0RedInfoLight => new(_haContext, "light.human_sensor_2a_06ead0_red_info_light");
     ///<summary>Kitchen Presence Sensor Red Info Light</summary>
-    public LightEntity ScreekHumanSensor2a872668RedInfoLight => new(_haContext, "light.screek_human_sensor_2a_872668_red_info_light");
+    public LightEntity ScreekHumanSensor2a872668RedInfoLight => new(_haContext, "light.human_sensor_2a_872668_red_info_light");
     ///<summary>Balcony Presence Sensor Red Info Light</summary>
-    public LightEntity ScreekHumanSensor2aD15cf4RedInfoLight => new(_haContext, "light.screek_human_sensor_2a_d15cf4_red_info_light");
+    public LightEntity ScreekHumanSensor2aD15cf4RedInfoLight => new(_haContext, "light.human_sensor_2a_d15cf4_red_info_light");
 }
 
 public partial class MediaPlayerEntities
@@ -442,41 +442,41 @@ public partial class BinarySensorEntities
     ///<summary>Qin’s iPhone Focus</summary>
     public BinarySensorEntity QinsIphoneFocus => new(_haContext, "binary_sensor.qins_iphone_focus");
     ///<summary>Bedroom 4 Presence Sensor Any Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0AnyPresence => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_any_presence");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0AnyPresence => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_any_presence");
     ///<summary>Bedroom 4 Presence Sensor Online</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0Online => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_online");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0Online => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_online");
     ///<summary>Bedroom 4 Presence Sensor Zone1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_zone1_presence");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone1Presence => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_zone1_presence");
     ///<summary>Bedroom 4 Presence Sensor Zone2 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone2Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_zone2_presence");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone2Presence => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_zone2_presence");
     ///<summary>Bedroom 4 Presence Sensor Zone3 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone3Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_zone3_presence");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0Zone3Presence => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_zone3_presence");
     ///<summary>Bedroom 4 Presence Sensor Zout1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a06ead0Zout1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_06ead0_zout1_presence");
+    public BinarySensorEntity ScreekHumanSensor2a06ead0Zout1Presence => new(_haContext, "binary_sensor.human_sensor_2a_06ead0_zout1_presence");
     ///<summary>Kitchen Presence Sensor Any Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668AnyPresence => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_any_presence");
+    public BinarySensorEntity ScreekHumanSensor2a872668AnyPresence => new(_haContext, "binary_sensor.human_sensor_2a_872668_any_presence");
     ///<summary>Kitchen Presence Sensor Online</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668Online => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_online");
+    public BinarySensorEntity ScreekHumanSensor2a872668Online => new(_haContext, "binary_sensor.human_sensor_2a_872668_online");
     ///<summary>Kitchen Presence Sensor Zone1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668Zone1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_zone1_presence");
+    public BinarySensorEntity ScreekHumanSensor2a872668Zone1Presence => new(_haContext, "binary_sensor.human_sensor_2a_872668_zone1_presence");
     ///<summary>Kitchen Presence Sensor Zone2 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668Zone2Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_zone2_presence");
+    public BinarySensorEntity ScreekHumanSensor2a872668Zone2Presence => new(_haContext, "binary_sensor.human_sensor_2a_872668_zone2_presence");
     ///<summary>Kitchen Presence Sensor Zone3 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668Zone3Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_zone3_presence");
+    public BinarySensorEntity ScreekHumanSensor2a872668Zone3Presence => new(_haContext, "binary_sensor.human_sensor_2a_872668_zone3_presence");
     ///<summary>Kitchen Presence Sensor Zout1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2a872668Zout1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_872668_zout1_presence");
+    public BinarySensorEntity ScreekHumanSensor2a872668Zout1Presence => new(_haContext, "binary_sensor.human_sensor_2a_872668_zout1_presence");
     ///<summary>Balcony Presence Sensor Any Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4AnyPresence => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_any_presence");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4AnyPresence => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_any_presence");
     ///<summary>Balcony Presence Sensor Online</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4Online => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_online");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4Online => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_online");
     ///<summary>Balcony Presence Sensor Zone1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_zone1_presence");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone1Presence => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_zone1_presence");
     ///<summary>Balcony Presence Sensor Zone2 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone2Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_zone2_presence");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone2Presence => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_zone2_presence");
     ///<summary>Balcony Presence Sensor Zone3 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone3Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_zone3_presence");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zone3Presence => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_zone3_presence");
     ///<summary>Balcony Presence Sensor Zout1 Presence</summary>
-    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zout1Presence => new(_haContext, "binary_sensor.screek_human_sensor_2a_d15cf4_zout1_presence");
+    public BinarySensorEntity ScreekHumanSensor2aD15cf4Zout1Presence => new(_haContext, "binary_sensor.human_sensor_2a_d15cf4_zout1_presence");
     ///<summary>Sun Solar rising</summary>
     public BinarySensorEntity SunSolarRising => new(_haContext, "binary_sensor.sun_solar_rising");
     ///<summary>Washing Machine Plug Cloud connection</summary>
@@ -536,11 +536,11 @@ public partial class ButtonEntities
     ///<summary>Living Room Presence Sensor Identify</summary>
     public ButtonEntity PresenceSensorFp2B4c4Identify => new(_haContext, "button.presence_sensor_fp2_b4c4_identify");
     ///<summary>Bedroom 4 Presence Sensor ESP Reboot</summary>
-    public ButtonEntity ScreekHumanSensor2a06ead0EspReboot => new(_haContext, "button.screek_human_sensor_2a_06ead0_esp_reboot");
+    public ButtonEntity ScreekHumanSensor2a06ead0EspReboot => new(_haContext, "button.human_sensor_2a_06ead0_esp_reboot");
     ///<summary>Kitchen Presence Sensor ESP Reboot</summary>
-    public ButtonEntity ScreekHumanSensor2a872668EspReboot => new(_haContext, "button.screek_human_sensor_2a_872668_esp_reboot");
+    public ButtonEntity ScreekHumanSensor2a872668EspReboot => new(_haContext, "button.human_sensor_2a_872668_esp_reboot");
     ///<summary>Balcony Presence Sensor ESP Reboot</summary>
-    public ButtonEntity ScreekHumanSensor2aD15cf4EspReboot => new(_haContext, "button.screek_human_sensor_2a_d15cf4_esp_reboot");
+    public ButtonEntity ScreekHumanSensor2aD15cf4EspReboot => new(_haContext, "button.human_sensor_2a_d15cf4_esp_reboot");
     ///<summary>Smart Wi-Fi Plug Identify</summary>
     public ButtonEntity SmartWiFiPlugIdentify => new(_haContext, "button.smart_wi_fi_plug_identify");
     ///<summary>Zigbee2MQTT Bridge Restart</summary>
@@ -908,125 +908,125 @@ public partial class NumberEntities
     ///<summary>Master Bathroom Toilet Motion Detection interval</summary>
     public NumberEntity MasterBathroomToiletMotionDetectionInterval => new(_haContext, "number.master_bathroom_toilet_motion_detection_interval");
     ///<summary>Bedroom 4 Presence Sensor Any Presence Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0AnyPresenceTimeout => new(_haContext, "number.screek_human_sensor_2a_06ead0_any_presence_timeout");
+    public NumberEntity ScreekHumanSensor2a06ead0AnyPresenceTimeout => new(_haContext, "number.human_sensor_2a_06ead0_any_presence_timeout");
     ///<summary>Bedroom 4 Presence Sensor Zone1 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone1Timeout => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone1_timeout");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone1Timeout => new(_haContext, "number.human_sensor_2a_06ead0_zone1_timeout");
     ///<summary>Bedroom 4 Presence Sensor Zone1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone1XBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone1_x_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone1XBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone1_x_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone1XEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone1_x_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone1XEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone1_x_end");
     ///<summary>Bedroom 4 Presence Sensor Zone1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone1YBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone1_y_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone1YBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone1_y_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone1YEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone1_y_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone1YEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone1_y_end");
     ///<summary>Bedroom 4 Presence Sensor Zone2 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone2Timeout => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone2_timeout");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone2Timeout => new(_haContext, "number.human_sensor_2a_06ead0_zone2_timeout");
     ///<summary>Bedroom 4 Presence Sensor Zone2 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone2XBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone2_x_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone2XBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone2_x_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone2 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone2XEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone2_x_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone2XEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone2_x_end");
     ///<summary>Bedroom 4 Presence Sensor Zone2 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone2YBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone2_y_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone2YBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone2_y_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone2 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone2YEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone2_y_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone2YEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone2_y_end");
     ///<summary>Bedroom 4 Presence Sensor Zone3 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone3Timeout => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone3_timeout");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone3Timeout => new(_haContext, "number.human_sensor_2a_06ead0_zone3_timeout");
     ///<summary>Bedroom 4 Presence Sensor Zone3 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone3XBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone3_x_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone3XBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone3_x_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone3 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone3XEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone3_x_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone3XEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone3_x_end");
     ///<summary>Bedroom 4 Presence Sensor Zone3 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone3YBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone3_y_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone3YBegin => new(_haContext, "number.human_sensor_2a_06ead0_zone3_y_begin");
     ///<summary>Bedroom 4 Presence Sensor Zone3 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zone3YEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zone3_y_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zone3YEnd => new(_haContext, "number.human_sensor_2a_06ead0_zone3_y_end");
     ///<summary>Bedroom 4 Presence Sensor Zout1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zout1XBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zout1_x_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zout1XBegin => new(_haContext, "number.human_sensor_2a_06ead0_zout1_x_begin");
     ///<summary>Bedroom 4 Presence Sensor Zout1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zout1XEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zout1_x_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zout1XEnd => new(_haContext, "number.human_sensor_2a_06ead0_zout1_x_end");
     ///<summary>Bedroom 4 Presence Sensor Zout1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zout1YBegin => new(_haContext, "number.screek_human_sensor_2a_06ead0_zout1_y_begin");
+    public NumberEntity ScreekHumanSensor2a06ead0Zout1YBegin => new(_haContext, "number.human_sensor_2a_06ead0_zout1_y_begin");
     ///<summary>Bedroom 4 Presence Sensor Zout1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a06ead0Zout1YEnd => new(_haContext, "number.screek_human_sensor_2a_06ead0_zout1_y_end");
+    public NumberEntity ScreekHumanSensor2a06ead0Zout1YEnd => new(_haContext, "number.human_sensor_2a_06ead0_zout1_y_end");
     ///<summary>Kitchen Presence Sensor Any Presence Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a872668AnyPresenceTimeout => new(_haContext, "number.screek_human_sensor_2a_872668_any_presence_timeout");
+    public NumberEntity ScreekHumanSensor2a872668AnyPresenceTimeout => new(_haContext, "number.human_sensor_2a_872668_any_presence_timeout");
     ///<summary>Kitchen Presence Sensor Zone1 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone1Timeout => new(_haContext, "number.screek_human_sensor_2a_872668_zone1_timeout");
+    public NumberEntity ScreekHumanSensor2a872668Zone1Timeout => new(_haContext, "number.human_sensor_2a_872668_zone1_timeout");
     ///<summary>Kitchen Presence Sensor Zone1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone1XBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone1_x_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone1XBegin => new(_haContext, "number.human_sensor_2a_872668_zone1_x_begin");
     ///<summary>Kitchen Presence Sensor Zone1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone1XEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone1_x_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone1XEnd => new(_haContext, "number.human_sensor_2a_872668_zone1_x_end");
     ///<summary>Kitchen Presence Sensor Zone1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone1YBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone1_y_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone1YBegin => new(_haContext, "number.human_sensor_2a_872668_zone1_y_begin");
     ///<summary>Kitchen Presence Sensor Zone1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone1YEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone1_y_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone1YEnd => new(_haContext, "number.human_sensor_2a_872668_zone1_y_end");
     ///<summary>Kitchen Presence Sensor Zone2 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone2Timeout => new(_haContext, "number.screek_human_sensor_2a_872668_zone2_timeout");
+    public NumberEntity ScreekHumanSensor2a872668Zone2Timeout => new(_haContext, "number.human_sensor_2a_872668_zone2_timeout");
     ///<summary>Kitchen Presence Sensor Zone2 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone2XBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone2_x_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone2XBegin => new(_haContext, "number.human_sensor_2a_872668_zone2_x_begin");
     ///<summary>Kitchen Presence Sensor Zone2 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone2XEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone2_x_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone2XEnd => new(_haContext, "number.human_sensor_2a_872668_zone2_x_end");
     ///<summary>Kitchen Presence Sensor Zone2 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone2YBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone2_y_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone2YBegin => new(_haContext, "number.human_sensor_2a_872668_zone2_y_begin");
     ///<summary>Kitchen Presence Sensor Zone2 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone2YEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone2_y_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone2YEnd => new(_haContext, "number.human_sensor_2a_872668_zone2_y_end");
     ///<summary>Kitchen Presence Sensor Zone3 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone3Timeout => new(_haContext, "number.screek_human_sensor_2a_872668_zone3_timeout");
+    public NumberEntity ScreekHumanSensor2a872668Zone3Timeout => new(_haContext, "number.human_sensor_2a_872668_zone3_timeout");
     ///<summary>Kitchen Presence Sensor Zone3 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone3XBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone3_x_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone3XBegin => new(_haContext, "number.human_sensor_2a_872668_zone3_x_begin");
     ///<summary>Kitchen Presence Sensor Zone3 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone3XEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone3_x_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone3XEnd => new(_haContext, "number.human_sensor_2a_872668_zone3_x_end");
     ///<summary>Kitchen Presence Sensor Zone3 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone3YBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zone3_y_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zone3YBegin => new(_haContext, "number.human_sensor_2a_872668_zone3_y_begin");
     ///<summary>Kitchen Presence Sensor Zone3 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zone3YEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zone3_y_end");
+    public NumberEntity ScreekHumanSensor2a872668Zone3YEnd => new(_haContext, "number.human_sensor_2a_872668_zone3_y_end");
     ///<summary>Kitchen Presence Sensor Zout1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zout1XBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zout1_x_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zout1XBegin => new(_haContext, "number.human_sensor_2a_872668_zout1_x_begin");
     ///<summary>Kitchen Presence Sensor Zout1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zout1XEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zout1_x_end");
+    public NumberEntity ScreekHumanSensor2a872668Zout1XEnd => new(_haContext, "number.human_sensor_2a_872668_zout1_x_end");
     ///<summary>Kitchen Presence Sensor Zout1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zout1YBegin => new(_haContext, "number.screek_human_sensor_2a_872668_zout1_y_begin");
+    public NumberEntity ScreekHumanSensor2a872668Zout1YBegin => new(_haContext, "number.human_sensor_2a_872668_zout1_y_begin");
     ///<summary>Kitchen Presence Sensor Zout1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2a872668Zout1YEnd => new(_haContext, "number.screek_human_sensor_2a_872668_zout1_y_end");
+    public NumberEntity ScreekHumanSensor2a872668Zout1YEnd => new(_haContext, "number.human_sensor_2a_872668_zout1_y_end");
     ///<summary>Balcony Presence Sensor Any Presence Timeout</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4AnyPresenceTimeout => new(_haContext, "number.screek_human_sensor_2a_d15cf4_any_presence_timeout");
+    public NumberEntity ScreekHumanSensor2aD15cf4AnyPresenceTimeout => new(_haContext, "number.human_sensor_2a_d15cf4_any_presence_timeout");
     ///<summary>Balcony Presence Sensor Zone1 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone1Timeout => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone1_timeout");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone1Timeout => new(_haContext, "number.human_sensor_2a_d15cf4_zone1_timeout");
     ///<summary>Balcony Presence Sensor Zone1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone1XBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone1_x_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone1XBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone1_x_begin");
     ///<summary>Balcony Presence Sensor Zone1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone1XEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone1_x_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone1XEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone1_x_end");
     ///<summary>Balcony Presence Sensor Zone1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone1YBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone1_y_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone1YBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone1_y_begin");
     ///<summary>Balcony Presence Sensor Zone1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone1YEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone1_y_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone1YEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone1_y_end");
     ///<summary>Balcony Presence Sensor Zone2 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone2Timeout => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone2_timeout");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone2Timeout => new(_haContext, "number.human_sensor_2a_d15cf4_zone2_timeout");
     ///<summary>Balcony Presence Sensor Zone2 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone2XBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone2_x_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone2XBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone2_x_begin");
     ///<summary>Balcony Presence Sensor Zone2 X-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone2XEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone2_x_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone2XEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone2_x_end");
     ///<summary>Balcony Presence Sensor Zone2 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone2YBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone2_y_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone2YBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone2_y_begin");
     ///<summary>Balcony Presence Sensor Zone2 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone2YEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone2_y_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone2YEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone2_y_end");
     ///<summary>Balcony Presence Sensor Zone3 Timeout</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone3Timeout => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone3_timeout");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone3Timeout => new(_haContext, "number.human_sensor_2a_d15cf4_zone3_timeout");
     ///<summary>Balcony Presence Sensor Zone3 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone3XBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone3_x_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone3XBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone3_x_begin");
     ///<summary>Balcony Presence Sensor Zone3 X-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone3XEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone3_x_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone3XEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone3_x_end");
     ///<summary>Balcony Presence Sensor Zone3 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone3YBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone3_y_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone3YBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zone3_y_begin");
     ///<summary>Balcony Presence Sensor Zone3 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zone3YEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zone3_y_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zone3YEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zone3_y_end");
     ///<summary>Balcony Presence Sensor Zout1 X-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zout1XBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zout1_x_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zout1XBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zout1_x_begin");
     ///<summary>Balcony Presence Sensor Zout1 X-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zout1XEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zout1_x_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zout1XEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zout1_x_end");
     ///<summary>Balcony Presence Sensor Zout1 Y-Begin</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zout1YBegin => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zout1_y_begin");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zout1YBegin => new(_haContext, "number.human_sensor_2a_d15cf4_zout1_y_begin");
     ///<summary>Balcony Presence Sensor Zout1 Y-End</summary>
-    public NumberEntity ScreekHumanSensor2aD15cf4Zout1YEnd => new(_haContext, "number.screek_human_sensor_2a_d15cf4_zout1_y_end");
+    public NumberEntity ScreekHumanSensor2aD15cf4Zout1YEnd => new(_haContext, "number.human_sensor_2a_d15cf4_zout1_y_end");
     ///<summary>Washing Machine Plug Power protection</summary>
     public NumberEntity WashingMachinePowerProtection => new(_haContext, "number.washing_machine_power_protection");
     ///<summary>Washing Machine Plug Turn off in</summary>
@@ -1325,53 +1325,53 @@ public partial class SensorEntities
     ///<summary>Redmi Charger type</summary>
     public SensorEntity RedmiChargerType => new(_haContext, "sensor.redmi_charger_type");
     ///<summary>Bedroom 4 Presence Sensor SCREEK Version</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0ScreekVersion => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_screek_version");
+    public SensorEntity ScreekHumanSensor2a06ead0ScreekVersion => new(_haContext, "sensor.human_sensor_2a_06ead0_version");
     ///<summary>Bedroom 4 Presence Sensor SN</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Sn => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_sn");
+    public SensorEntity ScreekHumanSensor2a06ead0Sn => new(_haContext, "sensor.human_sensor_2a_06ead0_sn");
     ///<summary>Bedroom 4 Presence Sensor Target1 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target1Direction => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_direction");
+    public SensorEntity ScreekHumanSensor2a06ead0Target1Direction => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_direction");
     ///<summary>Bedroom 4 Presence Sensor Target1 Position</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target1Position => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_position");
+    public SensorEntity ScreekHumanSensor2a06ead0Target1Position => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_position");
     ///<summary>Bedroom 4 Presence Sensor Target2 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target2Direction => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_direction");
+    public SensorEntity ScreekHumanSensor2a06ead0Target2Direction => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_direction");
     ///<summary>Bedroom 4 Presence Sensor Target2 Position</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target2Position => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_position");
+    public SensorEntity ScreekHumanSensor2a06ead0Target2Position => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_position");
     ///<summary>Bedroom 4 Presence Sensor Target3 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target3Direction => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_direction");
+    public SensorEntity ScreekHumanSensor2a06ead0Target3Direction => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_direction");
     ///<summary>Bedroom 4 Presence Sensor Target3 Position</summary>
-    public SensorEntity ScreekHumanSensor2a06ead0Target3Position => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_position");
+    public SensorEntity ScreekHumanSensor2a06ead0Target3Position => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_position");
     ///<summary>Kitchen Presence Sensor SCREEK Version</summary>
-    public SensorEntity ScreekHumanSensor2a872668ScreekVersion => new(_haContext, "sensor.screek_human_sensor_2a_872668_screek_version");
+    public SensorEntity ScreekHumanSensor2a872668ScreekVersion => new(_haContext, "sensor.human_sensor_2a_872668_version");
     ///<summary>Kitchen Presence Sensor SN</summary>
-    public SensorEntity ScreekHumanSensor2a872668Sn => new(_haContext, "sensor.screek_human_sensor_2a_872668_sn");
+    public SensorEntity ScreekHumanSensor2a872668Sn => new(_haContext, "sensor.human_sensor_2a_872668_sn");
     ///<summary>Kitchen Presence Sensor Target1 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target1Direction => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_direction");
+    public SensorEntity ScreekHumanSensor2a872668Target1Direction => new(_haContext, "sensor.human_sensor_2a_872668_target1_direction");
     ///<summary>Kitchen Presence Sensor Target1 Position</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target1Position => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_position");
+    public SensorEntity ScreekHumanSensor2a872668Target1Position => new(_haContext, "sensor.human_sensor_2a_872668_target1_position");
     ///<summary>Kitchen Presence Sensor Target2 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target2Direction => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_direction");
+    public SensorEntity ScreekHumanSensor2a872668Target2Direction => new(_haContext, "sensor.human_sensor_2a_872668_target2_direction");
     ///<summary>Kitchen Presence Sensor Target2 Position</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target2Position => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_position");
+    public SensorEntity ScreekHumanSensor2a872668Target2Position => new(_haContext, "sensor.human_sensor_2a_872668_target2_position");
     ///<summary>Kitchen Presence Sensor Target3 Direction</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target3Direction => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_direction");
+    public SensorEntity ScreekHumanSensor2a872668Target3Direction => new(_haContext, "sensor.human_sensor_2a_872668_target3_direction");
     ///<summary>Kitchen Presence Sensor Target3 Position</summary>
-    public SensorEntity ScreekHumanSensor2a872668Target3Position => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_position");
+    public SensorEntity ScreekHumanSensor2a872668Target3Position => new(_haContext, "sensor.human_sensor_2a_872668_target3_position");
     ///<summary>Balcony Presence Sensor SCREEK Version</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4ScreekVersion => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_screek_version");
+    public SensorEntity ScreekHumanSensor2aD15cf4ScreekVersion => new(_haContext, "sensor.human_sensor_2a_d15cf4_version");
     ///<summary>Balcony Presence Sensor SN</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Sn => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_sn");
+    public SensorEntity ScreekHumanSensor2aD15cf4Sn => new(_haContext, "sensor.human_sensor_2a_d15cf4_sn");
     ///<summary>Balcony Presence Sensor Target1 Direction</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target1Direction => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_direction");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target1Direction => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_direction");
     ///<summary>Balcony Presence Sensor Target1 Position</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target1Position => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_position");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target1Position => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_position");
     ///<summary>Balcony Presence Sensor Target2 Direction</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target2Direction => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_direction");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target2Direction => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_direction");
     ///<summary>Balcony Presence Sensor Target2 Position</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target2Position => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_position");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target2Position => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_position");
     ///<summary>Balcony Presence Sensor Target3 Direction</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target3Direction => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_direction");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target3Direction => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_direction");
     ///<summary>Balcony Presence Sensor Target3 Position</summary>
-    public SensorEntity ScreekHumanSensor2aD15cf4Target3Position => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_position");
+    public SensorEntity ScreekHumanSensor2aD15cf4Target3Position => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_position");
     ///<summary>Sun Next dawn</summary>
     public SensorEntity SunNextDawn => new(_haContext, "sensor.sun_next_dawn");
     ///<summary>Sun Next dusk</summary>
@@ -1645,157 +1645,157 @@ public partial class SensorEntities
     ///<summary>Redmi Battery level</summary>
     public NumericSensorEntity RedmiBatteryLevel => new(_haContext, "sensor.redmi_battery_level");
     ///<summary>Bedroom 4 Presence Sensor All Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0AllTargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_all_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0AllTargetCounts => new(_haContext, "sensor.human_sensor_2a_06ead0_all_target_counts");
     ///<summary>Bedroom 4 Presence Sensor ESP CPU Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0EspCpuSpeed => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_esp_cpu_speed");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0EspCpuSpeed => new(_haContext, "sensor.human_sensor_2a_06ead0_esp_cpu_speed");
     ///<summary>Bedroom 4 Presence Sensor ESP Free Memory</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0EspFreeMemory => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_esp_free_memory");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0EspFreeMemory => new(_haContext, "sensor.human_sensor_2a_06ead0_esp_free_memory");
     ///<summary>Bedroom 4 Presence Sensor ESP Temperature</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0EspTemperature => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_esp_temperature");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0EspTemperature => new(_haContext, "sensor.human_sensor_2a_06ead0_esp_temperature");
     ///<summary>Bedroom 4 Presence Sensor ESP Uptime</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0EspUptime => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_esp_uptime");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0EspUptime => new(_haContext, "sensor.human_sensor_2a_06ead0_esp_uptime");
     ///<summary>Bedroom 4 Presence Sensor Illuminance</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Illuminance => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_illuminance");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Illuminance => new(_haContext, "sensor.human_sensor_2a_06ead0_illuminance");
     ///<summary>Bedroom 4 Presence Sensor RSSI</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Rssi => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_rssi");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Rssi => new(_haContext, "sensor.human_sensor_2a_06ead0_rssi");
     ///<summary>Bedroom 4 Presence Sensor Target1 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Angle => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_angle");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Angle => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_angle");
     ///<summary>Bedroom 4 Presence Sensor Target1 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Resolution => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Resolution => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_resolution");
     ///<summary>Bedroom 4 Presence Sensor Target1 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Speed => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_speed");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Speed => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_speed");
     ///<summary>Bedroom 4 Presence Sensor Target1 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1X => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_x");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1X => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_x");
     ///<summary>Bedroom 4 Presence Sensor Target1 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Y => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target1_y");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target1Y => new(_haContext, "sensor.human_sensor_2a_06ead0_target1_y");
     ///<summary>Bedroom 4 Presence Sensor Target2 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Angle => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_angle");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Angle => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_angle");
     ///<summary>Bedroom 4 Presence Sensor Target2 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Resolution => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Resolution => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_resolution");
     ///<summary>Bedroom 4 Presence Sensor Target2 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Speed => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_speed");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Speed => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_speed");
     ///<summary>Bedroom 4 Presence Sensor Target2 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2X => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_x");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2X => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_x");
     ///<summary>Bedroom 4 Presence Sensor Target2 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Y => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target2_y");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target2Y => new(_haContext, "sensor.human_sensor_2a_06ead0_target2_y");
     ///<summary>Bedroom 4 Presence Sensor Target3 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Angle => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_angle");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Angle => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_angle");
     ///<summary>Bedroom 4 Presence Sensor Target3 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Resolution => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Resolution => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_resolution");
     ///<summary>Bedroom 4 Presence Sensor Target3 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Speed => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_speed");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Speed => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_speed");
     ///<summary>Bedroom 4 Presence Sensor Target3 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3X => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_x");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3X => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_x");
     ///<summary>Bedroom 4 Presence Sensor Target3 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Y => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_target3_y");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Target3Y => new(_haContext, "sensor.human_sensor_2a_06ead0_target3_y");
     ///<summary>Bedroom 4 Presence Sensor Zone1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_zone1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone1TargetCounts => new(_haContext, "sensor.human_sensor_2a_06ead0_zone1_target_counts");
     ///<summary>Bedroom 4 Presence Sensor Zone2 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone2TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_zone2_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone2TargetCounts => new(_haContext, "sensor.human_sensor_2a_06ead0_zone2_target_counts");
     ///<summary>Bedroom 4 Presence Sensor Zone3 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone3TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_zone3_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Zone3TargetCounts => new(_haContext, "sensor.human_sensor_2a_06ead0_zone3_target_counts");
     ///<summary>Bedroom 4 Presence Sensor Zout1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a06ead0Zout1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_06ead0_zout1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a06ead0Zout1TargetCounts => new(_haContext, "sensor.human_sensor_2a_06ead0_zout1_target_counts");
     ///<summary>Kitchen Presence Sensor All Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668AllTargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_872668_all_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a872668AllTargetCounts => new(_haContext, "sensor.human_sensor_2a_872668_all_target_counts");
     ///<summary>Kitchen Presence Sensor ESP Free Memory</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668EspFreeMemory => new(_haContext, "sensor.screek_human_sensor_2a_872668_esp_free_memory");
+    public NumericSensorEntity ScreekHumanSensor2a872668EspFreeMemory => new(_haContext, "sensor.human_sensor_2a_872668_esp_free_memory");
     ///<summary>Kitchen Presence Sensor ESP Temperature</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668EspTemperature => new(_haContext, "sensor.screek_human_sensor_2a_872668_esp_temperature");
+    public NumericSensorEntity ScreekHumanSensor2a872668EspTemperature => new(_haContext, "sensor.human_sensor_2a_872668_esp_temperature");
     ///<summary>Kitchen Presence Sensor ESP Uptime</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668EspUptime => new(_haContext, "sensor.screek_human_sensor_2a_872668_esp_uptime");
+    public NumericSensorEntity ScreekHumanSensor2a872668EspUptime => new(_haContext, "sensor.human_sensor_2a_872668_esp_uptime");
     ///<summary>Kitchen Presence Sensor Illuminance</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Illuminance => new(_haContext, "sensor.screek_human_sensor_2a_872668_illuminance");
+    public NumericSensorEntity ScreekHumanSensor2a872668Illuminance => new(_haContext, "sensor.human_sensor_2a_872668_illuminance");
     ///<summary>Kitchen Presence Sensor RSSI</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Rssi => new(_haContext, "sensor.screek_human_sensor_2a_872668_rssi");
+    public NumericSensorEntity ScreekHumanSensor2a872668Rssi => new(_haContext, "sensor.human_sensor_2a_872668_rssi");
     ///<summary>Kitchen Presence Sensor Target1 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target1Angle => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_angle");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target1Angle => new(_haContext, "sensor.human_sensor_2a_872668_target1_angle");
     ///<summary>Kitchen Presence Sensor Target1 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target1Resolution => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target1Resolution => new(_haContext, "sensor.human_sensor_2a_872668_target1_resolution");
     ///<summary>Kitchen Presence Sensor Target1 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target1Speed => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_speed");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target1Speed => new(_haContext, "sensor.human_sensor_2a_872668_target1_speed");
     ///<summary>Kitchen Presence Sensor Target1 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target1X => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_x");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target1X => new(_haContext, "sensor.human_sensor_2a_872668_target1_x");
     ///<summary>Kitchen Presence Sensor Target1 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target1Y => new(_haContext, "sensor.screek_human_sensor_2a_872668_target1_y");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target1Y => new(_haContext, "sensor.human_sensor_2a_872668_target1_y");
     ///<summary>Kitchen Presence Sensor Target2 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target2Angle => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_angle");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target2Angle => new(_haContext, "sensor.human_sensor_2a_872668_target2_angle");
     ///<summary>Kitchen Presence Sensor Target2 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target2Resolution => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target2Resolution => new(_haContext, "sensor.human_sensor_2a_872668_target2_resolution");
     ///<summary>Kitchen Presence Sensor Target2 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target2Speed => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_speed");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target2Speed => new(_haContext, "sensor.human_sensor_2a_872668_target2_speed");
     ///<summary>Kitchen Presence Sensor Target2 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target2X => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_x");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target2X => new(_haContext, "sensor.human_sensor_2a_872668_target2_x");
     ///<summary>Kitchen Presence Sensor Target2 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target2Y => new(_haContext, "sensor.screek_human_sensor_2a_872668_target2_y");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target2Y => new(_haContext, "sensor.human_sensor_2a_872668_target2_y");
     ///<summary>Kitchen Presence Sensor Target3 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target3Angle => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_angle");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target3Angle => new(_haContext, "sensor.human_sensor_2a_872668_target3_angle");
     ///<summary>Kitchen Presence Sensor Target3 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target3Resolution => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_resolution");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target3Resolution => new(_haContext, "sensor.human_sensor_2a_872668_target3_resolution");
     ///<summary>Kitchen Presence Sensor Target3 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target3Speed => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_speed");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target3Speed => new(_haContext, "sensor.human_sensor_2a_872668_target3_speed");
     ///<summary>Kitchen Presence Sensor Target3 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target3X => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_x");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target3X => new(_haContext, "sensor.human_sensor_2a_872668_target3_x");
     ///<summary>Kitchen Presence Sensor Target3 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Target3Y => new(_haContext, "sensor.screek_human_sensor_2a_872668_target3_y");
+    public NumericSensorEntity ScreekHumanSensor2a872668Target3Y => new(_haContext, "sensor.human_sensor_2a_872668_target3_y");
     ///<summary>Kitchen Presence Sensor Zone1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Zone1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_872668_zone1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a872668Zone1TargetCounts => new(_haContext, "sensor.human_sensor_2a_872668_zone1_target_counts");
     ///<summary>Kitchen Presence Sensor Zone2 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Zone2TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_872668_zone2_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a872668Zone2TargetCounts => new(_haContext, "sensor.human_sensor_2a_872668_zone2_target_counts");
     ///<summary>Kitchen Presence Sensor Zone3 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Zone3TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_872668_zone3_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a872668Zone3TargetCounts => new(_haContext, "sensor.human_sensor_2a_872668_zone3_target_counts");
     ///<summary>Kitchen Presence Sensor Zout1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2a872668Zout1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_872668_zout1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2a872668Zout1TargetCounts => new(_haContext, "sensor.human_sensor_2a_872668_zout1_target_counts");
     ///<summary>Balcony Presence Sensor All Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4AllTargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_all_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4AllTargetCounts => new(_haContext, "sensor.human_sensor_2a_d15cf4_all_target_counts");
     ///<summary>Balcony Presence Sensor ESP Free Memory</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspFreeMemory => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_esp_free_memory");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspFreeMemory => new(_haContext, "sensor.human_sensor_2a_d15cf4_esp_free_memory");
     ///<summary>Balcony Presence Sensor ESP Temperature</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspTemperature => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_esp_temperature");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspTemperature => new(_haContext, "sensor.human_sensor_2a_d15cf4_esp_temperature");
     ///<summary>Balcony Presence Sensor ESP Uptime</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspUptime => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_esp_uptime");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4EspUptime => new(_haContext, "sensor.human_sensor_2a_d15cf4_esp_uptime");
     ///<summary>Balcony Presence Sensor Illuminance</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Illuminance => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_illuminance");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Illuminance => new(_haContext, "sensor.human_sensor_2a_d15cf4_illuminance");
     ///<summary>Balcony Presence Sensor RSSI</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Rssi => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_rssi");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Rssi => new(_haContext, "sensor.human_sensor_2a_d15cf4_rssi");
     ///<summary>Balcony Presence Sensor Target1 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Angle => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_angle");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Angle => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_angle");
     ///<summary>Balcony Presence Sensor Target1 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Resolution => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_resolution");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Resolution => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_resolution");
     ///<summary>Balcony Presence Sensor Target1 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Speed => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_speed");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Speed => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_speed");
     ///<summary>Balcony Presence Sensor Target1 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1X => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_x");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1X => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_x");
     ///<summary>Balcony Presence Sensor Target1 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Y => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target1_y");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target1Y => new(_haContext, "sensor.human_sensor_2a_d15cf4_target1_y");
     ///<summary>Balcony Presence Sensor Target2 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Angle => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_angle");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Angle => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_angle");
     ///<summary>Balcony Presence Sensor Target2 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Resolution => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_resolution");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Resolution => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_resolution");
     ///<summary>Balcony Presence Sensor Target2 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Speed => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_speed");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Speed => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_speed");
     ///<summary>Balcony Presence Sensor Target2 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2X => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_x");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2X => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_x");
     ///<summary>Balcony Presence Sensor Target2 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Y => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target2_y");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target2Y => new(_haContext, "sensor.human_sensor_2a_d15cf4_target2_y");
     ///<summary>Balcony Presence Sensor Target3 Angle</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Angle => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_angle");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Angle => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_angle");
     ///<summary>Balcony Presence Sensor Target3 Resolution</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Resolution => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_resolution");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Resolution => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_resolution");
     ///<summary>Balcony Presence Sensor Target3 Speed</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Speed => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_speed");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Speed => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_speed");
     ///<summary>Balcony Presence Sensor Target3 X</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3X => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_x");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3X => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_x");
     ///<summary>Balcony Presence Sensor Target3 Y</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Y => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_target3_y");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Target3Y => new(_haContext, "sensor.human_sensor_2a_d15cf4_target3_y");
     ///<summary>Balcony Presence Sensor Zone1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_zone1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone1TargetCounts => new(_haContext, "sensor.human_sensor_2a_d15cf4_zone1_target_counts");
     ///<summary>Balcony Presence Sensor Zone2 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone2TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_zone2_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone2TargetCounts => new(_haContext, "sensor.human_sensor_2a_d15cf4_zone2_target_counts");
     ///<summary>Balcony Presence Sensor Zone3 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone3TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_zone3_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zone3TargetCounts => new(_haContext, "sensor.human_sensor_2a_d15cf4_zone3_target_counts");
     ///<summary>Balcony Presence Sensor Zout1 Target Counts</summary>
-    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zout1TargetCounts => new(_haContext, "sensor.screek_human_sensor_2a_d15cf4_zout1_target_counts");
+    public NumericSensorEntity ScreekHumanSensor2aD15cf4Zout1TargetCounts => new(_haContext, "sensor.human_sensor_2a_d15cf4_zout1_target_counts");
     ///<summary>Smart Wi-Fi Plug Effective current</summary>
     public NumericSensorEntity SmartWiFiPlugEffectiveCurrent => new(_haContext, "sensor.smart_wi_fi_plug_effective_current");
     ///<summary>Effective current (1)</summary>
@@ -2051,23 +2051,23 @@ public partial class SwitchEntities
     ///<summary>Master Bedroom Lights Right</summary>
     public SwitchEntity MasterBedroomLightsRight => new(_haContext, "switch.master_bedroom_lights_right");
     ///<summary>Bedroom 4 Presence Sensor Illuminance Fast-Update</summary>
-    public SwitchEntity ScreekHumanSensor2a06ead0IlluminanceFastUpdate => new(_haContext, "switch.screek_human_sensor_2a_06ead0_illuminance_fast_update");
+    public SwitchEntity ScreekHumanSensor2a06ead0IlluminanceFastUpdate => new(_haContext, "switch.human_sensor_2a_06ead0_illuminance_fast_update");
     ///<summary>Bedroom 4 Presence Sensor Zone Enable</summary>
-    public SwitchEntity ScreekHumanSensor2a06ead0ZoneEnable => new(_haContext, "switch.screek_human_sensor_2a_06ead0_zone_enable");
+    public SwitchEntity ScreekHumanSensor2a06ead0ZoneEnable => new(_haContext, "switch.human_sensor_2a_06ead0_zone_enable");
     ///<summary>Bedroom 4 Presence Sensor Zout1 Enable</summary>
-    public SwitchEntity ScreekHumanSensor2a06ead0Zout1Enable => new(_haContext, "switch.screek_human_sensor_2a_06ead0_zout1_enable");
+    public SwitchEntity ScreekHumanSensor2a06ead0Zout1Enable => new(_haContext, "switch.human_sensor_2a_06ead0_zout1_enable");
     ///<summary>Kitchen Presence Sensor Illuminance Fast-Update</summary>
-    public SwitchEntity ScreekHumanSensor2a872668IlluminanceFastUpdate => new(_haContext, "switch.screek_human_sensor_2a_872668_illuminance_fast_update");
+    public SwitchEntity ScreekHumanSensor2a872668IlluminanceFastUpdate => new(_haContext, "switch.human_sensor_2a_872668_illuminance_fast_update");
     ///<summary>Kitchen Presence Sensor Zone Enable</summary>
-    public SwitchEntity ScreekHumanSensor2a872668ZoneEnable => new(_haContext, "switch.screek_human_sensor_2a_872668_zone_enable");
+    public SwitchEntity ScreekHumanSensor2a872668ZoneEnable => new(_haContext, "switch.human_sensor_2a_872668_zone_enable");
     ///<summary>Kitchen Presence Sensor Zout1 Enable</summary>
-    public SwitchEntity ScreekHumanSensor2a872668Zout1Enable => new(_haContext, "switch.screek_human_sensor_2a_872668_zout1_enable");
+    public SwitchEntity ScreekHumanSensor2a872668Zout1Enable => new(_haContext, "switch.human_sensor_2a_872668_zout1_enable");
     ///<summary>Balcony Presence Sensor Illuminance Fast-Update</summary>
-    public SwitchEntity ScreekHumanSensor2aD15cf4IlluminanceFastUpdate => new(_haContext, "switch.screek_human_sensor_2a_d15cf4_illuminance_fast_update");
+    public SwitchEntity ScreekHumanSensor2aD15cf4IlluminanceFastUpdate => new(_haContext, "switch.human_sensor_2a_d15cf4_illuminance_fast_update");
     ///<summary>Balcony Presence Sensor Zone Enable</summary>
-    public SwitchEntity ScreekHumanSensor2aD15cf4ZoneEnable => new(_haContext, "switch.screek_human_sensor_2a_d15cf4_zone_enable");
+    public SwitchEntity ScreekHumanSensor2aD15cf4ZoneEnable => new(_haContext, "switch.human_sensor_2a_d15cf4_zone_enable");
     ///<summary>Balcony Presence Sensor Zout1 Enable</summary>
-    public SwitchEntity ScreekHumanSensor2aD15cf4Zout1Enable => new(_haContext, "switch.screek_human_sensor_2a_d15cf4_zout1_enable");
+    public SwitchEntity ScreekHumanSensor2aD15cf4Zout1Enable => new(_haContext, "switch.human_sensor_2a_d15cf4_zout1_enable");
     ///<summary>Smart Wi-Fi Plug</summary>
     public SwitchEntity SmartWiFiPlug => new(_haContext, "switch.smart_wi_fi_plug");
     ///<summary>Washing Machine Plug</summary>
