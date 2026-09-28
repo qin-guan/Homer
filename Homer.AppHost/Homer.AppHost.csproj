@@ -1,0 +1,13 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.5.4">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AspireUseCliBundle>true</AspireUseCliBundle>
+        <UserSecretsId>1732E0CF-75A8-45BB-843D-4DECE8A3F567</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Homer.NetDaemon\Homer.NetDaemon.csproj" />
+    </ItemGroup>
+
+</Project>

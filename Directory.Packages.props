@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <AspireVersion>13.5.4</AspireVersion>
+    <NetDaemonVersion>26.36.0</NetDaemonVersion>
+    <AspNetCoreVersion>11.0.0-rc.1.26425.128</AspNetCoreVersion>
+    <OpenTelemetryVersion>1.19.1</OpenTelemetryVersion>
+    <OpenTelemetryInstrumentationVersion>1.19.0</OpenTelemetryInstrumentationVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="AsyncKeyedLock" Version="8.1.2" />
+    <PackageVersion Include="BootstrapBlazor" Version="10.10.2" />
+    <PackageVersion Include="BootstrapBlazor.FontAwesome" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(AspNetCoreVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.10.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.10.0" />
+    <PackageVersion Include="NetDaemon.AppModel" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.Client" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.Extensions.Mqtt" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.Extensions.Scheduling" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.Extensions.Tts" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.HassModel" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="NetDaemon.Runtime" Version="$(NetDaemonVersion)" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationVersion)" />
+    <PackageVersion Include="Refit" Version="16.3.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="16.3.0" />
+    <PackageVersion Include="System.Reactive" Version="7.0.0" />
+  </ItemGroup>
+</Project>
