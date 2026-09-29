@@ -3,6 +3,7 @@
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>85506478-b17d-4829-8a46-95c22d4190ab</UserSecretsId>
+        <RefitRequireGeneratedRequests>true</RefitRequireGeneratedRequests>
     </PropertyGroup>
 
     <ItemGroup>
