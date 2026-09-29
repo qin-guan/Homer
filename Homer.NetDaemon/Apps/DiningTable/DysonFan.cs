@@ -29,13 +29,11 @@ public class DysonFan : IAsyncInitializable
         ];
         _switch = switchEntities.LivingRoomIkeaPlug;
 
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.dyson_fan.events_processed");
 
         _presence.Select(e => e.StateChanges()).Merge().DistinctUntilChanged()
             .WhenStateIsFor(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("dyson_fan");
                 return e.IsOn();
             }, TimeSpan.FromSeconds(45), scheduler)
             .SubscribeAsync(async e =>
@@ -47,7 +45,7 @@ public class DysonFan : IAsyncInitializable
         _presence.StateChanges()
             .WhenStateIsFor(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("dyson_fan");
                 return e.IsOff();
             }, TimeSpan.FromSeconds(30), scheduler)
             .SubscribeAsync(async e =>

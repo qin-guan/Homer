@@ -45,8 +45,6 @@ public class KitchenLights : IAsyncInitializable
         SwitchEntities switchEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.kitchen_lights.events_processed");
 
         _triggerEntities =
         [
@@ -92,7 +90,7 @@ public class KitchenLights : IAsyncInitializable
         triggerObservables
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_lights");
                 return TriggerPresence;
             })
             .Subscribe(_ =>
@@ -118,7 +116,7 @@ public class KitchenLights : IAsyncInitializable
         presenceObservables
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_lights");
                 return !Presence;
             })
             .Throttle(TimeSpan.FromMinutes(1), scheduler)

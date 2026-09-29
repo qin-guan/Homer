@@ -31,8 +31,6 @@ public class LivingRoomFan : IAsyncInitializable
         FanEntities fanEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_fan.events_processed");
 
         _logger = logger;
 
@@ -59,7 +57,7 @@ public class LivingRoomFan : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_fan");
                 return TooCold;
             })
             .Subscribe(_ => { _fan.TurnOff(); });
@@ -68,7 +66,7 @@ public class LivingRoomFan : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_fan");
                 return triggerEntities.Any(e => e.IsOn());
             })
             .Throttle(TimeSpan.FromSeconds(10), scheduler)
@@ -83,7 +81,7 @@ public class LivingRoomFan : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_fan");
                 return !Presence;
             })
             .Throttle(TimeSpan.FromSeconds(60), scheduler)

@@ -15,13 +15,11 @@ public class KitchenLightSwitch
         EventEntities eventEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.kitchen_light_switch.events_processed");
 
         eventEntities.KitchenLightsAction.StateChanges()
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_light_switch");
                 return e.Entity.Attributes?.EventType == "double_left";
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
@@ -29,7 +27,7 @@ public class KitchenLightSwitch
         eventEntities.KitchenLightsAction.StateChanges()
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_light_switch");
                 return e.Entity.Attributes?.EventType == "single_left";
             })
             .Subscribe(e => { switchEntities.KitchenLightsLeft.Toggle(); });

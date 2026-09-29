@@ -49,7 +49,11 @@ public static class Extensions
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
-                    .AddMeter(EntityMetrics.MeterInstance.Name);
+                    .AddMeter(EntityMetrics.MeterName)
+                    .AddView("homer.shower.duration",
+                        new ExplicitBucketHistogramConfiguration { Boundaries = EntityMetrics.DurationBucketsSeconds })
+                    .AddView("homer.water_heater.run.duration",
+                        new ExplicitBucketHistogramConfiguration { Boundaries = EntityMetrics.DurationBucketsSeconds });
             })
             .WithTracing(tracing =>
             {

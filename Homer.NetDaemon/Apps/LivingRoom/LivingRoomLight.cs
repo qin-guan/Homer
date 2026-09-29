@@ -32,8 +32,6 @@ public class LivingRoomLight : IAsyncInitializable
         LightEntities lightEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light.events_processed");
 
         _logger = logger;
 
@@ -70,7 +68,7 @@ public class LivingRoomLight : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_light");
                 return TooDark && Presence;
             })
             .Throttle(TimeSpan.FromMinutes(5), scheduler)
@@ -81,7 +79,7 @@ public class LivingRoomLight : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_light");
                 return Presence;
             })
             .Subscribe(_ =>
@@ -93,7 +91,7 @@ public class LivingRoomLight : IAsyncInitializable
             .Where(_ => !ManualOverride)
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_light");
                 return !Presence;
             })
             .Throttle(TimeSpan.FromMinutes(3), scheduler)

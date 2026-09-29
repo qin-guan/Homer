@@ -23,8 +23,6 @@ public class KitchenFan : IAsyncInitializable
         FanEntities fanEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.kitchen_fan.events_processed");
 
         _logger = logger;
         _fan = fanEntities.DmakerSg4682300181cS2Fan;
@@ -46,7 +44,7 @@ public class KitchenFan : IAsyncInitializable
         triggerObservables
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_fan");
                 return triggerEntities.Any(e => e.IsOn());
             })
             .Subscribe(_ =>
@@ -57,7 +55,7 @@ public class KitchenFan : IAsyncInitializable
         presenceObservables
             .Where(_ =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("kitchen_fan");
                 return !Presence;
             })
             .Throttle(TimeSpan.FromMinutes(1), scheduler)
