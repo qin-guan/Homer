@@ -40,17 +40,6 @@
         }));
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-
-        using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-        while (await periodicTimer.WaitForNextTickAsync())
-        {
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
     public void Dispose()
     {
         _disposables.ForEach(e => e.Dispose());
