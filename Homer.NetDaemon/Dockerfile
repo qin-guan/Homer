@@ -7,7 +7,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:11.0-preview AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["Homer.NetDaemon/Homer.NetDaemon.csproj", "Homer.NetDaemon/"]
+COPY ["Homer.NetDaemon.Client/Homer.NetDaemon.Client.csproj", "Homer.NetDaemon.Client/"]
+COPY ["Homer.ServiceDefaults/Homer.ServiceDefaults.csproj", "Homer.ServiceDefaults/"]
 RUN dotnet restore "Homer.NetDaemon/Homer.NetDaemon.csproj"
 COPY . .
 WORKDIR "/src/Homer.NetDaemon"

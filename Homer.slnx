@@ -4,7 +4,14 @@
         <Platform Name="x64" />
         <Platform Name="x86" />
     </Configurations>
-    <Folder Name="/Solution Items/" />
+    <Folder Name="/Solution Items/">
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Packages.props" />
+        <File Path="aspire.config.json" />
+        <File Path="Justfile" />
+        <File Path="docker-compose.yml" />
+    </Folder>
+    <Project Path="Homer.AppHost/Homer.AppHost.csproj" />
     <Project Path="Homer.NetDaemon.Client/Homer.NetDaemon.Client.csproj" />
     <Project Path="Homer.NetDaemon/Homer.NetDaemon.csproj" />
     <Project Path="Homer.ServiceDefaults/Homer.ServiceDefaults.csproj" />

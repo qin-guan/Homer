@@ -1,9 +1,7 @@
-using System.Diagnostics;
 using System.Reflection;
 using AsyncKeyedLock;
 using Homer.NetDaemon.Components;
 using Homer.NetDaemon.Entities;
-using Homer.NetDaemon.Hubs;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
 using Homer.NetDaemon.Services.DataMall;
@@ -20,18 +18,10 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSignalR();
-
 builder.Host.UseNetDaemonAppSettings();
 builder.Host.UseNetDaemonRuntime();
 builder.Host.UseNetDaemonTextToSpeech();
 builder.Host.UseNetDaemonMqttEntityManagement();
-
-builder.Services.AddOptions<KdkOptions>()
-    .Bind(builder.Configuration.GetSection("Kdk"));
-
-builder.Services.AddOptions<SimplyGoOptions>()
-    .Bind(builder.Configuration.GetSection("SimplyGo"));
 
 builder.Services.AddOptions<DataMallOptions>()
     .Bind(builder.Configuration.GetSection("DataMall"));
@@ -47,7 +37,6 @@ builder.Services.AddRefitClient<IDataMallApi>()
             sp.GetRequiredService<IOptions<DataMallOptions>>().Value.AccountKey);
     });
 
-
 builder.Services.AddRefitClient<IOpenMeteoApi>()
     .ConfigureHttpClient(options => { options.BaseAddress = new Uri("https://api.open-meteo.com"); });
 
@@ -59,9 +48,6 @@ builder.Services.AddHomeAssistantGenerated();
 builder.AddServiceDefaults();
 
 builder.Services.AddProblemDetails();
-
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<WaterHeaterTurnOffChannel>();
 builder.Services.AddHostedService<Homer.NetDaemon.Apps.Remotes.LivingRoomRemote>();
@@ -82,13 +68,11 @@ builder.Services.AddAntiforgery(options => { options.SuppressXFrameOptionsHeader
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
 }
 
-// app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseStaticFiles();
@@ -101,8 +85,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode(o => o.ContentSecurityFrameAncestorsPolicy = null)
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(Homer.NetDaemon.Client._Imports).Assembly);
-
-app.MapHub<PrinterHub>("/hub");
 
 app.MapGet("/loaderio-ce0e0bd11b62d5ea48a4f5998c69599f", () => "loaderio-ce0e0bd11b62d5ea48a4f5998c69599f");
 
@@ -135,15 +117,3 @@ app.MapPost("/contact/qg",
     });
 
 app.Run();
-
-public class DH : DelegatingHandler
-{
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-        CancellationToken cancellationToken)
-    {
-        Activity.Current = null;
-        var res = await base.SendAsync(request, cancellationToken);
-        var c = await res.Content.ReadAsStringAsync(cancellationToken);
-        return res;
-    }
-}
