@@ -4,6 +4,7 @@ public class WaterHeaterTimerService
 {
     private DateTime? _scheduledTurnOffDateTime;
     private DateTime? _lastTurnedOnDateTime;
+    private IWaterHeaterController? _controller;
 
     public DateTime? ScheduledTurnOffDateTime
     {
@@ -35,8 +36,20 @@ public class WaterHeaterTimerService
         }
     }
 
-    public event Action<TimeSpan>? ManualOverrideRequested;
+    /// <summary>The running WaterHeaterController app, or null while it is disabled.</summary>
+    public IWaterHeaterController? Controller => Volatile.Read(ref _controller);
+
     public event Action? StateChanged;
+
+    /// <summary>Raised after the controller has handled the heater turning off, outside of the controller's lock.</summary>
+    public event Action? HeaterTurnedOff;
+
+    public void AttachController(IWaterHeaterController controller) => Volatile.Write(ref _controller, controller);
+
+    public void DetachController(IWaterHeaterController controller) =>
+        Interlocked.CompareExchange(ref _controller, null, controller);
+
+    public void OnHeaterTurnedOff() => HeaterTurnedOff?.Invoke();
 
     public bool RequestManualOverride(int minutes)
     {
@@ -45,13 +58,14 @@ public class WaterHeaterTimerService
             return false;
         }
 
-        var manualOverrideRequested = ManualOverrideRequested;
-        if (manualOverrideRequested is null)
+        if (Controller is not { } controller)
         {
             return false;
         }
 
-        manualOverrideRequested.Invoke(TimeSpan.FromMinutes(minutes));
+        controller.RequestHeating(
+            $"manual override requested for {minutes} minutes",
+            TimeSpan.FromMinutes(minutes));
         return true;
     }
 }

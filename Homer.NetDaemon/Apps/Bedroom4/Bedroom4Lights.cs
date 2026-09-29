@@ -1,16 +1,15 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using Homer.NetDaemon.Apps.Core;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel;
 using NetDaemon.HassModel.Entities;
 
 namespace Homer.NetDaemon.Apps.Bedroom4;
 
+/// <summary>Turns the Bedroom 4 ceiling fan and its light on with presence and off once the room is empty.</summary>
 [NetDaemonApp]
-public class Bedroom4Lights : Occupancy
+public class Bedroom4Lights
 {
     private readonly SensorEntities _sensorEntities;
 
@@ -19,33 +18,13 @@ public class Bedroom4Lights : Occupancy
     public bool IsMidnight => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(2, 0), new TimeOnly(6, 0));
 
     public Bedroom4Lights(
-        ILogger<Bedroom4Lights> logger,
         IScheduler scheduler,
-        INetDaemonScheduler netDaemonScheduler,
-        InputDatetimeEntities inputDatetimeEntities,
         InputBooleanEntities inputBooleanEntities,
-        InputNumberEntities inputNumberEntities,
-        BinarySensorEntities binarySensorEntities,
         SensorEntities sensorEntities,
-        SwitchEntities switchEntities,
-        RemoteEntities remoteEntities,
-        ClimateEntities climateEntities,
-        EventEntities eventEntities
-    ) : base(
-        inputDatetimeEntities.Bedroom4LastPresence,
-        inputBooleanEntities.Bedroom4Presence,
-        [binarySensorEntities.Bedroom4DoorContact],
-        [
-            binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence,
-        ],
-        [
-            binarySensorEntities.ScreekHumanSensor2a06ead0Zone1Presence,
-        ],
-        TimeSpan.FromSeconds(2)
+        SwitchEntities switchEntities
     )
     {
         _sensorEntities = sensorEntities;
-
 
         inputBooleanEntities.Bedroom4Presence.StateChanges().DistinctUntilChanged()
             .SubscribeAsync(async _ =>
@@ -60,33 +39,6 @@ public class Bedroom4Lights : Occupancy
                 }
 
                 inputBooleanEntities.Bedroom4Fan.TurnOn();
-            });
-
-        climateEntities.Daikinap97235.StateChanges()
-            .Where(s => s.Old.IsOff())
-            .Subscribe(_ =>
-            {
-                if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
-
-                inputNumberEntities.Bedroom4FanSpeed.SetValue(16 * 5);
-
-                netDaemonScheduler.RunIn(TimeSpan.FromMinutes(5),
-                    () => { inputNumberEntities.Bedroom4FanSpeed.SetValue(16); });
-            });
-
-        climateEntities.Daikinap97235.StateChanges()
-            .Where(s => s.New.IsOff())
-            .Subscribe(_ =>
-            {
-                if (inputBooleanEntities.Bedroom4Presence.IsOff()) return;
-
-                netDaemonScheduler.RunIn(TimeSpan.FromHours(2),
-                    () =>
-                    {
-                        inputNumberEntities.Bedroom4FanSpeed.SetValue(
-                            16 * 2
-                        );
-                    });
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Text.Json;
+using Homer.NetDaemon.Channels;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Services;
 using NetDaemon.AppModel;
@@ -9,14 +10,15 @@ using NetDaemon.HassModel;
 
 namespace Homer.NetDaemon.Apps.Balcony;
 
-[Focus]
+/// <summary>
+/// Asks everyone whether to close the balcony blinds when rain is forecast during the day, then closes them now or
+/// later depending on the answer.
+/// </summary>
 [NetDaemonApp]
-public class RainyWeatherCloseBlinds(
+public class RainyDayBlindsPrompt(
     ApiObservableFactoryService factory,
-    InputTextEntities textEntities,
     NotifyServices notify,
     IHaContext context,
-    IHaRegistry registry,
     IScheduler scheduler
 )
     : IAsyncInitializable, IAsyncDisposable
@@ -39,28 +41,9 @@ public class RainyWeatherCloseBlinds(
             tag = "close_blinds"
         };
 
-        notify.MobileAppQinSS26Ultra(
-            "clear_notification",
-            data: clear
-        );
+        NotifyEveryone("clear_notification", data: clear);
 
-        notify.MobileAppGuanXiujiSIphone(
-            "clear_notification",
-            data: clear
-        );
-
-        notify.MobileAppQinBosIphone16ProMax(
-            "clear_notification",
-            data: clear
-        );
-
-        var observable = factory.CreateForecast()
-            .Select(f => f.Current.WeatherCode)
-            .Where(v => Homer.NetDaemon.Services.OpenMeteo.OpenMeteoWmoMapper.IsRainy(v))
-            .Select(v => Homer.NetDaemon.Services.OpenMeteo.OpenMeteoWmoMapper.GetWeatherDescription(v))
-            .DistinctUntilChanged();
-
-        _disposables.Add(observable
+        _disposables.Add(factory.CreateRainForecast()
             .Where(_ => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(9, 0), new TimeOnly(21, 0)))
             .Subscribe(forecast =>
             {
@@ -97,29 +80,7 @@ public class RainyWeatherCloseBlinds(
                     }
                 };
 
-                notify.MobileAppQinSS26Ultra(
-                    $"快要下雨了！ ({forecast})",
-                    "主人想关阳台窗帘吗？",
-                    data: data
-                );
-
-                notify.MobileAppGuanXiujiSIphone(
-                    $"快要下雨了！ ({forecast})",
-                    "主人想关阳台窗帘吗？",
-                    data: data
-                );
-
-                notify.MobileAppQinBosIphone16ProMax(
-                    $"快要下雨了！ ({forecast})",
-                    "主人想关阳台窗帘吗？",
-                    data: data
-                );
-            }));
-
-        _disposables.Add(observable
-            .Where(_ => TimeOnly.FromDateTime(DateTime.Now).IsBetween(new TimeOnly(21, 0), new TimeOnly(9, 0)))
-            .Subscribe(forecast => {
-                Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0));
+                NotifyEveryone($"快要下雨了！ ({forecast})", "主人想关阳台窗帘吗？", data);
             }));
 
         context.Events.Where(e => e.DataElement?.TryGetProperty("actionName", out _) ?? false)
@@ -129,7 +90,7 @@ public class RainyWeatherCloseBlinds(
             {
                 try
                 {
-                    return JsonSerializer.Deserialize<ActionData>(v);
+                    return JsonSerializer.Deserialize<ActionData>(v!);
                 }
                 catch
                 {
@@ -144,33 +105,18 @@ public class RainyWeatherCloseBlinds(
                 switch (e.Time)
                 {
                     case ActionDataTimeSpan.Now:
-                        Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0));
+                        BalconyBlindsChannel.CloseAll();
                         break;
                     case ActionDataTimeSpan.ThirtyMinutes:
-                        scheduler.Schedule(TimeSpan.FromMinutes(30),
-                            () => { Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0)); });
+                        scheduler.Schedule(TimeSpan.FromMinutes(30), BalconyBlindsChannel.CloseAll);
                         break;
                     case ActionDataTimeSpan.SixtyMinutes:
-                        scheduler.Schedule(TimeSpan.FromMinutes(60),
-                            () => { Homer.NetDaemon.Channels.BalconyBlindsChannel.Channel.Writer.TryWrite(new Homer.NetDaemon.Channels.BalconyBlindCommand(Homer.NetDaemon.Channels.BalconyBlindAction.GoToPosition, [0, 1, 2], 3.0)); });
+                        scheduler.Schedule(TimeSpan.FromMinutes(60), BalconyBlindsChannel.CloseAll);
                         break;
                     default: throw new InvalidEnumArgumentException();
                 }
 
-                notify.MobileAppQinSS26Ultra(
-                    "clear_notification",
-                    data: clear
-                );
-
-                notify.MobileAppGuanXiujiSIphone(
-                    "clear_notification",
-                    data: clear
-                );
-
-                notify.MobileAppQinBosIphone16ProMax(
-                    "clear_notification",
-                    data: clear
-                );
+                NotifyEveryone("clear_notification", data: clear);
 
                 var time = e.Time switch
                 {
@@ -180,18 +126,15 @@ public class RainyWeatherCloseBlinds(
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
-                notify.MobileAppQinSS26Ultra(
-                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
-                );
-
-                notify.MobileAppGuanXiujiSIphone(
-                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
-                );
-
-                notify.MobileAppQinBosIphone16ProMax(
-                    $"我将在 {time.ToShortTimeString()} 关阳台窗帘"
-                );
+                NotifyEveryone($"我将在 {time.ToShortTimeString()} 关阳台窗帘");
             });
+    }
+
+    private void NotifyEveryone(string message, string? title = null, object? data = null)
+    {
+        notify.MobileAppQinSS26Ultra(message, title, data: data);
+        notify.MobileAppGuanXiujiSIphone(message, title, data: data);
+        notify.MobileAppQinBosIphone16ProMax(message, title, data: data);
     }
 
     public ValueTask DisposeAsync()
