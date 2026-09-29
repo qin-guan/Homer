@@ -2,7 +2,7 @@ using System.Reactive.Concurrency;
 using Homer.NetDaemon.Entities;
 using NetDaemon.AppModel;
 
-namespace Homer.NetDaemon.Apps.Bathroom;
+namespace Homer.NetDaemon.Apps.WaterHeater;
 
 [NetDaemonApp]
 public class WaterHeaterKeepAlive

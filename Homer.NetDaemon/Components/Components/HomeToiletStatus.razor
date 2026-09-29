@@ -1,5 +1,4 @@
 @using Homer.NetDaemon.Services
-@using Homer.NetDaemon.Entities
 
 @rendermode InteractiveServer
 @implements IDisposable
@@ -28,22 +27,19 @@
 
 @code {
     [Inject] public BathroomStatusService BathroomStatusService { get; set; } = null!;
-    [Inject] public InputBooleanEntities InputBooleanEntities { get; set; } = null!;
-    
-    private readonly List<IDisposable> _disposables = [];
 
     protected override void OnInitialized()
     {
-        // Subscribe to presence changes to refresh the UI
-        _disposables.Add(InputBooleanEntities.BathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
-        _disposables.Add(InputBooleanEntities.MasterBathroomPresence.StateAllChanges().Subscribe(_ => InvokeAsync(StateHasChanged)));
+        BathroomStatusService.StatusChanged += OnStatusChanged;
     }
 
     public void Dispose()
     {
-        _disposables.ForEach(e => e.Dispose());
+        BathroomStatusService.StatusChanged -= OnStatusChanged;
     }
-    
+
+    private void OnStatusChanged(BathroomStatusChange _) => InvokeAsync(StateHasChanged);
+
     private (string Icon, string Text, string ColorClass) GetBathroomDisplayInfo(BathroomState status)
     {
         return status switch

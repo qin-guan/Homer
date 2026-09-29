@@ -4,9 +4,9 @@ using NetDaemon.AppModel;
 namespace Homer.NetDaemon.Apps.Remotes;
 
 [NetDaemonApp]
-public class BedroomLight
+public class Bedroom4Light
 {
-    public BedroomLight(
+    public Bedroom4Light(
         InputBooleanEntities inputBooleanEntities,
         RemoteEntities remoteEntities
     )

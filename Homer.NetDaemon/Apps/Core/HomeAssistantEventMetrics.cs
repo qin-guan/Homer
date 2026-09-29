@@ -1,33 +1,16 @@
-using System.Diagnostics;
-using System.Reactive.Concurrency;
 using System.Text.Json;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
-using NetDaemon.Extensions.MqttEntityManager;
 using NetDaemon.HassModel;
 
-namespace Homer.NetDaemon.Apps;
+namespace Homer.NetDaemon.Apps.Core;
 
-// [Focus]
+/// <summary>Counts Home Assistant bus traffic by event type and, for state changes, entity domain.</summary>
 [NetDaemonApp]
-public class DefaultApp
+public class HomeAssistantEventMetrics
 {
-    private readonly ActivitySource _activitySource = new("Homer.NetDaemon.Apps.DefaultApp");
-
-    public DefaultApp(ILogger<DefaultApp> logger, IHaContext haContext, IScheduler scheduler, IMqttEntityManager manager)
+    public HomeAssistantEventMetrics(IHaContext haContext)
     {
-        manager.RemoveAsync("climate.water_heater_2");
-        manager.RemoveAsync("climate.10");
-        manager.RemoveAsync("binary_sensor.daikin");
-        manager.RemoveAsync("button.daikin");
-        manager.RemoveAsync("switch.daikin");
-        manager.RemoveAsync("water_heater.daikin");
-        manager.RemoveAsync("water_heater.daikin2");
-        manager.RemoveAsync("water_heater.10");
-        manager.RemoveAsync("sensor.water_heater");
-        manager.RemoveAsync("sensor.10");
-        manager.RemoveAsync("switch.10");
-        
         haContext.Events.Subscribe(e =>
         {
             // Only event type and entity domain are tagged: per-entity / friendly name / user tags multiplied
@@ -45,7 +28,5 @@ public class DefaultApp
                 new KeyValuePair<string, object?>("ha.event_type", e.EventType),
                 new KeyValuePair<string, object?>("ha.domain", domain));
         });
-
-        logger.LogInformation("Hello, home!");
     }
 }

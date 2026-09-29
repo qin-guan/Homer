@@ -26,4 +26,14 @@ public class ApiObservableFactoryService(IDataMallApi dataMallApi, IOpenMeteoApi
             .Replay(1)
             .RefCount();
     }
+
+    /// <summary>Descriptions of rainy current weather, emitted whenever the kind of rain changes.</summary>
+    public IObservable<string> CreateRainForecast()
+    {
+        return CreateForecast()
+            .Select(f => f.Current.WeatherCode)
+            .Where(v => OpenMeteoWmoMapper.IsRainy(v))
+            .Select(v => OpenMeteoWmoMapper.GetWeatherDescription(v))
+            .DistinctUntilChanged();
+    }
 }
