@@ -28,57 +28,22 @@ public class DefaultApp
         manager.RemoveAsync("sensor.10");
         manager.RemoveAsync("switch.10");
         
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.homeassistant.events_processed");
-
         haContext.Events.Subscribe(e =>
         {
-            if (e.DataElement.HasValue)
+            // Only event type and entity domain are tagged: per-entity / friendly name / user tags multiplied
+            // series count and forced a string allocation per property on every event of the HA bus.
+            var domain = "none";
+            if (e.EventType == "state_changed" && e.DataElement is { ValueKind: JsonValueKind.Object } data &&
+                data.TryGetProperty("entity_id", out var entityId) &&
+                entityId.GetString() is { } id)
             {
-                var val = e.DataElement.GetValueOrDefault();
-                var tags = new List<KeyValuePair<string, object?>>();
-
-                if (val.TryGetProperty("entity_id", out var entityId))
-                {
-                    tags.Add(new KeyValuePair<string, object?>("ha.entity_id", entityId.GetString()));
-                }
-
-                if (val.TryGetProperty("new_state", out var state))
-                {
-                    if (state.ValueKind == JsonValueKind.Object &&
-                        state.TryGetProperty("attributes", out var attributes))
-                    {
-                        if (attributes.ValueKind == JsonValueKind.Object &&
-                            attributes.TryGetProperty("friendly_name", out var friendlyName))
-                        {
-                            if (friendlyName.GetString() is not null)
-                            {
-                                tags.Add(
-                                    new KeyValuePair<string, object?>("ha.friendly_name", friendlyName.GetString()));
-                            }
-                        }
-                    }
-
-                    if (state.ValueKind == JsonValueKind.Object && state.TryGetProperty("context", out var context))
-                    {
-                        if (context.ValueKind == JsonValueKind.Object &&
-                            context.TryGetProperty("user_id", out var userIdElement))
-                        {
-                            if (userIdElement.GetString() is not null)
-                            {
-                                tags.Add(
-                                    new KeyValuePair<string, object?>("ha.user_id", userIdElement.GetString()));
-                            }
-                        }
-                    }
-                }
-
-                eventsProcessedMeter.Add(1, tags.ToArray());
+                var dot = id.IndexOf('.');
+                domain = dot > 0 ? id[..dot] : "unknown";
             }
-            else
-            {
-                eventsProcessedMeter.Add(1);
-            }
+
+            EntityMetrics.HomeAssistantEvents.Add(1,
+                new KeyValuePair<string, object?>("ha.event_type", e.EventType),
+                new KeyValuePair<string, object?>("ha.domain", domain));
         });
 
         logger.LogInformation("Hello, home!");

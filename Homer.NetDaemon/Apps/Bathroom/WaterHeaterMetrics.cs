@@ -12,23 +12,21 @@ public class WaterHeaterMetrics
 {
     public WaterHeaterMetrics(ILogger<WaterHeaterMetrics> logger, SwitchEntities switchEntities, IScheduler scheduler)
     {
-        var waterHeaterMinutesOn =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.water_heater_metrics.minutes_on");
-
         switchEntities.WaterHeaterSwitch.StateChanges()
-            .Where(s => s.Entity.IsOff())
-            .Subscribe((s) =>
+            .Where(s => s.Old.IsOn() && s.New.IsOff())
+            .Subscribe(s =>
             {
-                var timeSpan = s.New?.LastChanged - s.Old?.LastChanged;
-                if (timeSpan is null)
+                var duration = s.New?.LastChanged - s.Old?.LastChanged;
+                if (duration is null || duration.Value <= TimeSpan.Zero)
                 {
                     return;
                 }
 
-                waterHeaterMinutesOn.Add((int)timeSpan.Value.TotalMinutes);
+                // Seconds, not truncated whole minutes: short cycles used to be recorded as 0.
+                EntityMetrics.WaterHeaterRunDuration.Record(duration.Value.TotalSeconds);
 
-                logger.LogInformation("Recorded water heater turn on duration of {Minutes}",
-                    timeSpan.Value.TotalMinutes);
+                logger.LogInformation("Recorded water heater run of {Minutes:F1} minutes",
+                    duration.Value.TotalMinutes);
             });
     }
 }

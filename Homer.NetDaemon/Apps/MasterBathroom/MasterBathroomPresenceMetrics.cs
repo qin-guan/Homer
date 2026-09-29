@@ -17,9 +17,6 @@ public class MasterBathroomPresenceMetrics
         IScheduler scheduler
     )
     {
-        var waterHeaterMinutesOn =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.master_bathroom_presence_metrics.shower_duration");
-
         var sensorPresence = new List<BinarySensorEntity>
         {
             binarySensorEntities.MasterBathroomSinkMotionOccupancy,
@@ -28,12 +25,13 @@ public class MasterBathroomPresenceMetrics
 
         var actualPresence = inputBooleanEntities.MasterBathroomPresence;
         DateTime? timing = null;
+        var room = new KeyValuePair<string, object?>("room", "master_bathroom");
 
         sensorPresence.StateChanges()
             .Where(_ => sensorPresence.All(s => s.IsOff()) && actualPresence.IsOn() && timing is null)
             .Subscribe(_ =>
             {
-                timing = DateTime.Now;
+                timing = DateTime.UtcNow;
                 logger.LogInformation("Presence in master bathroom shower was detected {Sensors} {ActualPresence}",
                     sensorPresence.Select(s => new { s.EntityId, s.State }),
                     actualPresence.State
@@ -49,7 +47,7 @@ public class MasterBathroomPresenceMetrics
                     throw new ArgumentNullException(nameof(timing));
                 }
 
-                waterHeaterMinutesOn.Add((int)(DateTime.Now - timing).Value.TotalMinutes);
+                EntityMetrics.ShowerDuration.Record((DateTime.UtcNow - timing.Value).TotalSeconds, room);
                 timing = null;
             });
     }

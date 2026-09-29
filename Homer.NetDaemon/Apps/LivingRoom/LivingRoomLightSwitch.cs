@@ -17,13 +17,11 @@ public class LivingRoomLightSwitch
         EventEntities eventEntities
     )
     {
-        var eventsProcessedMeter =
-            EntityMetrics.MeterInstance.CreateCounter<int>("homer.netdaemon.living_room_light_switch.events_processed");
 
         eventEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_light_switch");
                 return e.Entity.Attributes?.EventType == "single_center";
             })
             .Subscribe(e => { lightEntities.LivingRoomKdk.Toggle(); });
@@ -31,7 +29,7 @@ public class LivingRoomLightSwitch
         eventEntities.LivingRoomLightsAction.StateChanges()
             .Where(e =>
             {
-                eventsProcessedMeter.Add(1);
+                EntityMetrics.AutomationEvent("living_room_light_switch");
                 return e.Entity.Attributes?.EventType == "double_center";
             })
             .Subscribe(e => { switchEntities.DiningTableLights.Toggle(); });
