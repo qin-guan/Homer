@@ -29,7 +29,7 @@ builder.Services.AddOptions<DataMallOptions>()
 builder.Services.AddOptions<GoogleHomeDashboardOptions>()
     .Bind(builder.Configuration.GetSection("GoogleHomeDashboard"));
 
-builder.Services.AddRefitClient<IDataMallApi>()
+builder.Services.AddRefitGeneratedClient<IDataMallApi>()
     .ConfigureHttpClient((sp, client) =>
     {
         client.BaseAddress = new Uri("https://datamall2.mytransport.sg");
@@ -37,7 +37,7 @@ builder.Services.AddRefitClient<IDataMallApi>()
             sp.GetRequiredService<IOptions<DataMallOptions>>().Value.AccountKey);
     });
 
-builder.Services.AddRefitClient<IOpenMeteoApi>()
+builder.Services.AddRefitGeneratedClient<IOpenMeteoApi>()
     .ConfigureHttpClient(options => { options.BaseAddress = new Uri("https://api.open-meteo.com"); });
 
 builder.Services.AddAppsFromAssembly(Assembly.GetExecutingAssembly());
