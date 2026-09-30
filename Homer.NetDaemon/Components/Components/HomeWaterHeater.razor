@@ -24,6 +24,9 @@
         <span class="fs-2 text-secondary">关</span>
         <span class="fs-6 text-muted">热水器</span>
     }
+
+    <span class="small text-muted mt-1">库存:</span>
+    <span class="small">@Inventory.StateOfChargeMinutes.ToString("0.0") min</span>
     
     @if (WaterHeaterTimerService.LastTurnedOnDateTime is not null)
     {
@@ -52,6 +55,7 @@
 
     [Inject] public SwitchEntities Switches { get; set; } = null!;
     [Inject] public WaterHeaterTimerService WaterHeaterTimerService { get; set; } = null!;
+    [Inject] public WaterHeaterInventory Inventory { get; set; } = null!;
 
     private readonly List<IDisposable> _disposables = [];
     private IDisposable? _timerDisposable;
@@ -65,12 +69,14 @@
             InvokeAsync(StateHasChanged);
         }));
         WaterHeaterTimerService.StateChanged += OnWaterHeaterTimerStateChanged;
+        Inventory.StateChanged += OnInventoryStateChanged;
         ManageTimer();
     }
 
     public void Dispose()
     {
         WaterHeaterTimerService.StateChanged -= OnWaterHeaterTimerStateChanged;
+        Inventory.StateChanged -= OnInventoryStateChanged;
         _timerDisposable?.Dispose();
         _disposables.ForEach(e => e.Dispose());
     }
@@ -92,6 +98,11 @@
     private void OnWaterHeaterTimerStateChanged()
     {
         ManageTimer();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnInventoryStateChanged()
+    {
         _ = InvokeAsync(StateHasChanged);
     }
 
