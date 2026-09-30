@@ -1,6 +1,7 @@
 using System.Diagnostics.Metrics;
 using System.Reactive.Linq;
 using Homer.NetDaemon.Entities;
+using Homer.NetDaemon.Services;
 using Homer.ServiceDefaults.Metrics;
 using NetDaemon.AppModel;
 using NetDaemon.HassModel.Entities;
@@ -8,8 +9,8 @@ using NetDaemon.HassModel.Entities;
 namespace Homer.NetDaemon.Apps.WaterHeater;
 
 /// <summary>
-/// Records each water heater run, plus pull-based gauges for whether it is heating and the budget left. Each app
-/// instance owns a Meter so a NetDaemon reload doesn't leave stale callbacks behind.
+/// Records each water heater run, plus pull-based gauges for whether it is heating, the budget left, and the
+/// estimated tank inventory. Each app instance owns a Meter so a NetDaemon reload doesn't leave stale callbacks behind.
 /// </summary>
 [NetDaemonApp]
 public sealed class WaterHeaterMetrics : IDisposable
@@ -19,7 +20,8 @@ public sealed class WaterHeaterMetrics : IDisposable
     public WaterHeaterMetrics(
         ILogger<WaterHeaterMetrics> logger,
         SwitchEntities switchEntities,
-        InputNumberEntities inputNumberEntities)
+        InputNumberEntities inputNumberEntities,
+        WaterHeaterInventory inventory)
     {
         var heater = switchEntities.WaterHeaterSwitch;
         var minutesLeft = inputNumberEntities.WaterHeaterMinutesLeft;
@@ -45,6 +47,8 @@ public sealed class WaterHeaterMetrics : IDisposable
             "1", "1 while the water heater is heating");
         _meter.CreateObservableGauge("homer.water_heater.budget.remaining", () => minutesLeft.State ?? 0,
             "min", "Heating minutes left in today's water heater budget");
+        _meter.CreateObservableGauge("homer.water_heater.soc", () => inventory.StateOfChargeMinutes,
+            "min", "Estimated tank heat inventory in heater-minutes");
     }
 
     public void Dispose() => _meter.Dispose();

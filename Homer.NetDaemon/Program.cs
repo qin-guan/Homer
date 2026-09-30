@@ -54,6 +54,7 @@ builder.Services.AddHostedService<Homer.NetDaemon.Apps.Remotes.LivingRoomRemote>
 builder.Services.AddHostedService<Homer.NetDaemon.Apps.Balcony.Blinds>();
 builder.Services.AddSingleton<ApiObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
+builder.Services.AddSingleton<WaterHeaterInventory>();
 builder.Services.AddSingleton<BathroomStatusService>();
 builder.Services.AddSingleton<AsyncKeyedLocker<string>>();
 
