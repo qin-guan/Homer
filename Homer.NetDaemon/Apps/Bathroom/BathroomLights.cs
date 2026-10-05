@@ -73,7 +73,7 @@ public class BathroomLights
             });
 
         inputBooleanEntities.BathroomPresence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1.5), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(8), scheduler)
             .Subscribe(_ =>
             {
                 logger.LogInformation("Turning off lights");
