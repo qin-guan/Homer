@@ -42,7 +42,7 @@ public class Bedroom4Lights
             });
 
         inputBooleanEntities.Bedroom4Presence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(3), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(15), scheduler)
             .SubscribeAsync(async _ =>
             {
                 inputBooleanEntities.Bedroom4Light.TurnOff();
