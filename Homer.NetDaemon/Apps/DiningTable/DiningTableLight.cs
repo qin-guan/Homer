@@ -18,7 +18,7 @@ public class DiningTableLight
             {
                 EntityMetrics.AutomationEvent("dining_table_light");
                 return e.IsOff();
-            }, TimeSpan.FromMinutes(1), scheduler)
+            }, TimeSpan.FromMinutes(10), scheduler)
             .Subscribe(e =>
             {
                 switchEntities.DiningTableLights.TurnOff();
