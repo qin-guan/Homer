@@ -58,7 +58,7 @@ public class KitchenFan : IAsyncInitializable
                 EntityMetrics.AutomationEvent("kitchen_fan");
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromMinutes(1), scheduler)
+            .Throttle(TimeSpan.FromMinutes(12), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ => { _fan.TurnOff(); });
     }
