@@ -47,7 +47,7 @@ public class DysonFan : IAsyncInitializable
             {
                 EntityMetrics.AutomationEvent("dyson_fan");
                 return e.IsOff();
-            }, TimeSpan.FromSeconds(30), scheduler)
+            }, TimeSpan.FromMinutes(8), scheduler)
             .SubscribeAsync(async e =>
             {
                 if (_presence.All(e => e.IsOff()))
