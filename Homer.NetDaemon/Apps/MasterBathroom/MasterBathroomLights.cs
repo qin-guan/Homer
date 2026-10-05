@@ -72,7 +72,7 @@ public class MasterBathroomLights
             });
 
         inputBooleanEntities.MasterBathroomPresence.StateChanges()
-            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(1.5), scheduler)
+            .WhenStateIsFor(e => e.IsOff(), TimeSpan.FromMinutes(8), scheduler)
             .Subscribe(_ =>
             {
                 using var activity = _activitySource.StartActivity();
