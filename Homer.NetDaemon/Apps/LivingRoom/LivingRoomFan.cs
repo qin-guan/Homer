@@ -84,7 +84,7 @@ public class LivingRoomFan : IAsyncInitializable
                 EntityMetrics.AutomationEvent("living_room_fan");
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromSeconds(60), scheduler)
+            .Throttle(TimeSpan.FromMinutes(12), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ => { _fan.TurnOff(); });
     }
