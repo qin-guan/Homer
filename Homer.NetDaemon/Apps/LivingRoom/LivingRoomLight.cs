@@ -94,7 +94,7 @@ public class LivingRoomLight : IAsyncInitializable
                 EntityMetrics.AutomationEvent("living_room_light");
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromMinutes(3), scheduler)
+            .Throttle(TimeSpan.FromMinutes(12), scheduler)
             .Where(e => !Presence)
             .Subscribe(_ => { _light.TurnOff(); });
     }
