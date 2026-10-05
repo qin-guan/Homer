@@ -119,7 +119,7 @@ public class KitchenLights : IAsyncInitializable
                 EntityMetrics.AutomationEvent("kitchen_lights");
                 return !Presence;
             })
-            .Throttle(TimeSpan.FromMinutes(1), scheduler)
+            .Throttle(TimeSpan.FromMinutes(10), scheduler)
             .Where(_ => !Presence)
             .Subscribe(_ =>
             {
