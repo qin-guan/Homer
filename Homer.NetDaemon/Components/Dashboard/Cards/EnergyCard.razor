@@ -1,0 +1,57 @@
+@{
+    var energy = Home.Energy;
+    var total = Math.Max(energy.TotalWatts, 1);
+    var kilowatts = energy.TotalWatts >= 1000;
+}
+
+<GlassCard Model="Card" Title="用电" Icon="fa-bolt" Accent="#f5b400">
+    <div class="big num">
+        @(kilowatts ? (energy.TotalWatts / 1000).ToString("0.00") : energy.TotalWatts.ToString("0"))<small>@(kilowatts ? "kW" : "W")</small>
+    </div>
+    @if (!IsSmall && energy.Parts.Count > 0)
+    {
+        <div class="meter" role="img" aria-label="用电构成">
+            @foreach (var part in energy.Parts)
+            {
+                <span style="width: @Format.Invariant(part.Watts / total * 100)%; --c: @Colour(part.Name)"></span>
+            }
+        </div>
+        @if (IsLarge)
+        {
+            <div class="list">
+                @foreach (var part in energy.Parts)
+                {
+                    <div class="list__row" style="min-height: 38px">
+                        <span class="status-dot" style="color: @Colour(part.Name)"></span>
+                        <span class="list__title grow">@part.Name</span>
+                        <span class="sub num" style="margin-right: 8px">@Format.Power(part.Watts)</span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="meter-legend">
+                @foreach (var part in energy.Parts.Take(4))
+                {
+                    <span style="--c: @Colour(part.Name)">@part.Name</span>
+                }
+            </div>
+        }
+    }
+    else if (IsSmall)
+    {
+        <div class="sub">实时用电</div>
+    }
+</GlassCard>
+
+@code {
+    private static string Colour(string part) => part switch
+    {
+        "空调" => "var(--sky)",
+        "热水器" => "var(--orange)",
+        "洗衣机" => "var(--indigo)",
+        "洗碗机" => "var(--teal)",
+        _ => "var(--yellow)"
+    };
+}

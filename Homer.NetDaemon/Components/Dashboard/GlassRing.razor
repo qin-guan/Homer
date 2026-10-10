@@ -1,0 +1,21 @@
+@* Circular gauge; the gradients it strokes with are defined once on the page. *@
+
+<div class="ring @(Cool ? "cool" : "")" style="--size: @(Size)px">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring__track" cx="50" cy="50" r="@Radius" stroke-width="10"/>
+        <circle class="ring__value" cx="50" cy="50" r="@Radius" stroke-width="10"
+                stroke-dasharray="@Format.Invariant(Circumference)"
+                stroke-dashoffset="@Format.Invariant(Circumference * (1 - Math.Clamp(Fraction, 0, 1)))"/>
+    </svg>
+    <div class="ring__center">@ChildContent</div>
+</div>
+
+@code {
+    private const double Radius = 42;
+    private static readonly double Circumference = 2 * Math.PI * Radius;
+
+    [Parameter] public int Size { get; set; } = 84;
+    [Parameter] public double Fraction { get; set; }
+    [Parameter] public bool Cool { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

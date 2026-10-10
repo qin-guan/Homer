@@ -1,0 +1,47 @@
+@{
+    var devices = SubjectDevices();
+}
+
+<GlassCard Model="Card" Title="准备睡觉了？" Icon="fa-moon" Accent="var(--indigo)" ShowReason="IsLarge">
+    <div class="sub">将关闭</div>
+    @if (IsLarge)
+    {
+        <div class="list">
+            @foreach (var device in devices.Take(5))
+            {
+                <div class="list__row">
+                    <span class="list__icon on"><i class="fa-solid @Format.DeviceIcon(device.Kind)"></i></span>
+                    <span class="list__text">
+                        <span class="list__title">@device.Name</span>
+                        <span class="list__sub">@RoomName(device.RoomId)</span>
+                    </span>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="hrow" style="flex-wrap: wrap; gap: 6px">
+            @foreach (var device in devices.Take(3))
+            {
+                <span class="chip"><i class="fa-solid @Format.DeviceIcon(device.Kind)"></i>@device.Name</span>
+            }
+            @if (devices.Count > 3)
+            {
+                <span class="chip">+@(devices.Count - 3)</span>
+            }
+        </div>
+    }
+    <div class="actions">
+        <button class="gbtn primary pressable wide" @onclick="TurnOffAll">
+            <i class="fa-solid fa-moon"></i>一键关闭
+        </button>
+        <button class="gbtn pressable" @onclick="Dismiss">稍后</button>
+    </div>
+</GlassCard>
+
+@code {
+    private void TurnOffAll() => Ui.Run(a => a.TurnOff(SubjectDevices().Select(d => d.EntityId).ToList()));
+
+    private void Dismiss() => Ui.Run(a => a.Dismiss(Card));
+}

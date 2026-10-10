@@ -1,89 +1,289 @@
-﻿@page "/"
-@using Homer.NetDaemon.Entities
+@page "/"
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@using Homer.NetDaemon.Components.Dashboard
+@using Homer.NetDaemon.Dashboard
 @using Homer.NetDaemon.Options
 @using Microsoft.Extensions.Options
-@using Homer.NetDaemon.Components.Components
-@inject SwitchEntities Switches
-@inject InputBooleanEntities InputBooleanEntities
+@inject DashboardState State
+@inject DashboardActions Actions
+@inject IJSRuntime JS
+@inject IOptions<GoogleHomeDashboardOptions> DashboardOptions
+@inject IWebHostEnvironment HostEnvironment
+@inject ILogger<Home> Logger
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Homer</PageTitle>
 
-<style>
-    .home-container {
-        font-family: Noto Sans SC, sans-serif;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    @@media (min-width: 768px) {
-        .home-container {
-            height: 100vh;
-            overflow: hidden;
-        }
-        .col-md-h-100 {
-            height: 100% !important;
-        }
-        .flex-md-50 {
-            flex-basis: 50% !important;
-        }
-    }
-</style>
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="@Assets["css/home.css"]"/>
+    <meta name="theme-color" content="#0b1530">
+</HeadContent>
 
-@if (GoogleHomeDashboardOptions.Value.Secret != Secret)
+@if (!Authorized)
 {
     <span class="p-2">Nothing here!</span>
 }
 else
 {
-    <div class="d-flex flex-column px-2 py-2 gap-2 home-container">
-        <div>
-            <HomeTopBar></HomeTopBar>
+    <div class="home wp-@WallpaperFor(_view?.Home)" data-glass="@(Glass == "lite" ? "lite" : "full")">
+        <div class="wallpaper" aria-hidden="true">
+            <span class="orb o1"></span>
+            <span class="orb o2"></span>
+            <span class="orb o3"></span>
+            <span class="orb o4"></span>
         </div>
 
-        <div class="row flex-grow-1 gx-2 gy-2 gy-md-0 m-0 pb-2">
-            <!-- Left column -->
-            <div class="col-12 col-md-5 d-flex flex-column gap-2 col-md-h-100">
-                <div class="d-flex gap-1 flex-grow-1 flex-md-50">
-                    <HomePowerButton SwitchId="@Switches.BalconyLights.EntityId" Name="阳台灯"/>
-                    <HomePowerButton SwitchId="@Switches.Daikinap59921None.EntityId" Name="空调一"/>
-                    <HomePowerButton SwitchId="@Switches.Daikinap16703None.EntityId" Name="空调二"/>
-                </div>
+        <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+            <defs>
+                <linearGradient id="ring-ember" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffd166"/>
+                    <stop offset=".55" stop-color="#ff8a3d"/>
+                    <stop offset="1" stop-color="#ff4d4d"/>
+                </linearGradient>
+                <linearGradient id="ring-cool" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#b8f3ff"/>
+                    <stop offset=".6" stop-color="#64d2ff"/>
+                    <stop offset="1" stop-color="#3a8bff"/>
+                </linearGradient>
+            </defs>
+        </svg>
 
-                <div class="card flex-grow-1 shadow-sm flex-md-50">
-                    <div class="card-body d-flex flex-column h-100 p-2">
-                        <h6 class="fw-semibold mb-2">巴士</h6>
-                        <HomeBusTimings></HomeBusTimings>
+        @if (_view is not { } view)
+        {
+            <div class="connecting glass">正在连接 Home Assistant…</div>
+        }
+        else
+        {
+            <CascadingValue Value="_ui" IsFixed="true">
+                <div class="home-grid">
+                    <HomeHero Home="view.Home"/>
+
+                    <div class="stack-wrap">
+                        <section class="stack" @ref="_stack" aria-label="智能卡片">
+                            @foreach (var page in view.Pages)
+                            {
+                                <div class="stack__page">
+                                    @foreach (var card in page.Cards)
+                                    {
+                                        <CardHost @key="card.Key" Card="card" Home="view.Home"/>
+                                    }
+                                </div>
+                            }
+                        </section>
+                        @if (view.Pages.Count > 1)
+                        {
+                            <div class="stack__dots" aria-hidden="true">
+                                @for (var i = 0; i < view.Pages.Count; i++)
+                                {
+                                    <span class="dot @(i == 0 ? "is-active" : "")"></span>
+                                }
+                            </div>
+                        }
                     </div>
-                </div>
-            </div>
 
-            <!-- Middle column -->
-            <div class="col-12 col-md-5 d-flex flex-column gap-2 col-md-h-100">
-                <div class="d-flex gap-2 flex-grow-1 flex-md-50">
-                    <HomeWaterHeater/>
-                    <HomeToiletStatus/>
+                    <HomeDock Home="view.Home" Pending="_pending.Keys" OnPress="Press"/>
                 </div>
 
-                <div class="card flex-grow-1 shadow-sm flex-md-50">
-                    <div class="card-body d-flex flex-column h-100 p-2">
-                        <h6 class="fw-semibold mb-2">天气</h6>
-                        <HomeWeather/>
-                    </div>
-                </div>
-            </div>
+                @if (_sheet == DashboardSheet.Blinds)
+                {
+                    <BlindsSheet Blinds="view.Home.Blinds" OnClose="CloseSheet"/>
+                }
+                else if (_sheet == DashboardSheet.WaterHeater)
+                {
+                    <WaterHeaterSheet Heater="view.Home.WaterHeater" OnClose="CloseSheet"/>
+                }
+            </CascadingValue>
+        }
 
-            <!-- Right column -->
-            <div class="col-12 col-md-2 d-flex flex-column gap-2 col-md-h-100">
-                <div class="flex-grow-1 d-flex flex-column">
-                    <HomeBalconyButtons/>
-                </div>
-            </div>
+        <div id="components-reconnect-modal" class="glass">
+            <i class="fa-solid fa-wifi"></i>连接中断，正在重新连接…
         </div>
     </div>
 }
 
 @code {
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan PendingTimeout = TimeSpan.FromSeconds(6);
+    private static readonly TimeSpan SheetIdleTimeout = TimeSpan.FromMinutes(2);
 
-    [SupplyParameterFromQuery] private string Secret { get; set; } = null!;
-    [Inject] public IOptions<GoogleHomeDashboardOptions> GoogleHomeDashboardOptions { get; set; } = null!;
-    
+    [SupplyParameterFromQuery] private string? Secret { get; set; }
+
+    /// <summary>Development only: render a sample home instead of the live one, such as ?demo=evening.</summary>
+    [SupplyParameterFromQuery] private string? Demo { get; set; }
+
+    /// <summary>?glass=lite turns off the live blur for screens that can't keep up with it.</summary>
+    [SupplyParameterFromQuery] private string? Glass { get; set; }
+
+    private DashboardUi _ui = null!;
+    private DashboardView? _view;
+    private DashboardSheet _sheet;
+    private DateTime _lastInteractionUtc = DateTime.UtcNow;
+    private readonly Dictionary<string, (bool WasOn, DateTime AtUtc)> _pending = [];
+    private ElementReference _stack;
+    private bool _stackReady;
+    private IJSObjectReference? _module;
+    private IDisposable? _viewer;
+    private System.Threading.Timer? _refresh;
+
+    private bool Authorized => DashboardOptions.Value.Secret == Secret;
+
+    private bool IsDemo => HostEnvironment.IsDevelopment() && !string.IsNullOrEmpty(Demo);
+
+    protected override void OnInitialized()
+    {
+        _ui = new DashboardUi(Actions, Logger, IsDemo, () => IsDemo && _view is not null ? _view.Home.Now : DateTime.Now,
+            OpenSheet, () => _lastInteractionUtc = DateTime.UtcNow);
+
+        if (!Authorized)
+        {
+            return;
+        }
+
+        if (IsDemo)
+        {
+            _view = DemoScenarios.View(Demo!);
+            return;
+        }
+
+        _view = State.Current;
+        if (RendererInfo.IsInteractive)
+        {
+            State.Changed += OnStateChanged;
+            _viewer = State.AddViewer();
+            _refresh = new System.Threading.Timer(_ => InvokeAsync(OnRefresh), null, RefreshInterval, RefreshInterval);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!RendererInfo.IsInteractive || !Authorized)
+        {
+            return;
+        }
+
+        try
+        {
+            if (firstRender)
+            {
+                _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/dashboard.js");
+                await _module.InvokeVoidAsync("start");
+            }
+
+            if (_module is not null && _view is not null && !_stackReady)
+            {
+                _stackReady = true;
+                await _module.InvokeVoidAsync("initStack", _stack);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // The hub navigated away or reloaded mid-render.
+        }
+    }
+
+    private void OnStateChanged() => _ = InvokeAsync(() =>
+    {
+        _view = State.Current;
+        ResolvePending();
+        StateHasChanged();
+    });
+
+    private void OnRefresh()
+    {
+        ResolvePending();
+        if (_sheet != DashboardSheet.None && DateTime.UtcNow - _lastInteractionUtc > SheetIdleTimeout)
+        {
+            _sheet = DashboardSheet.None;
+        }
+
+        StateHasChanged();
+    }
+
+    /// <summary>A tapped tile pulses until Home Assistant reports the new state, or gives up after a few seconds.</summary>
+    private void ResolvePending()
+    {
+        if (_view is null)
+        {
+            return;
+        }
+
+        foreach (var (key, pending) in _pending.ToList())
+        {
+            var toggle = _view.Home.QuickToggles.FirstOrDefault(t => t.Key == key);
+            if (toggle is null || toggle.On != pending.WasOn || DateTime.UtcNow - pending.AtUtc > PendingTimeout)
+            {
+                _pending.Remove(key);
+            }
+        }
+    }
+
+    private void Press(QuickToggle toggle)
+    {
+        switch (toggle.Kind)
+        {
+            case QuickToggleKind.Blinds:
+                OpenSheet(DashboardSheet.Blinds);
+                break;
+            case QuickToggleKind.WaterHeater:
+                OpenSheet(DashboardSheet.WaterHeater);
+                break;
+            default:
+                _pending[toggle.Key] = (toggle.On, DateTime.UtcNow);
+                _ui.Run(a => a.Toggle(toggle.Key));
+                break;
+        }
+    }
+
+    private void OpenSheet(DashboardSheet sheet)
+    {
+        _sheet = sheet;
+        _lastInteractionUtc = DateTime.UtcNow;
+        StateHasChanged();
+    }
+
+    private void CloseSheet() => _sheet = DashboardSheet.None;
+
+    /// <summary>The wallpaper follows the sun and the sky: bright by day, grey when it's wet, dim after midnight.</summary>
+    private static string WallpaperFor(HomeSnapshot? home)
+    {
+        if (home is null)
+        {
+            return "night";
+        }
+
+        var wet = home.Weather is { } weather && (weather.IsRaining || weather.Code is 3 or 45 or 48);
+        return home.Phase switch
+        {
+            DayPhase.Dawn => "dawn",
+            DayPhase.Morning or DayPhase.Afternoon => wet ? "overcast" : "day",
+            DayPhase.Dusk => "dusk",
+            DayPhase.Night => wet ? "rain-night" : "night",
+            _ => "late-night"
+        };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        State.Changed -= OnStateChanged;
+        _viewer?.Dispose();
+        if (_refresh is not null)
+        {
+            await _refresh.DisposeAsync();
+        }
+
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // The circuit is already gone.
+            }
+        }
+    }
 }

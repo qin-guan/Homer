@@ -1,0 +1,40 @@
+@{
+    var running = SubjectDevices();
+    var shown = running.Take(IsLarge ? 5 : 2).ToList();
+}
+
+<GlassCard Model="Card" Title="空调" Icon="fa-snowflake" Accent="var(--sky)"
+           Meta="@(IsSmall ? null : $"{running.Count} 台运行中")">
+    @if (IsSmall)
+    {
+        <div class="big num">@running.Count<small>台</small></div>
+        <div class="sub">正在运行</div>
+    }
+    else
+    {
+        <div class="list">
+            @foreach (var aircon in shown)
+            {
+                var a = aircon;
+                <div class="list__row">
+                    <span class="list__icon" style="color: var(--sky)"><i class="fa-solid fa-snowflake"></i></span>
+                    <span class="list__text">
+                        <span class="list__title">@a.Name</span>
+                        <span class="list__sub">
+                            @Format.AirconMode(a.Mode)@(a.Temperature is { } t ? $" · 室内 {t:0.#}°" : "")@(a.TargetTemperature is { } target ? $" → {target:0.#}°" : "")
+                        </span>
+                    </span>
+                    <button class="mini pressable" @onclick="() => TurnOff(a.EntityId)">关</button>
+                </div>
+            }
+        </div>
+        @if (running.Count > shown.Count)
+        {
+            <div class="sub muted">还有 @(running.Count - shown.Count) 台</div>
+        }
+    }
+</GlassCard>
+
+@code {
+    private void TurnOff(string entityId) => Ui.Run(a => a.TurnOff([entityId]));
+}

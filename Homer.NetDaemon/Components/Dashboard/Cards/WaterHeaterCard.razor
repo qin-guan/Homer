@@ -1,0 +1,79 @@
+@{
+    var heater = Home.WaterHeater;
+    var ringSize = Card.Size switch { CardSize.Large => 176, CardSize.Medium => 100, _ => 92 };
+    var low = heater.InventoryMinutes < 8;
+    var status = heater.On ? "加热中"
+        : heater.InventoryFraction >= .55 ? "热水充足"
+        : heater.InventoryFraction >= .25 ? "热水偏少"
+        : "热水不足";
+}
+
+<GlassCard Model="Card" Title="热水器" Icon="fa-fire-flame-curved" Accent="var(--orange)" OnTap="Open"
+           Meta="@(IsSmall ? null : status)">
+    <div class="hrow" style="gap: 16px; @(IsSmall ? "justify-content: center" : IsLarge ? "flex-direction: column; text-align: center" : "")">
+        <GlassRing Size="ringSize" Fraction="heater.InventoryFraction" Cool="!heater.On">
+            <span class="ring__value-text num">@heater.InventoryMinutes.ToString("0")</span>
+            <span class="ring__unit">分钟</span>
+        </GlassRing>
+        @if (!IsSmall)
+        {
+            <div class="grow">
+                @if (heater.On && heater.TurnOffAtUtc is { } turnOff)
+                {
+                    <div class="big num" data-countdown="@Format.IsoUtc(turnOff)">--:--</div>
+                    <div class="sub">后自动关闭</div>
+                }
+                else
+                {
+                    <div class="headline">@status</div>
+                    <div class="sub">水箱约有 @heater.InventoryMinutes.ToString("0") 分钟热水</div>
+                    @if (IsLarge && heater.BudgetLeftMinutes is { } budget)
+                    {
+                        <div class="sub muted">今天还能加热 @budget.ToString("0") 分钟</div>
+                    }
+                }
+            </div>
+        }
+    </div>
+    @if (IsSmall)
+    {
+        <div class="sub" style="text-align: center">
+            @if (heater.On && heater.TurnOffAtUtc is { } turnOff)
+            {
+                <span class="num" data-countdown="@Format.IsoUtc(turnOff)">--:--</span>
+            }
+            else
+            {
+                @status
+            }
+        </div>
+    }
+    else if (heater.On && IsLarge)
+    {
+        <div class="actions">
+            <button class="gbtn pressable wide" @onclick="Stop" @onclick:stopPropagation="true">
+                <i class="fa-solid fa-stop"></i>停止加热
+            </button>
+        </div>
+    }
+    else if (!heater.On && (low || IsLarge))
+    {
+        <div class="actions">
+            @foreach (var minutes in IsLarge ? new[] { 5, 10, 15 } : [10])
+            {
+                var m = minutes;
+                <button class="gbtn primary pressable wide" @onclick="() => Heat(m)" @onclick:stopPropagation="true">
+                    <i class="fa-solid fa-fire-flame-curved"></i>@m 分钟
+                </button>
+            }
+        </div>
+    }
+</GlassCard>
+
+@code {
+    private void Open() => Ui.OpenSheet(DashboardSheet.WaterHeater);
+
+    private void Heat(int minutes) => Ui.Run(a => a.HeatWater(minutes));
+
+    private void Stop() => Ui.Run(a => a.StopWaterHeater());
+}

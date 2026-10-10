@@ -1,0 +1,22 @@
+@{
+    var arrivals = (Card.Subjects ?? [])
+        .Select(id => Home.People.FirstOrDefault(p => p.Id == id))
+        .OfType<PersonInfo>()
+        .ToList();
+}
+
+<GlassCard Model="Card" Centered="true" Title="欢迎回家" Icon="fa-house-chimney" Accent="var(--green)">
+    <div class="hrow">
+        <div class="faces">
+            @foreach (var person in arrivals)
+            {
+                <span class="face" style="--h: @Format.Hue(person.Id)">@person.Initials</span>
+            }
+        </div>
+    </div>
+    <div class="headline ellipsis">@string.Join("、", arrivals.Select(p => p.Name))</div>
+    @if (arrivals.FirstOrDefault()?.Since is { } since)
+    {
+        <div class="sub">@Format.Ago(since, Ui.Now)到家</div>
+    }
+</GlassCard>

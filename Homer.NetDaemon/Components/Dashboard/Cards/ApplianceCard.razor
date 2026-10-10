@@ -1,0 +1,53 @@
+@{
+    var appliance = Home.Appliances.First(a => a.Kind == Kind);
+    var washer = Kind == ApplianceKind.WashingMachine;
+    var now = Ui.Now;
+}
+
+<GlassCard Model="Card" Centered="@(appliance.Status == ApplianceStatus.Finished)" Title="@appliance.Name" Icon="@(washer ? "fa-shirt" : "fa-utensils")"
+           Accent="var(--indigo)" ShowReason="false">
+    @if (appliance is { Status: ApplianceStatus.Finished, FinishedAt: { } finishedAt })
+    {
+        @if (IsLarge)
+        {
+            <i class="glyph fa-solid @(washer ? "fa-shirt" : "fa-utensils")"></i>
+        }
+        <div class="headline">@(washer ? "衣服洗好了" : "碗洗好了")</div>
+        <div class="sub">
+            @Format.Ago(finishedAt, now)
+            @if (!IsSmall && appliance.StartedAt is { } started)
+            {
+                @($" · 洗了 {Format.Duration(finishedAt - started)}")
+            }
+        </div>
+        @if (!IsSmall)
+        {
+            <div class="actions">
+                @if (washer)
+                {
+                    <button class="gbtn pressable wide @(Home.LaundryMode ? "primary" : "")" style="--accent: var(--mint)"
+                            @onclick="ToggleLaundryMode">
+                        <i class="fa-solid fa-wind"></i>@(Home.LaundryMode ? "晾衣模式已开" : "开晾衣模式")
+                    </button>
+                }
+                <button class="gbtn pressable @(washer ? "" : "wide")" @onclick="Dismiss">知道了</button>
+            </div>
+        }
+    }
+    else
+    {
+        var running = appliance.StartedAt is { } started ? now - started : TimeSpan.Zero;
+        <div class="big num">@((int)running.TotalMinutes)<small>分钟</small></div>
+        <div class="sub">
+            运行中@(appliance.Watts is { } watts && !IsSmall ? $" · {Format.Power(watts)}" : "")
+        </div>
+    }
+</GlassCard>
+
+@code {
+    [Parameter, EditorRequired] public ApplianceKind Kind { get; set; }
+
+    private void ToggleLaundryMode() => Ui.Run(a => a.SetLaundryMode(!Home.LaundryMode));
+
+    private void Dismiss() => Ui.Run(a => a.Dismiss(Card));
+}

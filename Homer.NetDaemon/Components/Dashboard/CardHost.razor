@@ -1,0 +1,59 @@
+@switch (Card.Kind)
+{
+    case CardKind.Rain:
+        <RainCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Bus:
+        <BusCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Bathroom:
+        <BathroomCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.WaterHeater:
+        <WaterHeaterCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Laundry:
+        <ApplianceCard Card="Card" Home="Home" Kind="ApplianceKind.WashingMachine"/>
+        break;
+    case CardKind.Dishwasher:
+        <ApplianceCard Card="Card" Home="Home" Kind="ApplianceKind.Dishwasher"/>
+        break;
+    case CardKind.LeftOn:
+        <LeftOnCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Climate:
+        <ClimateCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.ClimateSuggestion:
+        <ClimateSuggestionCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.FrontDoor:
+        <FrontDoorCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Energy:
+        <EnergyCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Bedtime:
+        <BedtimeCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.NowPlaying:
+        <NowPlayingCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Maintenance:
+        <MaintenanceCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Dehumidifier:
+        <DehumidifierCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Arrival:
+        <ArrivalCard Card="Card" Home="Home"/>
+        break;
+    case CardKind.Forecast:
+        <ForecastCard Card="Card" Home="Home"/>
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired] public SmartCard Card { get; set; } = null!;
+    [Parameter, EditorRequired] public HomeSnapshot Home { get; set; } = null!;
+}

@@ -1,0 +1,46 @@
+@{
+    var devices = SubjectDevices();
+    var now = Ui.Now;
+    var shown = IsLarge ? devices.Take(5).ToList() : [];
+}
+
+<GlassCard Model="Card" Title="@(Home.NobodyHome ? "家里没人" : "开着没人用")" Icon="fa-power-off" Accent="var(--amber)"
+           Meta="@($"{devices.Count} 个")" ShowReason="IsLarge">
+    @if (IsLarge)
+    {
+        <div class="list">
+            @foreach (var device in shown)
+            {
+                var d = device;
+                <div class="list__row">
+                    <span class="list__icon on"><i class="fa-solid @Format.DeviceIcon(d.Kind)"></i></span>
+                    <span class="list__text">
+                        <span class="list__title">@d.Name</span>
+                        <span class="list__sub">
+                            @RoomName(d.RoomId)@(d.OnSince is { } since ? $" · 开了 {Format.Duration(now - since)}" : "")
+                        </span>
+                    </span>
+                    <button class="mini pressable" @onclick="() => TurnOff([d.EntityId])">关</button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="headline">@devices.Count 个设备还开着</div>
+        <div class="sub ellipsis">@string.Join("、", devices.Select(d => d.Name))</div>
+    }
+    <div class="actions">
+        @if (devices.Count > shown.Count && IsLarge)
+        {
+            <span class="sub grow">还有 @(devices.Count - shown.Count) 个</span>
+        }
+        <button class="gbtn primary pressable wide" @onclick="() => TurnOff(devices.Select(d => d.EntityId).ToList())">
+            <i class="fa-solid fa-power-off"></i>全部关闭
+        </button>
+    </div>
+</GlassCard>
+
+@code {
+    private void TurnOff(List<string> entityIds) => Ui.Run(a => a.TurnOff(entityIds));
+}

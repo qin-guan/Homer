@@ -14,5 +14,6 @@
     <Project Path="Homer.AppHost/Homer.AppHost.csproj" />
     <Project Path="Homer.NetDaemon.Client/Homer.NetDaemon.Client.csproj" />
     <Project Path="Homer.NetDaemon/Homer.NetDaemon.csproj" />
+    <Project Path="Homer.NetDaemon.Tests/Homer.NetDaemon.Tests.csproj" />
     <Project Path="Homer.ServiceDefaults/Homer.ServiceDefaults.csproj" />
 </Solution>

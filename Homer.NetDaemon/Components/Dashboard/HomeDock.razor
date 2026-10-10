@@ -1,0 +1,41 @@
+@* Living room controls, always within reach along the bottom of the screen. *@
+
+<nav class="dock glass" aria-label="快捷控制">
+    @foreach (var toggle in Home.QuickToggles)
+    {
+        var tile = toggle;
+        <button @key="tile.Key"
+                class="tile pressable tint-@tile.Tint.ToString().ToLowerInvariant() @(tile.On ? "lit" : "") @(Pending.Contains(tile.Key) ? "is-pending" : "") @(tile.Available ? "" : "is-unavailable")"
+                disabled="@(!tile.Available)"
+                aria-pressed="@(tile.Kind == QuickToggleKind.Toggle ? tile.On.ToString().ToLowerInvariant() : null)"
+                @onclick="() => OnPress.InvokeAsync(tile)">
+            <span class="tile__icon">
+                @if (tile.Icon == "blinds")
+                {
+                    <BlindsIcon/>
+                }
+                else
+                {
+                    <i class="fa-solid @tile.Icon"></i>
+                }
+            </span>
+            <span class="tile__text">
+                <span class="tile__label">@tile.Label</span>
+                @if (tile.Kind == QuickToggleKind.WaterHeater && tile.On && Home.WaterHeater.TurnOffAtUtc is { } turnOff)
+                {
+                    <span class="tile__detail num" data-countdown="@Format.IsoUtc(turnOff)">加热中</span>
+                }
+                else
+                {
+                    <span class="tile__detail">@(tile.Detail ?? (tile.On ? "已开" : "已关"))</span>
+                }
+            </span>
+        </button>
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public HomeSnapshot Home { get; set; } = null!;
+    [Parameter] public IReadOnlyCollection<string> Pending { get; set; } = [];
+    [Parameter] public EventCallback<QuickToggle> OnPress { get; set; }
+}

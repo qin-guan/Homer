@@ -1,0 +1,83 @@
+@* The water heater up close: how much hot water is left, and buttons to heat for a set time. *@
+
+@{
+    var budgetLeft = Heater.BudgetLeftMinutes;
+    var status = Heater.On ? "加热中"
+        : Heater.InventoryFraction >= .55 ? "热水充足"
+        : Heater.InventoryFraction >= .25 ? "热水偏少"
+        : "热水不足";
+}
+
+<div class="sheet-backdrop" @onclick="Close">
+    <section class="sheet glass" role="dialog" aria-label="热水器" style="--accent: var(--orange)"
+             @onclick:stopPropagation="true">
+        <header class="sheet__head">
+            <span class="widget__icon" style="width: 40px; height: 40px"><i class="fa-solid fa-fire-flame-curved"></i></span>
+            <div class="sheet__title">
+                热水器
+                <small>@status</small>
+            </div>
+            <button class="sheet__close pressable" aria-label="关闭" @onclick="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+        <div class="sheet__body">
+            <div class="heater">
+                <GlassRing Size="200" Fraction="Heater.InventoryFraction" Cool="!Heater.On">
+                    <span class="ring__value-text num">@Heater.InventoryMinutes.ToString("0")</span>
+                    <span class="ring__unit">分钟热水</span>
+                </GlassRing>
+                @if (Heater.On && Heater.TurnOffAtUtc is { } turnOff)
+                {
+                    <div class="headline">还要加热 <span class="num" data-countdown="@Format.IsoUtc(turnOff)">--:--</span></div>
+                }
+                else
+                {
+                    <div class="headline">@status</div>
+                }
+                <div class="sub muted">水箱估算库存，满箱约 @Heater.CapacityMinutes.ToString("0") 分钟</div>
+            </div>
+            <div class="sheet__side" style="width: 360px">
+                <div class="sub">加热多久</div>
+                <div class="durations">
+                    @foreach (var minutes in new[] { 5, 10, 15, 20, DashboardActions.MaxHeatMinutes })
+                    {
+                        var m = minutes;
+                        <button class="gbtn pressable" disabled="@(budgetLeft is { } left && left < 1)" @onclick="() => Heat(m)">
+                            @m<small>分钟</small>
+                        </button>
+                    }
+                    @if (Heater.On)
+                    {
+                        <button class="gbtn primary pressable" style="--accent: var(--red)" @onclick="Stop">
+                            停止<small style="color: inherit">加热</small>
+                        </button>
+                    }
+                </div>
+                <div class="facts" style="margin-top: auto">
+                    @if (budgetLeft is not null)
+                    {
+                        <div><span>今天还能加热</span><b class="num">@budgetLeft.Value.ToString("0") 分钟</b></div>
+                    }
+                    @if (Heater.LastOnUtc is { } lastOn)
+                    {
+                        <div><span>上次开启</span><b class="num">@lastOn.ToLocalTime().ToString("HH:mm")</b></div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [CascadingParameter] public DashboardUi Ui { get; set; } = null!;
+
+    [Parameter, EditorRequired] public WaterHeaterInfo Heater { get; set; } = null!;
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private void Heat(int minutes) => Ui.Run(a => a.HeatWater(minutes));
+
+    private void Stop() => Ui.Run(a => a.StopWaterHeater());
+
+    private Task Close() => OnClose.InvokeAsync();
+}

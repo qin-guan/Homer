@@ -1,0 +1,19 @@
+<GlassCard Model="Card" Title="需要换电池" Icon="fa-battery-quarter" Accent="#8e8e93">
+    @if (IsSmall)
+    {
+        <div class="big num">@Home.LowBatteries.Count<small>个</small></div>
+        <div class="sub ellipsis">@Home.LowBatteries[0].Name 等</div>
+    }
+    else
+    {
+        <div class="list">
+            @foreach (var battery in Home.LowBatteries.Take(IsLarge ? 6 : 2))
+            {
+                <div class="hrow">
+                    <span class="grow sub ellipsis">@battery.Name</span>
+                    <span class="chip warn num">@battery.Percent.ToString("0")%</span>
+                </div>
+            }
+        </div>
+    }
+</GlassCard>

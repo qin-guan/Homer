@@ -1,0 +1,59 @@
+@* The glass shell every smart stack card shares: icon, title, optional dismiss, body and why it's showing. *@
+
+<article class="widget glass @Format.SizeClass(Model.Size) @(OnTap.HasDelegate ? "is-tappable pressable" : "")"
+         style="--accent: @Accent"
+         @onclick="Tap">
+    <header class="widget__head">
+        <span class="widget__icon">
+            @if (IconContent is not null)
+            {
+                @IconContent
+            }
+            else
+            {
+                <i class="fa-solid @Icon"></i>
+            }
+        </span>
+        <span class="widget__title">@Title</span>
+        @if (Meta is not null)
+        {
+            <span class="widget__meta num">@Meta</span>
+        }
+        @if (Model.DismissFor is not null)
+        {
+            <button class="widget__close" aria-label="关闭" @onclick="Dismiss" @onclick:stopPropagation="true">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        }
+    </header>
+    <div class="widget__body @(Centered && Model.Size == CardSize.Large ? "is-centered" : "")">
+        @ChildContent
+    </div>
+    @if (ShowReason && Model.Reason is not null && Model.Size != CardSize.Small)
+    {
+        <footer class="widget__reason">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>@Model.Reason
+        </footer>
+    }
+</article>
+
+@code {
+    [CascadingParameter] public DashboardUi Ui { get; set; } = null!;
+
+    [Parameter, EditorRequired] public SmartCard Model { get; set; } = null!;
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "fa-circle";
+    [Parameter] public RenderFragment? IconContent { get; set; }
+    [Parameter] public string Accent { get; set; } = "var(--blue)";
+    [Parameter] public string? Meta { get; set; }
+    [Parameter] public bool ShowReason { get; set; } = true;
+
+    /// <summary>Centre the body when large: for status cards that are a glyph and a line or two.</summary>
+    [Parameter] public bool Centered { get; set; }
+    [Parameter] public EventCallback OnTap { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private Task Tap() => OnTap.HasDelegate ? OnTap.InvokeAsync() : Task.CompletedTask;
+
+    private void Dismiss() => Ui.Run(a => a.Dismiss(Model));
+}
