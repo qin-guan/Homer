@@ -4,7 +4,7 @@
     var kilowatts = energy.TotalWatts >= 1000;
 }
 
-<WidgetCard Model="Card" Title="用电" Icon="fa-bolt" Accent="var(--yellow)">
+<WidgetCard Model="Card" Title="用电" Icon="fa-bolt" Accent="var(--yellow)" OnTap="Open">
     <div class="big num">
         @(kilowatts ? (energy.TotalWatts / 1000).ToString("0.00") : energy.TotalWatts.ToString("0"))<small>@(kilowatts ? "kW" : "W")</small>
     </div>
@@ -13,7 +13,7 @@
         <div class="meter" role="img" aria-label="用电构成">
             @foreach (var part in energy.Parts)
             {
-                <span style="width: @Format.Invariant(part.Watts / total * 100)%; --c: @Colour(part.Name)"></span>
+                <span style="width: @Format.Invariant(part.Watts / total * 100)%; --c: @Format.EnergyColor(part.Name)"></span>
             }
         </div>
         @if (IsLarge)
@@ -22,7 +22,7 @@
                 @foreach (var part in energy.Parts)
                 {
                     <div class="list__row" style="min-height: 38px">
-                        <span class="status-dot" style="color: @Colour(part.Name)"></span>
+                        <span class="status-dot" style="color: @Format.EnergyColor(part.Name)"></span>
                         <span class="list__title grow">@part.Name</span>
                         <span class="sub num" style="margin-right: 8px">@Format.Power(part.Watts)</span>
                     </div>
@@ -34,7 +34,7 @@
             <div class="meter-legend">
                 @foreach (var part in energy.Parts.Take(4))
                 {
-                    <span style="--c: @Colour(part.Name)">@part.Name</span>
+                    <span style="--c: @Format.EnergyColor(part.Name)">@part.Name</span>
                 }
             </div>
         }
@@ -46,12 +46,5 @@
 </WidgetCard>
 
 @code {
-    private static string Colour(string part) => part switch
-    {
-        "空调" => "var(--cyan)",
-        "热水器" => "var(--orange)",
-        "洗衣机" => "var(--indigo)",
-        "洗碗机" => "var(--teal)",
-        _ => "var(--yellow)"
-    };
+    private void Open() => Ui.OpenSheet(DashboardSheet.Energy);
 }

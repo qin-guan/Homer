@@ -88,8 +88,13 @@ public static class DemoScenarios
         ],
         Media = new MediaInfo("media_player.living_room", "playing", "晴天", "周杰伦", "Spotify"),
         Devices = Devices(now, on: ["light.living_room_kdk", "climate.daikinap59921"]),
-        Energy = new EnergyInfo(4310,
-            [new("热水器", 2980), new("洗碗机", 1870), new("空调", 620), new("插座", 140)]),
+        Energy = new EnergyInfo(5610,
+        [
+            new("热水器", 2980) { Devices = [new("热水器", 2980)] },
+            new("洗碗机", 1870) { Devices = [new("洗碗机", 1870)] },
+            new(EnergyPart.Aircons, 620) { Devices = [new("客厅空调一", 620, "climate.daikinap59921")] },
+            new("插座", 140) { Devices = [new("客厅插座", 90), new("主卧插座", 50)] }
+        ]),
         Buses = Buses(now, [9, 21], [4, 17])
     };
 
@@ -102,6 +107,14 @@ public static class DemoScenarios
             "light.living_room_kdk", "switch.dining_table_lights", "switch.balcony_lights", "climate.daikinap59921",
             "climate.daikinap79207"
         ]),
+        Energy = new EnergyInfo(1760,
+        [
+            new(EnergyPart.Aircons, 1240)
+            {
+                Devices = [new("客厅空调一", 760, "climate.daikinap59921"), new("主卧空调", 480, "climate.daikinap79207")]
+            },
+            new("插座", 520) { Devices = [new("客厅插座", 380), new("主卧插座", 140)] }
+        ]),
         Buses = []
     };
 
@@ -112,7 +125,11 @@ public static class DemoScenarios
         Rooms = Rooms(now, occupied: [], vacantMinutes: 50),
         Devices = Devices(now, on: ["climate.daikinap59921", "switch.balcony_lights", "fan.living_room_kdk"]),
         FrontDoor = new DoorInfo(false, now.AddMinutes(-48)),
-        Energy = new EnergyInfo(1460, [new("空调", 1180), new("插座", 280)])
+        Energy = new EnergyInfo(1460,
+        [
+            new(EnergyPart.Aircons, 1180) { Devices = [new("客厅空调一", 1180, "climate.daikinap59921")] },
+            new("插座", 280) { Devices = [new("客厅插座", 160), new("卧室四插座", 120)] }
+        ])
     };
 
     private static HomeSnapshot Hot(DateTime now) => Base(now, DayPhase.Afternoon) with
@@ -160,7 +177,7 @@ public static class DemoScenarios
             new ApplianceInfo(ApplianceKind.WashingMachine, "洗衣机", ApplianceStatus.Idle, null, null, 0),
             new ApplianceInfo(ApplianceKind.Dishwasher, "洗碗机", ApplianceStatus.Idle, null, null, 0)
         ],
-        Energy = new EnergyInfo(820, [new("空调", 0), new("插座", 520), new("洗衣机", 300)]),
+        Energy = new EnergyInfo(520, [new("插座", 520) { Devices = [new("客厅插座", 380), new("主卧插座", 140)] }]),
         FrontDoor = new DoorInfo(false, now.AddHours(-2))
     };
 

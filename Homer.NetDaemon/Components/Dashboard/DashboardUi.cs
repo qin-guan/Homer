@@ -6,7 +6,8 @@ public enum DashboardSheet
 {
     None,
     Blinds,
-    WaterHeater
+    WaterHeater,
+    Energy
 }
 
 /// <summary>Cascaded to every dashboard component: runs actions (or ignores them in demo mode) and opens sheets.</summary>

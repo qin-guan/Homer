@@ -203,7 +203,17 @@ public sealed record ApplianceInfo(
     DateTime? FinishedAt,
     double? Watts);
 
-public sealed record EnergyPart(string Name, double Watts);
+/// <param name="EntityId">The device the meter belongs to where the dashboard follows it too, such as an aircon.</param>
+public sealed record EnergyDevice(string Name, double Watts, string? EntityId = null);
+
+public sealed record EnergyPart(string Name, double Watts)
+{
+    /// <summary>The part for every aircon's compressor, which the breakdown lists unit by unit even when idle.</summary>
+    public const string Aircons = "空调";
+
+    /// <summary>The meters behind this part that are drawing power, highest first.</summary>
+    public EquatableList<EnergyDevice> Devices { get; init; } = [];
+}
 
 public sealed record EnergyInfo(double TotalWatts, EquatableList<EnergyPart> Parts);
 

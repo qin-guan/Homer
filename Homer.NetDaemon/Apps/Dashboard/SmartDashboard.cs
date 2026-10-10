@@ -37,7 +37,10 @@ public sealed class SmartDashboard : IDisposable
 
     private sealed record Toggle(Entity Entity, string Label, string Icon, Tint Tint, NumericSensorEntity? Temperature = null);
 
-    private sealed record EnergySource(string Name, NumericSensorEntity[] Sensors);
+    /// <param name="Device">The device the meter measures, when the dashboard also follows its state.</param>
+    private sealed record EnergyMeter(string Name, NumericSensorEntity Sensor, Entity? Device = null);
+
+    private sealed record EnergySource(string Name, EnergyMeter[] Meters);
 
     private sealed record Battery(string Name, NumericSensorEntity Sensor, double Threshold);
 
@@ -176,19 +179,23 @@ public sealed class SmartDashboard : IDisposable
 
         _energy =
         [
-            new("空调",
+            new(EnergyPart.Aircons,
             [
-                sensors.Daikinap59921CompressorEstimatedPowerConsumption, sensors.Daikinap16703CompressorEstimatedPowerConsumption,
-                sensors.Daikinap79207CompressorEstimatedPowerConsumption, sensors.Daikinap97235CompressorEstimatedPowerConsumption,
-                sensors.Daikinap35095CompressorEstimatedPowerConsumption, sensors.Daikinap25067CompressorEstimatedPowerConsumption
+                new("客厅空调一", sensors.Daikinap59921CompressorEstimatedPowerConsumption, climates.Daikinap59921),
+                new("客厅空调二", sensors.Daikinap16703CompressorEstimatedPowerConsumption, climates.Daikinap16703),
+                new("主卧空调", sensors.Daikinap79207CompressorEstimatedPowerConsumption, climates.Daikinap79207),
+                new("卧室四空调", sensors.Daikinap97235CompressorEstimatedPowerConsumption, climates.Daikinap97235),
+                new("卧室二空调", sensors.Daikinap35095CompressorEstimatedPowerConsumption, climates.Daikinap35095),
+                new("卧室三空调", sensors.Daikinap25067CompressorEstimatedPowerConsumption, climates.Daikinap25067)
             ]),
-            new("热水器", [sensors.WaterHeaterSwitchPower]),
-            new("洗衣机", [sensors.WashingMachineCurrentConsumption]),
-            new("洗碗机", [sensors.DishwasherPlugCurrentConsumption]),
+            new("热水器", [new("热水器", sensors.WaterHeaterSwitchPower)]),
+            new("洗衣机", [new("洗衣机", sensors.WashingMachineCurrentConsumption)]),
+            new("洗碗机", [new("洗碗机", sensors.DishwasherPlugCurrentConsumption)]),
             new("插座",
             [
-                sensors.Bedroom2IkeaPlugPower, sensors.Bedroom3IkeaPlugPower, sensors.Bedroom4IkeaPlugPower,
-                sensors.MasterBedroomIkeaPlugPower, sensors.LivingRoomIkeaPlugPower, sensors.SmartWiFiPlugPower
+                new("卧室二插座", sensors.Bedroom2IkeaPlugPower), new("卧室三插座", sensors.Bedroom3IkeaPlugPower),
+                new("卧室四插座", sensors.Bedroom4IkeaPlugPower), new("主卧插座", sensors.MasterBedroomIkeaPlugPower),
+                new("客厅插座", sensors.LivingRoomIkeaPlugPower), new("Wi-Fi 插座", sensors.SmartWiFiPlugPower)
             ])
         ];
 
@@ -222,7 +229,7 @@ public sealed class SmartDashboard : IDisposable
                 .Concat(_devices.Select(d => d.Entity))
                 .Concat(_devices.Select(d => d.Temperature).OfType<Entity>())
                 .Concat(_toggles.Select(t => t.Entity))
-                .Concat(_energy.SelectMany(e => e.Sensors))
+                .Concat(_energy.SelectMany(e => e.Meters).Select(m => m.Sensor))
                 .Concat(_batteries.Select(b => b.Sensor))
                 .Select(e => e.EntityId));
 
@@ -502,11 +509,27 @@ public sealed class SmartDashboard : IDisposable
     private static ApplianceInfo BuildAppliance(ApplianceKind kind, string name, ApplianceCycleTracker tracker, double? watts) =>
         new(kind, name, tracker.Status, tracker.StartedAt, tracker.FinishedAt, Round(watts, -1));
 
+    /// <summary>
+    /// Each part's total is rounded from its meters' sum, so standby draw that rounds away per device still counts.
+    /// </summary>
     private EnergyInfo BuildEnergy()
     {
         var parts = _energy
-            .Select(e => new EnergyPart(e.Name, e.Sensors.Sum(s => SensorMeasurements.Read(s, toWatts: true) ?? 0)))
-            .Select(p => p with { Watts = Math.Round(p.Watts / 10) * 10 })
+            .Select(e =>
+            {
+                var readings = e.Meters
+                    .Select(m => (Meter: m, Watts: SensorMeasurements.Read(m.Sensor, toWatts: true) ?? 0))
+                    .ToList();
+
+                return new EnergyPart(e.Name, Round(readings.Sum(r => r.Watts), -1) ?? 0)
+                {
+                    Devices = readings
+                        .Select(r => new EnergyDevice(r.Meter.Name, Round(r.Watts, -1) ?? 0, r.Meter.Device?.EntityId))
+                        .Where(d => d.Watts > 0)
+                        .OrderByDescending(d => d.Watts)
+                        .ToEquatableList()
+                };
+            })
             .Where(p => p.Watts > 0)
             .OrderByDescending(p => p.Watts)
             .ToEquatableList();

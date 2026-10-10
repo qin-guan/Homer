@@ -6,6 +6,7 @@
  * - Content (the smart stack cards) sits on solid secondary backgrounds; no glass in the content layer.
  * - Liquid Glass only for the functional layer floating above it: the control dock and sheets.
  * - System colours, used sparingly: status, device state and one primary action per card.
+ * - Touch targets of at least 44 px, most 48 px or more: the hub is tapped at arm's length, often in passing.
  */
 
 /* ---------------------------------------------------------------- appearance tokens */
@@ -457,28 +458,28 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    min-height: 28px;
+    min-height: 30px;
 }
 
 /* The symbol carries the card's colour; the title stays a quiet secondary label. */
 .widget__icon {
     flex: none;
-    width: 22px;
+    width: 24px;
     display: grid;
     place-items: center;
-    font-size: 17px;
+    font-size: 19px;
     color: var(--accent);
 }
 
 .widget__icon svg {
-    width: 19px;
-    height: 19px;
+    width: 21px;
+    height: 21px;
 }
 
 .widget__title {
     flex: 1;
     min-width: 0;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--label-2);
     white-space: nowrap;
@@ -486,34 +487,34 @@
     text-overflow: ellipsis;
 }
 
-.widget.sz-l .widget__title { font-size: 17px; }
+.widget.sz-l .widget__title { font-size: 18px; }
 
 .widget__meta {
     flex: none;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--label-2);
 }
 
 .widget__close {
     flex: none;
-    width: 30px;
-    height: 30px;
-    margin: -2px -4px -2px 0;
+    width: 36px;
+    height: 36px;
+    margin: -3px -6px -3px 0;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--label-2);
     background: var(--fill-3);
     position: relative;
 }
 
-/* A 44 pt target around the small visible button. */
+/* A 48 px target around the smaller visible button. */
 .widget__close::after {
     content: "";
     position: absolute;
-    inset: -7px;
+    inset: -6px;
 }
 
 .widget__body {
@@ -540,7 +541,7 @@
     align-items: center;
     gap: 6px;
     margin-top: 8px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--label-2);
     white-space: nowrap;
@@ -549,7 +550,7 @@
 }
 
 .widget__reason i {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--label-3);
 }
 
@@ -557,7 +558,7 @@
     cursor: pointer;
 }
 
-.widget.sz-s .widget__title { font-size: 14px; }
+.widget.sz-s .widget__title { font-size: 15px; }
 
 .glyph {
     font-size: 52px;
@@ -593,12 +594,12 @@
 .widget.sz-l .headline { font-size: 28px; }
 
 .sub {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--label-2);
     line-height: 1.3;
 }
 
-.widget.sz-l .sub { font-size: 16px; }
+.widget.sz-l .sub { font-size: 17px; }
 
 .muted {
     color: var(--label-2);
@@ -642,14 +643,14 @@
 
 /* Capsule buttons: grey by default; the one primary action per card is filled with the accent colour. */
 .gbtn {
-    min-height: 44px;
-    padding: 0 18px;
+    min-height: 50px;
+    padding: 0 20px;
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     white-space: nowrap;
     color: var(--label);
@@ -671,17 +672,19 @@
     color: var(--red);
 }
 
+/* Centred in the room they share, so the label needs the space more than the padding does. */
 .gbtn.wide {
     flex: 1;
+    padding: 0 14px;
 }
 
 .mini {
     flex: none;
-    min-width: 56px;
-    height: 36px;
-    padding: 0 14px;
+    min-width: 64px;
+    height: 44px;
+    padding: 0 16px;
     border-radius: 999px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--blue);
     background: var(--fill-3);
@@ -692,9 +695,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 999px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     white-space: nowrap;
     background: var(--fill-3);
@@ -734,7 +737,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: 48px;
+    min-height: 54px;
     padding: 4px 6px 4px 12px;
     border-radius: var(--radius-inner);
     background: var(--inset);
@@ -742,9 +745,9 @@
 
 .list__icon {
     flex: none;
-    width: 24px;
+    width: 26px;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--label-2);
 }
 
@@ -760,7 +763,7 @@
 }
 
 .list__title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -768,7 +771,7 @@
 }
 
 .list__sub {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--label-2);
     white-space: nowrap;
     overflow: hidden;
@@ -1058,19 +1061,19 @@
 }
 
 .rbtn {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    font-size: 18px;
+    font-size: 20px;
     background: var(--fill-3);
 }
 
 .rbtn.primary {
-    width: 60px;
-    height: 60px;
-    font-size: 22px;
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
     color: var(--card);
     background: var(--label);
 }
@@ -1082,7 +1085,7 @@
     display: flex;
     gap: 8px;
     padding: 8px;
-    border-radius: 32px;
+    border-radius: 34px;
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -1094,10 +1097,10 @@
 /* Accessory tiles, as in the Home app: quiet when off, solid white with a coloured symbol when on. */
 .tile {
     position: relative;
-    flex: 1 0 104px;
-    height: 84px;
-    padding: 10px 12px;
-    border-radius: 24px;
+    flex: 1 0 108px;
+    height: 92px;
+    padding: 12px 14px;
+    border-radius: 26px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1107,16 +1110,16 @@
 }
 
 .tile__icon {
-    height: 26px;
+    height: 28px;
     display: flex;
     align-items: center;
-    font-size: 21px;
+    font-size: 24px;
     color: var(--label-2);
 }
 
 .tile__icon svg {
-    width: 22px;
-    height: 22px;
+    width: 25px;
+    height: 25px;
 }
 
 .tile__text {
@@ -1127,13 +1130,13 @@
 }
 
 .tile__label {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     white-space: nowrap;
 }
 
 .tile__detail {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--label-2);
     white-space: nowrap;
@@ -1217,35 +1220,35 @@
 }
 
 .sheet__head .widget__icon {
-    width: 28px;
-    font-size: 22px;
+    width: 30px;
+    font-size: 24px;
 }
 
 .sheet__head .widget__icon svg {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
 }
 
 .sheet__title {
     flex: 1;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
 }
 
 .sheet__title small {
     display: block;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--label-2);
 }
 
 .sheet__close {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    font-size: 17px;
+    font-size: 20px;
     color: var(--label-2);
     background: var(--fill-3);
 }
@@ -1266,11 +1269,11 @@
 }
 
 .sheet__side .gbtn {
-    min-height: 56px;
+    min-height: 64px;
     justify-content: flex-start;
-    padding: 0 18px;
-    border-radius: 18px;
-    font-size: 17px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-size: 18px;
 }
 
 /* ---------------------------------------------------------------- blinds */
@@ -1291,7 +1294,7 @@
 }
 
 .blind__label {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
@@ -1382,16 +1385,16 @@
 }
 
 .durations .gbtn {
-    min-height: 64px;
-    border-radius: 20px;
+    min-height: 72px;
+    border-radius: 22px;
     flex-direction: column;
     gap: 0;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
 }
 
 .durations .gbtn small {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--label-2);
 }
@@ -1400,7 +1403,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 15px;
+    font-size: 16px;
     color: var(--label-2);
 }
 
@@ -1411,6 +1414,98 @@
 
 .facts b {
     color: var(--label);
+}
+
+/* ---------------------------------------------------------------- energy sheet */
+
+.energy-summary {
+    flex: none;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.energy-summary .big {
+    font-size: 48px;
+}
+
+.energy-summary .meter {
+    height: 16px;
+    margin: 8px 0 6px;
+}
+
+.energy-summary .facts {
+    gap: 12px;
+}
+
+.energy-summary .facts small {
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.energy-part {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.energy-part::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c);
+}
+
+/* Every device by draw, its row tinted as far as its share of the total. */
+.energy-list {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.energy-list::-webkit-scrollbar {
+    display: none;
+}
+
+.energy-row {
+    flex: none;
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--c) 22%, var(--inset)) var(--share), var(--inset) var(--share));
+}
+
+.energy-row .list__icon {
+    color: var(--c);
+}
+
+.energy-row.is-idle {
+    color: var(--label-2);
+}
+
+.energy-row.is-idle .list__icon {
+    color: var(--label-3);
+}
+
+.energy-row__value {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.energy-row__value small {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--label-2);
 }
 
 /* ---------------------------------------------------------------- connection */
@@ -1491,7 +1586,7 @@
         height: auto;
         overflow: visible;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-auto-rows: 168px;
+        grid-auto-rows: 192px;
         grid-auto-flow: row dense;
         scroll-snap-type: none;
     }
@@ -1530,7 +1625,7 @@
         flex-direction: column;
     }
 
-    .sheet__side {
+    .sheet__side, .energy-summary {
         width: auto;
     }
 

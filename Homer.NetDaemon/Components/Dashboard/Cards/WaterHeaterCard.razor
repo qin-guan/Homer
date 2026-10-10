@@ -63,7 +63,12 @@
             {
                 var m = minutes;
                 <button class="gbtn @(IsLarge ? "" : "primary") pressable wide" @onclick="() => Heat(m)" @onclick:stopPropagation="true">
-                    <i class="fa-solid fa-fire-flame-curved"></i>@m 分钟
+                    @* Three side by side only fit without the symbol. *@
+                    @if (!IsLarge)
+                    {
+                        <i class="fa-solid fa-fire-flame-curved"></i>
+                    }
+                    @m 分钟
                 </button>
             }
         </div>

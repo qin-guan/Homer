@@ -77,6 +77,32 @@ public static class Format
         _ => "fa-lightbulb"
     };
 
+    /// <summary>A system colour per part of the electricity breakdown, the same on the card and its sheet.</summary>
+    public static string EnergyColor(string part) => part switch
+    {
+        EnergyPart.Aircons => "var(--cyan)",
+        "热水器" => "var(--orange)",
+        "洗衣机" => "var(--indigo)",
+        "洗碗机" => "var(--teal)",
+        _ => "var(--yellow)"
+    };
+
+    public static string EnergyIcon(string part) => part switch
+    {
+        EnergyPart.Aircons => "fa-snowflake",
+        "热水器" => "fa-fire-flame-curved",
+        "洗衣机" => "fa-shirt",
+        "洗碗机" => "fa-utensils",
+        _ => "fa-plug"
+    };
+
+    /// <summary>A share of the total draw as a whole percentage, without claiming 0% for something that draws power.</summary>
+    public static string Share(double watts, double total)
+    {
+        var percent = total <= 0 ? 0 : watts / total * 100;
+        return percent is > 0 and < 1 ? "<1%" : $"{Math.Round(percent):0}%";
+    }
+
     public static string BlindsState(double fractionClosed)
     {
         var percent = (int)Math.Round(fractionClosed * 100);

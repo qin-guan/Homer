@@ -73,6 +73,10 @@ else
                 {
                     <WaterHeaterSheet Heater="view.Home.WaterHeater" OnClose="CloseSheet"/>
                 }
+                else if (_sheet == DashboardSheet.Energy)
+                {
+                    <EnergySheet Home="view.Home" OnClose="CloseSheet"/>
+                }
             </CascadingValue>
         }
 
