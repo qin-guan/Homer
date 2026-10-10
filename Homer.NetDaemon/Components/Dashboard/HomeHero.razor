@@ -1,0 +1,77 @@
+@* Left column: time, weather, who's home and what the house is drawing. *@
+
+@{
+    var weather = Home.Weather;
+    var home = Home.People.Where(p => p.Home).ToList();
+    var humidity = Home.Indoor.Humidity ?? weather?.Humidity;
+}
+
+<section class="hero">
+    <div class="hero__greeting">@Format.Greeting(Ui.Now)</div>
+    @if (Ui.Demo)
+    {
+        <div class="hero__clock">@Ui.Now.ToString("HH:mm")</div>
+    }
+    else
+    {
+        <div class="hero__clock" data-clock>@DateTime.Now.ToString("HH:mm")</div>
+    }
+    <div class="hero__date">@Format.Date(Ui.Now)</div>
+
+    @if (weather is not null)
+    {
+        var (icon, tone) = WeatherText.Icon(weather.Code, weather.IsDay);
+        <div class="hero__weather">
+            <i class="wx fa-solid @icon @tone"></i>
+            <div class="hero__temp num">@(weather.Temperature?.ToString("0") ?? "--")°</div>
+            <div class="hero__condition">
+                @WeatherText.Describe(weather.Code)@(weather.FeelsLike is { } feelsLike ? $" · 体感 {feelsLike:0}°" : "")
+            </div>
+        </div>
+    }
+
+    <div class="hero__facts">
+        @if (Home.Indoor.Temperature is { } indoor)
+        {
+            <span class="fact"><i class="fa-solid fa-house"></i>室内 @Format.Temperature(indoor)</span>
+        }
+        @if (humidity is { } h)
+        {
+            <span class="fact"><i class="fa-solid fa-droplet"></i>湿度 @h.ToString("0")%</span>
+        }
+        @if (Home.LaundryMode)
+        {
+            <span class="fact"><i class="fa-solid fa-wind"></i>晾衣模式</span>
+        }
+    </div>
+
+    <div class="hero__footer">
+        <div class="people">
+            @if (home.Count > 0)
+            {
+                <div class="faces">
+                    @foreach (var person in home)
+                    {
+                        <span class="face" style="--c: @Format.PersonColor(person.Id)" title="@person.Name">@person.Initials</span>
+                    }
+                </div>
+                <span class="people__label">@home.Count 人在家</span>
+            }
+            else if (Home.NobodyHome)
+            {
+                <span class="people__label"><i class="fa-solid fa-house-chimney"></i> 家里没人</span>
+            }
+        </div>
+        <div class="energy-pill">
+            <i class="fa-solid fa-bolt"></i>
+            <span class="num">@Format.Power(Home.Energy.TotalWatts)</span>
+            <small>实时用电</small>
+        </div>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter] public DashboardUi Ui { get; set; } = null!;
+
+    [Parameter, EditorRequired] public HomeSnapshot Home { get; set; } = null!;
+}

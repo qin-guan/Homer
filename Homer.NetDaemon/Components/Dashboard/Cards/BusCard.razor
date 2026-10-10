@@ -1,0 +1,63 @@
+@{
+    var now = Ui.Now;
+    var services = Home.Buses.Where(b => b.Arrivals.Count > 0).ToList();
+}
+
+<WidgetCard Model="Card" Title="巴士" Icon="fa-bus" Accent="var(--green)">
+    @foreach (var bus in services)
+    {
+        var next = bus.Arrivals[0];
+        var minutes = Format.MinutesUntil(next.At, now);
+        var later = bus.Arrivals.Skip(1).Take(2)
+            .Select(a => Format.MinutesUntil(a.At, now)?.ToString() ?? "0")
+            .ToList();
+
+        <div class="bus-row">
+            <span class="bus-badge">@bus.Service</span>
+            @if (IsLarge)
+            {
+                <div class="bus-stack">
+                    <span class="bus-next num">@NextText(minutes)</span>
+                    @if (later.Count > 0)
+                    {
+                        <span class="bus-meta num">之后 @string.Join(" · ", later) 分钟</span>
+                    }
+                </div>
+                @if (Crowding(next.Load) is { } crowding)
+                {
+                    <span class="chip crowd @next.Load">@crowding</span>
+                }
+            }
+            else
+            {
+                <span class="bus-next num">@NextText(minutes)</span>
+                @if (!IsSmall && later.Count > 0)
+                {
+                    <span class="bus-later num">@string.Join(" · ", later) 分</span>
+                }
+            }
+        </div>
+    }
+</WidgetCard>
+
+@code {
+    private RenderFragment NextText(int? minutes) => __builder =>
+    {
+        if (minutes is { } m)
+        {
+            <text>@m<small>@(IsSmall ? "分" : "分钟")</small></text>
+        }
+        else
+        {
+            <text>到站</text>
+        }
+    };
+
+    private static string? Crowding(string? load) => load switch
+    {
+        "SEA" => "有座位",
+        "SDA" => "有站位",
+        "LSD" => "很拥挤",
+        _ => null
+    };
+}

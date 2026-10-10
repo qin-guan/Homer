@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Homer.NetDaemon.Services.DataMall.BusArrival;
 
 public class BusArrivalResponse
@@ -19,6 +21,8 @@ public class NextBus
 {
     public string OriginCode { get; set; }
     public string DestinationCode { get; set; }
+    // DataMall sends "" when there is no next bus, which System.Text.Json can't read as a DateTime.
+    [JsonConverter(typeof(EmptyStringAsNullDateTimeConverter))]
     public DateTime? EstimatedArrival { get; set; }
     public int Monitored { get; set; }
     public string Latitude { get; set; }

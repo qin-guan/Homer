@@ -1,0 +1,22 @@
+@{
+    var door = Home.FrontDoor;
+    var since = door.LastChanged is { } changed ? Ui.Now - changed : TimeSpan.Zero;
+}
+
+<WidgetCard Model="Card" Centered="true" Title="前门" Icon="@(door.Open ? "fa-door-open" : "fa-door-closed")"
+           Accent="@(door.Open ? "var(--red)" : "var(--pink)")">
+    @if (IsLarge)
+    {
+        <i class="glyph fa-solid @(door.Open ? "fa-door-open" : "fa-door-closed")"></i>
+    }
+    @if (door.Open)
+    {
+        <div class="headline">门开着</div>
+        <div class="sub">已经 @Format.Duration(since)</div>
+    }
+    else
+    {
+        <div class="headline">刚开过</div>
+        <div class="sub">@(door.LastChanged is { } at ? Format.Ago(at, Ui.Now) : "")关上了</div>
+    }
+</WidgetCard>

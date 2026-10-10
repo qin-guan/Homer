@@ -1,0 +1,31 @@
+@{
+    var aircon = SubjectDevices().FirstOrDefault();
+}
+
+<WidgetCard Model="Card" Title="客厅有点热" Icon="fa-temperature-high" Accent="var(--orange)" ShowReason="false">
+    <div class="hrow">
+        <div class="big num">@Format.Temperature(Home.Indoor.Temperature)</div>
+        <div class="sub">
+            现在客厅有人
+            @if (Home.Indoor.Humidity is { } humidity)
+            {
+                <br/>@($"湿度 {humidity:0}%")
+            }
+        </div>
+    </div>
+    <div class="actions">
+        @if (aircon is not null)
+        {
+            <button class="gbtn primary pressable wide" @onclick="() => TurnOn(aircon.EntityId)">
+                <i class="fa-solid fa-snowflake"></i>开@(aircon.Name)
+            </button>
+        }
+        <button class="gbtn pressable" @onclick="Dismiss">不用</button>
+    </div>
+</WidgetCard>
+
+@code {
+    private void TurnOn(string entityId) => Ui.Run(a => a.TurnOn(entityId));
+
+    private void Dismiss() => Ui.Run(a => a.Dismiss(Card));
+}

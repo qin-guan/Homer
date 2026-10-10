@@ -1,0 +1,1547 @@
+/*
+ * Homer living room dashboard, following Apple's Human Interface Guidelines.
+ * Laid out for a Google Nest Hub (1024 × 600, touch); scales up for larger screens and reflows for phones.
+ *
+ * - Plain system grouped background, light by day and dark at night (or when the browser prefers dark).
+ * - Content (the smart stack cards) sits on solid secondary backgrounds; no glass in the content layer.
+ * - Liquid Glass only for the functional layer floating above it: the control dock and sheets.
+ * - System colours, used sparingly: status, device state and one primary action per card.
+ */
+
+/* ---------------------------------------------------------------- appearance tokens */
+
+.home {
+    /* iOS system colours (June 2025 values) and semantic colours, light appearance. */
+    --red: rgb(255, 56, 60);
+    --orange: rgb(255, 141, 40);
+    --yellow: rgb(255, 204, 0);
+    --green: rgb(52, 199, 89);
+    --mint: rgb(0, 200, 179);
+    --teal: rgb(0, 195, 208);
+    --cyan: rgb(0, 192, 232);
+    --blue: rgb(0, 136, 255);
+    --indigo: rgb(97, 85, 245);
+    --purple: rgb(203, 48, 224);
+    --pink: rgb(255, 45, 85);
+    --brown: rgb(172, 127, 94);
+    --gray: rgb(142, 142, 147);
+
+    --bg: rgb(242, 242, 247);           /* systemGroupedBackground */
+    --card: rgb(255, 255, 255);         /* secondarySystemGroupedBackground */
+    --inset: rgb(242, 242, 247);        /* tertiarySystemGroupedBackground */
+    --label: rgb(0, 0, 0);
+    /* Secondary text a little stronger than secondaryLabel: this screen is read from across the room. */
+    --label-2: rgba(60, 60, 67, .74);
+    --label-3: rgba(60, 60, 67, .45);
+    --separator: rgba(60, 60, 67, .2);
+    --fill: rgba(120, 120, 128, .2);
+    --fill-2: rgba(120, 120, 128, .16);
+    --fill-3: rgba(118, 118, 128, .12);
+
+    /* Liquid Glass, regular variant: blurs and lifts what's behind it. */
+    --glass: rgba(255, 255, 255, .72);
+    --glass-edge: rgba(0, 0, 0, .06);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, .1);
+    --sheet: rgba(255, 255, 255, .9);
+    --dim: rgba(0, 0, 0, .2);
+
+    /* An "on" accessory tile, as in the Home app. */
+    --tile-on: rgb(255, 255, 255);
+    --tile-on-label: rgb(0, 0, 0);
+    --tile-on-label-2: rgba(60, 60, 67, .7);
+
+    --bus: rgb(0, 137, 50);             /* green, increased contrast, so white numbers stay legible */
+
+    --pad: 16px;
+    --gap: 12px;
+    --radius: 24px;
+    --radius-inner: 14px;
+    --spring: cubic-bezier(.34, 1.4, .64, 1);
+    --ease: cubic-bezier(.2, .8, .2, 1);
+
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    color: var(--label);
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.25;
+    transition: background-color .6s var(--ease), color .6s var(--ease);
+}
+
+/* Dark appearance: at night (set by the server from the sun) or when the browser prefers it. */
+.home.dark {
+    --red: rgb(255, 66, 69);
+    --orange: rgb(255, 146, 48);
+    --yellow: rgb(255, 214, 0);
+    --green: rgb(48, 209, 88);
+    --mint: rgb(0, 218, 195);
+    --teal: rgb(0, 210, 224);
+    --cyan: rgb(60, 211, 254);
+    --blue: rgb(0, 145, 255);
+    --indigo: rgb(109, 124, 255);
+    --purple: rgb(219, 52, 242);
+    --pink: rgb(255, 55, 95);
+    --brown: rgb(183, 138, 102);
+
+    --bg: rgb(0, 0, 0);
+    --card: rgb(28, 28, 30);
+    --inset: rgb(44, 44, 46);
+    --label: rgb(255, 255, 255);
+    --label-2: rgba(235, 235, 245, .7);
+    --label-3: rgba(235, 235, 245, .4);
+    --separator: rgba(84, 84, 88, .6);
+    --fill: rgba(120, 120, 128, .36);
+    --fill-2: rgba(120, 120, 128, .32);
+    --fill-3: rgba(118, 118, 128, .24);
+
+    --glass: rgba(44, 44, 46, .72);
+    --glass-edge: rgba(255, 255, 255, .1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+    --sheet: rgba(36, 36, 38, .9);
+    --dim: rgba(0, 0, 0, .5);
+}
+
+@media (prefers-color-scheme: dark) {
+    .home {
+        --red: rgb(255, 66, 69);
+        --orange: rgb(255, 146, 48);
+        --yellow: rgb(255, 214, 0);
+        --green: rgb(48, 209, 88);
+        --mint: rgb(0, 218, 195);
+        --teal: rgb(0, 210, 224);
+        --cyan: rgb(60, 211, 254);
+        --blue: rgb(0, 145, 255);
+        --indigo: rgb(109, 124, 255);
+        --purple: rgb(219, 52, 242);
+        --pink: rgb(255, 55, 95);
+        --brown: rgb(183, 138, 102);
+
+        --bg: rgb(0, 0, 0);
+        --card: rgb(28, 28, 30);
+        --inset: rgb(44, 44, 46);
+        --label: rgb(255, 255, 255);
+        --label-2: rgba(235, 235, 245, .7);
+        --label-3: rgba(235, 235, 245, .4);
+        --separator: rgba(84, 84, 88, .6);
+        --fill: rgba(120, 120, 128, .36);
+        --fill-2: rgba(120, 120, 128, .32);
+        --fill-3: rgba(118, 118, 128, .24);
+
+        --glass: rgba(44, 44, 46, .72);
+        --glass-edge: rgba(255, 255, 255, .1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+        --sheet: rgba(36, 36, 38, .9);
+        --dim: rgba(0, 0, 0, .5);
+    }
+}
+
+/* After midnight: dim the whole screen so the hub doesn't light up the living room. */
+.home.late-night::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    background: rgba(0, 0, 0, .3);
+}
+
+.home *, .home *::before, .home *::after {
+    box-sizing: border-box;
+}
+
+/* :where() keeps the reset at zero specificity, so a plain class like .gbtn can give a button its fill. */
+:where(.home) button {
+    font: inherit;
+    color: inherit;
+    border: 0;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:where(.home) button:disabled {
+    cursor: default;
+    opacity: .4;
+}
+
+.home h1, .home h2, .home h3, .home p {
+    margin: 0;
+}
+
+.num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- materials */
+
+/* Liquid Glass for controls and sheets that float above the content layer. */
+.material {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: inset 0 0 0 .5px var(--glass-edge), var(--glass-shadow);
+}
+
+/* Reduce Transparency, or ?glass=lite for screens that can't keep up with live blur. */
+.home[data-glass="lite"] .material {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--card);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .home .material {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: var(--card);
+    }
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.home-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 296px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "hero stack" "dock dock";
+    gap: var(--gap);
+    padding: var(--pad);
+}
+
+/* ---------------------------------------------------------------- hero */
+
+/* Time and weather sit straight on the background, like the Lock Screen: no panel around them. */
+.hero {
+    grid-area: hero;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 6px 8px 4px;
+}
+
+.hero__greeting {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.hero__clock {
+    margin-top: 2px;
+    font-size: 96px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -.035em;
+    font-variant-numeric: tabular-nums;
+}
+
+.hero__date {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.hero__weather {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 14px;
+}
+
+.hero__weather .wx {
+    grid-row: span 2;
+    font-size: 46px;
+}
+
+.hero__temp {
+    font-size: 44px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -.02em;
+}
+
+.hero__condition {
+    font-size: 16px;
+    color: var(--label-2);
+}
+
+.hero__facts {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+}
+
+.fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    color: var(--label-2);
+}
+
+.fact i {
+    font-size: 13px;
+    color: var(--label-3);
+}
+
+.hero__footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.people {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+}
+
+.faces {
+    display: flex;
+}
+
+/* Monogram avatars in a system colour per person. */
+.face {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--c, var(--gray));
+    box-shadow: 0 0 0 2px var(--bg);
+}
+
+.faces .face + .face {
+    margin-left: -4px;
+}
+
+.people__label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--label-2);
+}
+
+.energy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.energy-pill i {
+    color: var(--yellow);
+}
+
+.energy-pill small {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--label-2);
+}
+
+/* ---------------------------------------------------------------- weather glyphs */
+
+.wx {
+    display: inline-block;
+    line-height: 1;
+}
+
+.wx-sun { color: var(--yellow); }
+.wx-moon { color: var(--indigo); }
+.wx-cloud { color: var(--gray); }
+.wx-rain { color: var(--blue); }
+.wx-bolt { color: var(--orange); }
+
+.dark .wx-moon, .dark .wx-cloud { color: var(--label-2); }
+
+@media (prefers-color-scheme: dark) {
+    .home .wx-moon, .home .wx-cloud { color: var(--label-2); }
+}
+
+/* ---------------------------------------------------------------- smart stack */
+
+.stack-wrap {
+    grid-area: stack;
+    position: relative;
+    min-height: 0;
+}
+
+.stack {
+    height: 100%;
+    display: grid;
+    grid-auto-rows: 100%;
+    gap: var(--gap);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+}
+
+.stack::-webkit-scrollbar {
+    display: none;
+}
+
+.stack__page {
+    scroll-snap-align: start;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    gap: var(--gap);
+    min-height: 0;
+}
+
+/* Page indicator, like the Smart Stack's. */
+.stack__dots {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--fill);
+    transition: background-color .3s var(--ease);
+}
+
+.dot.is-active {
+    background: var(--label-2);
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.widget {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: var(--pad);
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--card);
+    animation: card-in .4s var(--ease) both;
+}
+
+.widget.sz-m { grid-column: span 2; }
+.widget.sz-l { grid-column: span 2; grid-row: span 2; padding: 20px; }
+
+@keyframes card-in {
+    from { opacity: 0; transform: scale(.97); }
+}
+
+.widget__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+}
+
+/* The symbol carries the card's colour; the title stays a quiet secondary label. */
+.widget__icon {
+    flex: none;
+    width: 22px;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    color: var(--accent);
+}
+
+.widget__icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.widget__title {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.widget.sz-l .widget__title { font-size: 17px; }
+
+.widget__meta {
+    flex: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.widget__close {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    margin: -2px -4px -2px 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    color: var(--label-2);
+    background: var(--fill-3);
+    position: relative;
+}
+
+/* A 44 pt target around the small visible button. */
+.widget__close::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+}
+
+.widget__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding-top: 8px;
+}
+
+.widget__body.is-centered {
+    align-items: center;
+    text-align: center;
+}
+
+.widget__body.is-centered .actions {
+    align-self: stretch;
+}
+
+.widget__reason {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.widget__reason i {
+    font-size: 11px;
+    color: var(--label-3);
+}
+
+.widget.is-tappable {
+    cursor: pointer;
+}
+
+.widget.sz-s .widget__title { font-size: 14px; }
+
+.glyph {
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: var(--accent);
+}
+
+.big {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+}
+
+.widget.sz-l .big { font-size: 48px; }
+.widget.sz-s .big { font-size: 30px; }
+
+.big small {
+    margin-left: 3px;
+    font-size: .45em;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--label-2);
+}
+
+.headline {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.widget.sz-l .headline { font-size: 28px; }
+
+.sub {
+    font-size: 15px;
+    color: var(--label-2);
+    line-height: 1.3;
+}
+
+.widget.sz-l .sub { font-size: 16px; }
+
+.muted {
+    color: var(--label-2);
+}
+
+.hrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.grow {
+    flex: 1;
+    min-width: 0;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.pressable {
+    transition: transform .4s var(--spring), opacity .2s var(--ease), background-color .25s var(--ease);
+}
+
+.pressable:active {
+    transform: scale(.96);
+    opacity: .8;
+    transition-duration: .08s;
+}
+
+/* Capsule buttons: grey by default; the one primary action per card is filled with the accent colour. */
+.gbtn {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--label);
+    background: var(--fill-2);
+}
+
+.gbtn.primary {
+    color: #fff;
+    background: var(--blue);
+}
+
+/* A toggled option, in the tinted style. */
+.gbtn.selected {
+    color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 16%, transparent);
+}
+
+.gbtn.destructive {
+    color: var(--red);
+}
+
+.gbtn.wide {
+    flex: 1;
+}
+
+.mini {
+    flex: none;
+    min-width: 56px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--blue);
+    background: var(--fill-3);
+}
+
+/* Status: a coloured dot and a word, so it reads without the colour too. */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--fill-3);
+}
+
+.chip.free::before, .chip.busy::before, .chip.shower::before, .chip.warn::before, .crowd::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+}
+
+.chip.free { --dot: var(--green); }
+.chip.busy { --dot: var(--orange); }
+.chip.shower { --dot: var(--blue); }
+.chip.warn { --dot: var(--red); }
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+}
+
+/* ---------------------------------------------------------------- lists */
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+}
+
+.list__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 4px 6px 4px 12px;
+    border-radius: var(--radius-inner);
+    background: var(--inset);
+}
+
+.list__icon {
+    flex: none;
+    width: 24px;
+    text-align: center;
+    font-size: 16px;
+    color: var(--label-2);
+}
+
+.list__icon.on {
+    color: var(--accent);
+}
+
+.list__text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.list__title {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list__sub {
+    font-size: 13px;
+    color: var(--label-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------------------------------------------------------------- bus */
+
+.bus-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bus-badge {
+    flex: none;
+    min-width: 52px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    background: var(--bus);
+}
+
+.bus-next {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1;
+}
+
+.bus-next small {
+    margin-left: 2px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.bus-later {
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+    text-align: right;
+}
+
+.widget.sz-l .bus-row {
+    padding: 14px 0;
+}
+
+.widget.sz-l .bus-row + .bus-row {
+    border-top: .5px solid var(--separator);
+}
+
+.widget.sz-l .bus-badge {
+    min-width: 68px;
+    height: 46px;
+    border-radius: 13px;
+    font-size: 23px;
+}
+
+.widget.sz-l .bus-next {
+    font-size: 54px;
+}
+
+.widget.sz-l .bus-next small {
+    font-size: 18px;
+}
+
+.bus-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.bus-meta {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.crowd {
+    margin-left: auto;
+}
+
+.crowd.SEA { --dot: var(--green); }
+.crowd.SDA { --dot: var(--orange); }
+.crowd.LSD { --dot: var(--red); }
+
+/* ---------------------------------------------------------------- rain & forecast charts */
+
+.pbars {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 6px;
+    align-items: end;
+    height: 76px;
+}
+
+.widget.sz-l .pbars { height: 160px; }
+
+.pbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    height: 100%;
+    min-width: 0;
+}
+
+.pbar__fill {
+    width: 100%;
+    max-width: 28px;
+    min-height: 4px;
+    height: calc(var(--v) * 1%);
+    border-radius: 6px;
+    background: var(--blue);
+}
+
+.pbar__fill.low {
+    background: var(--fill);
+}
+
+.pbar__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label-2);
+    white-space: nowrap;
+}
+
+.pbar__value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--label-2);
+}
+
+.fhours {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.fhour {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.fhour .wx { font-size: 24px; }
+.widget.sz-l .fhour .wx { font-size: 32px; }
+
+.fhour__time {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.fhour__temp {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.fhour__rain {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+}
+
+/* ---------------------------------------------------------------- ring gauge */
+
+.ring {
+    position: relative;
+    flex: none;
+    width: var(--size, 84px);
+    height: var(--size, 84px);
+}
+
+.ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.ring__track {
+    fill: none;
+    stroke: var(--fill);
+}
+
+.ring__value {
+    fill: none;
+    stroke: var(--orange);
+    stroke-linecap: round;
+    transition: stroke-dashoffset .8s var(--ease);
+}
+
+.ring.cool .ring__value {
+    stroke: var(--cyan);
+}
+
+.ring__center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    text-align: center;
+}
+
+.ring__value-text {
+    font-size: calc(var(--size, 84px) * .27);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.ring__unit {
+    font-size: calc(var(--size, 84px) * .12);
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+/* ---------------------------------------------------------------- energy */
+
+.meter {
+    display: flex;
+    height: 12px;
+    gap: 2px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--fill-3);
+}
+
+.meter span {
+    height: 100%;
+    background: var(--c);
+}
+
+.meter-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 13px;
+    color: var(--label-2);
+}
+
+.meter-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meter-legend span::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c);
+}
+
+/* ---------------------------------------------------------------- media */
+
+.artwork {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    color: var(--label-3);
+    background: var(--inset);
+}
+
+.widget.sz-l .artwork {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    font-size: 46px;
+}
+
+.rbtn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    background: var(--fill-3);
+}
+
+.rbtn.primary {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+    color: var(--card);
+    background: var(--label);
+}
+
+/* ---------------------------------------------------------------- dock */
+
+.dock {
+    grid-area: dock;
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 32px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.dock::-webkit-scrollbar {
+    display: none;
+}
+
+/* Accessory tiles, as in the Home app: quiet when off, solid white with a coloured symbol when on. */
+.tile {
+    position: relative;
+    flex: 1 0 104px;
+    height: 84px;
+    padding: 10px 12px;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    text-align: left;
+    background: var(--fill-2);
+}
+
+.tile__icon {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    font-size: 21px;
+    color: var(--label-2);
+}
+
+.tile__icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.tile__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.tile__label {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tile__detail {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile.lit {
+    color: var(--tile-on-label);
+    background: var(--tile-on);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+}
+
+.tile.lit .tile__icon {
+    color: var(--tint);
+}
+
+.tile.lit .tile__detail {
+    color: var(--tile-on-label-2);
+}
+
+.tint-amber { --tint: rgb(255, 179, 0); }
+.tint-ice { --tint: rgb(0, 160, 220); }
+.tint-mint { --tint: rgb(0, 170, 150); }
+.tint-sky { --tint: rgb(0, 122, 255); }
+.tint-ember { --tint: rgb(255, 120, 20); }
+
+.tile.is-pending .tile__icon {
+    animation: pending 1s ease-in-out infinite;
+}
+
+.tile.is-unavailable {
+    opacity: .4;
+}
+
+@keyframes pending {
+    50% { opacity: .35; }
+}
+
+/* ---------------------------------------------------------------- sheets */
+
+.sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: var(--pad);
+    background: var(--dim);
+    /* Fade the colour, not opacity: opacity would make this the backdrop root and the sheet would stop blurring. */
+    animation: dim-in .25s var(--ease) both;
+}
+
+@keyframes dim-in {
+    from { background-color: transparent; }
+}
+
+.sheet {
+    width: min(820px, 100%);
+    height: min(520px, 100%);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px 24px;
+    border-radius: 34px;
+    animation: sheet-in .45s var(--spring) both;
+}
+
+/* Sheets hold a lot of text and controls, so their glass is thicker than the dock's. */
+.sheet.material {
+    background: var(--sheet);
+}
+
+@keyframes sheet-in {
+    from { opacity: 0; transform: translateY(32px); }
+}
+
+.sheet__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sheet__head .widget__icon {
+    width: 28px;
+    font-size: 22px;
+}
+
+.sheet__head .widget__icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.sheet__title {
+    flex: 1;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.sheet__title small {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--label-2);
+}
+
+.sheet__close {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    color: var(--label-2);
+    background: var(--fill-3);
+}
+
+.sheet__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 24px;
+    padding-top: 18px;
+}
+
+.sheet__side {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sheet__side .gbtn {
+    min-height: 56px;
+    justify-content: flex-start;
+    padding: 0 18px;
+    border-radius: 18px;
+    font-size: 17px;
+}
+
+/* ---------------------------------------------------------------- blinds */
+
+.blinds {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.blind {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-height: 0;
+}
+
+.blind__label {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.blind__label small {
+    margin-left: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+/* The track is the window; the blind drops from the top as it lowers (0 open … 1 closed). */
+.blind__track {
+    --value: 0;
+    --shown: var(--value);
+    position: relative;
+    flex: 1;
+    width: 100%;
+    max-width: 150px;
+    border-radius: 24px;
+    overflow: hidden;
+    touch-action: none;
+    cursor: ns-resize;
+    background: var(--fill-3);
+}
+
+.blind__track.is-dragging {
+    --shown: var(--drag);
+}
+
+.blind__fabric {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(var(--shown) * 100%);
+    min-height: 8px;
+    /* Slats: thin separator lines on a flat fill. */
+    background: repeating-linear-gradient(180deg, transparent 0 14px, var(--separator) 14px 15px), var(--label-3);
+    transition: height .9s linear;
+}
+
+.blind__track.is-dragging .blind__fabric {
+    transition: none;
+}
+
+/* Where a moving blind is headed. */
+.blind__ghost {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(var(--target) * 100%);
+    background: var(--fill-2);
+    pointer-events: none;
+}
+
+.blind__target {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: calc(var(--target) * 100%);
+    height: 0;
+    border-top: 2px dashed var(--label-2);
+    pointer-events: none;
+}
+
+.blind__track.is-dragging .blind__ghost,
+.blind__track.is-dragging .blind__target {
+    display: none;
+}
+
+/* ---------------------------------------------------------------- water heater sheet */
+
+.heater {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+}
+
+.durations {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.durations .gbtn {
+    min-height: 64px;
+    border-radius: 20px;
+    flex-direction: column;
+    gap: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.durations .gbtn small {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.facts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--label-2);
+}
+
+.facts div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.facts b {
+    color: var(--label);
+}
+
+/* ---------------------------------------------------------------- connection */
+
+.connecting {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 14px 24px;
+    border-radius: 999px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+#components-reconnect-modal {
+    display: none;
+}
+
+#components-reconnect-modal.components-reconnect-show,
+#components-reconnect-modal.components-reconnect-failed,
+#components-reconnect-modal.components-reconnect-rejected,
+#components-reconnect-modal.components-reconnect-retrying {
+    display: flex;
+    position: absolute;
+    z-index: 50;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- other screens */
+
+/* Nest Hub Max and larger: same layout, scaled up. */
+@media (min-width: 1200px) and (min-height: 740px) {
+    .home-grid, .sheet-backdrop {
+        zoom: 1.25;
+    }
+}
+
+@media (min-width: 1600px) and (min-height: 900px) {
+    .home-grid, .sheet-backdrop {
+        zoom: 1.5;
+    }
+}
+
+/* Phones: time on top, cards flow in two columns, the dock floats at the bottom. */
+@media (max-width: 760px) {
+    .home {
+        overflow-y: auto;
+    }
+
+    .home-grid {
+        position: relative;
+        inset: auto;
+        min-height: 100%;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        grid-template-areas: "hero" "stack";
+        padding-bottom: 120px;
+    }
+
+    .hero__clock {
+        font-size: 72px;
+    }
+
+    .hero__footer {
+        margin-top: 18px;
+    }
+
+    .stack {
+        height: auto;
+        overflow: visible;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: 168px;
+        grid-auto-flow: row dense;
+        scroll-snap-type: none;
+    }
+
+    .stack__page {
+        display: contents;
+    }
+
+    .stack__dots {
+        display: none;
+    }
+
+    .widget.sz-l {
+        grid-row: span 2;
+    }
+
+    /* Chromium doesn't blur behind a fixed bar over scrolling content, so this one uses the thicker material. */
+    .dock {
+        position: fixed;
+        z-index: 10;
+        left: var(--pad);
+        right: var(--pad);
+        bottom: var(--pad);
+    }
+
+    .dock.material {
+        background: var(--sheet);
+    }
+
+    .sheet {
+        height: auto;
+        max-height: 100%;
+    }
+
+    .sheet__body {
+        flex-direction: column;
+    }
+
+    .sheet__side {
+        width: auto;
+    }
+
+    .blinds {
+        min-height: 300px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home *, .home *::before, .home *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

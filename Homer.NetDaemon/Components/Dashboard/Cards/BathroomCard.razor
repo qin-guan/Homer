@@ -1,0 +1,47 @@
+@{
+    var now = Ui.Now;
+    var title = Home.Bathrooms.Any(b => b.State == Homer.NetDaemon.Services.BathroomState.Showering) ? "有人在洗澡" : "浴室";
+}
+
+<WidgetCard Model="Card" Title="@title" Icon="fa-shower" Accent="var(--teal)">
+    @if (IsSmall)
+    {
+        @foreach (var bathroom in Home.Bathrooms)
+        {
+            var (tone, text) = Describe(bathroom);
+            <div class="hrow">
+                <span class="grow sub ellipsis">@bathroom.Name</span>
+                <span class="chip @tone">@text</span>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="list">
+            @foreach (var bathroom in Home.Bathrooms)
+            {
+                var (tone, text) = Describe(bathroom);
+                <div class="list__row">
+                    <span class="list__icon"><i class="fa-solid @(bathroom.State == Homer.NetDaemon.Services.BathroomState.Showering ? "fa-shower" : "fa-toilet")"></i></span>
+                    <span class="list__text">
+                        <span class="list__title">@bathroom.Name</span>
+                        @if (bathroom.State != Homer.NetDaemon.Services.BathroomState.Unoccupied && bathroom.Since is { } since)
+                        {
+                            <span class="list__sub">已 @Format.Duration(now - since)</span>
+                        }
+                    </span>
+                    <span class="chip @tone" style="margin-right: 6px">@text</span>
+                </div>
+            }
+        </div>
+    }
+</WidgetCard>
+
+@code {
+    private static (string Tone, string Text) Describe(BathroomInfo bathroom) => bathroom.State switch
+    {
+        Homer.NetDaemon.Services.BathroomState.Showering => ("shower", "洗澡中"),
+        Homer.NetDaemon.Services.BathroomState.Occupied => ("busy", "有人"),
+        _ => ("free", "空闲")
+    };
+}

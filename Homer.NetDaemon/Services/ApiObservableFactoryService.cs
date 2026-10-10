@@ -6,7 +6,10 @@ using Homer.NetDaemon.Services.OpenMeteo;
 
 namespace Homer.NetDaemon.Services;
 
-public class ApiObservableFactoryService(IDataMallApi dataMallApi, IOpenMeteoApi openMeteoApi)
+public class ApiObservableFactoryService(
+    IDataMallApi dataMallApi,
+    IOpenMeteoApi openMeteoApi,
+    ILogger<ApiObservableFactoryService> logger)
 {
     private readonly ConcurrentDictionary<string, IObservable<BusArrivalResponse>> _busStopCache = new();
     private IObservable<OpenMeteoResponse>? _forecastCache;
@@ -14,7 +17,7 @@ public class ApiObservableFactoryService(IDataMallApi dataMallApi, IOpenMeteoApi
     public IObservable<BusArrivalResponse> CreateWithBusStopCode(string code)
     {
         return _busStopCache.GetOrAdd(code, c => Observable.Interval(TimeSpan.FromSeconds(5))
-            .SelectMany(async i => await dataMallApi.GetBusArrivalAsync(c))
+            .SelectMany(_ => FetchOrSkip(() => dataMallApi.GetBusArrivalAsync(c), $"bus arrivals for stop {c}"))
             .Replay(1)
             .RefCount());
     }
@@ -22,7 +25,7 @@ public class ApiObservableFactoryService(IDataMallApi dataMallApi, IOpenMeteoApi
     public IObservable<OpenMeteoResponse> CreateForecast()
     {
         return _forecastCache ??= Observable.Timer(TimeSpan.Zero, TimeSpan.FromMinutes(5))
-            .SelectMany(async i => await openMeteoApi.GetForecastAsync())
+            .SelectMany(_ => FetchOrSkip(() => openMeteoApi.GetForecastAsync(), "the weather forecast"))
             .Replay(1)
             .RefCount();
     }
@@ -36,4 +39,14 @@ public class ApiObservableFactoryService(IDataMallApi dataMallApi, IOpenMeteoApi
             .Select(v => OpenMeteoWmoMapper.GetWeatherDescription(v))
             .DistinctUntilChanged();
     }
+
+    // These feeds are shared and replayed: a single failed request would otherwise error the stream and leave every
+    // subscriber, now and later, without data until Homer restarts. Skip the failed poll and try again next time.
+    private IObservable<T> FetchOrSkip<T>(Func<Task<T>> fetch, string what) =>
+        Observable.FromAsync(fetch)
+            .Catch<T, Exception>(e =>
+            {
+                logger.LogWarning(e, "Failed to fetch {What}; retrying on the next poll", what);
+                return Observable.Empty<T>();
+            });
 }

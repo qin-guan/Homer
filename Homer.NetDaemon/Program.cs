@@ -1,6 +1,7 @@
 using System.Reflection;
 using AsyncKeyedLock;
 using Homer.NetDaemon.Components;
+using Homer.NetDaemon.Dashboard;
 using Homer.NetDaemon.Entities;
 using Homer.NetDaemon.Options;
 using Homer.NetDaemon.Services;
@@ -56,6 +57,8 @@ builder.Services.AddSingleton<ApiObservableFactoryService>();
 builder.Services.AddSingleton<WaterHeaterTimerService>();
 builder.Services.AddSingleton<WaterHeaterInventory>();
 builder.Services.AddSingleton<BathroomStatusService>();
+builder.Services.AddSingleton<DashboardState>();
+builder.Services.AddScoped<DashboardActions>();
 builder.Services.AddSingleton<AsyncKeyedLocker<string>>();
 
 builder.Services.AddServerSideBlazor();

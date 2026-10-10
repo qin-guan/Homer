@@ -1,0 +1,37 @@
+@{
+    var weather = Home.Weather!;
+    var hours = weather.Hours.Where(h => h.Time > Home.Now.AddHours(-1)).Take(6).ToList();
+    var temperatures = hours.Select(h => h.Temperature).OfType<double>().ToList();
+}
+
+<WidgetCard Model="Card" Title="接下来几小时" Icon="fa-cloud-sun" Accent="var(--blue)"
+           Meta="@(temperatures.Count > 0 ? $"{temperatures.Min():0}° – {temperatures.Max():0}°" : null)">
+    <div class="fhours">
+        @foreach (var hour in hours)
+        {
+            var (icon, tone) = WeatherText.Icon(hour.Code ?? weather.Code, hour.Time.Hour is >= 7 and < 19);
+            <div class="fhour">
+                <span class="fhour__time num">@(hour.Time <= Home.Now ? "现在" : $"{hour.Time.Hour}时")</span>
+                <i class="wx fa-solid @icon @tone"></i>
+                <span class="fhour__temp num">@(hour.Temperature?.ToString("0") ?? "--")°</span>
+                @if (IsLarge)
+                {
+                    <span class="fhour__rain num">@(hour.PrecipitationProbability ?? 0)%</span>
+                }
+            </div>
+        }
+    </div>
+    @if (IsLarge)
+    {
+        <div class="hero__facts" style="justify-content: center">
+            @if (weather.FeelsLike is { } feelsLike)
+            {
+                <span class="fact"><i class="fa-solid fa-temperature-half"></i>体感 @feelsLike.ToString("0")°</span>
+            }
+            @if (weather.Humidity is { } humidity)
+            {
+                <span class="fact"><i class="fa-solid fa-droplet"></i>湿度 @humidity.ToString("0")%</span>
+            }
+        </div>
+    }
+</WidgetCard>

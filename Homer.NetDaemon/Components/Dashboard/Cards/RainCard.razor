@@ -1,0 +1,47 @@
+@{
+    var weather = Home.Weather!;
+    var chance = weather.RainChanceWithin(Home.Now, TimeSpan.FromHours(2));
+    var hours = weather.Hours
+        .Where(h => h.Time > Home.Now.AddHours(-1))
+        .Take(IsLarge ? 8 : 6)
+        .ToList();
+}
+
+<WidgetCard Model="Card" Title="@(weather.IsRaining ? "正在下雨" : "快下雨了")" Icon="fa-cloud-rain"
+           Accent="var(--blue)" Meta="@($"降雨 {chance}%")" ShowReason="IsLarge">
+    @if (hours.Count > 0)
+    {
+        <div class="pbars" role="img" aria-label="未来几小时的降雨概率">
+            @foreach (var hour in hours)
+            {
+                var probability = hour.PrecipitationProbability ?? 0;
+                <div class="pbar">
+                    @if (IsLarge)
+                    {
+                        <span class="pbar__value num">@probability%</span>
+                    }
+                    <span class="pbar__fill @(probability < 50 ? "low" : "")" style="--v: @Math.Max(probability, 4)"></span>
+                    <span class="pbar__label num">@(hour.Time <= Home.Now ? "现在" : $"{hour.Time.Hour}时")</span>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Home.Blinds.AnyOpen)
+    {
+        <div class="actions">
+            <span class="sub grow">阳台窗帘还开着</span>
+            <button class="gbtn primary pressable" @onclick="CloseBlinds">
+                <i class="fa-solid fa-angles-down"></i>关窗帘
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="sub"><i class="fa-solid fa-circle-check" style="color: var(--green)"></i> 阳台窗帘已关好</div>
+    }
+</WidgetCard>
+
+@code {
+    private void CloseBlinds() => Ui.Run(a => a.CloseBlinds());
+}
