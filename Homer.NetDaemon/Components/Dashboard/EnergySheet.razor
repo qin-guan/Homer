@@ -1,0 +1,118 @@
+@* Where the power goes: the meter by part, then every device drawing power, highest first. Every aircon is listed,
+   running or not, with a button to turn off the ones that are on. *@
+
+@{
+    var energy = Home.Energy;
+    var total = Math.Max(energy.TotalWatts, 1);
+    var kilowatts = energy.TotalWatts >= 1000;
+    var rows = Rows();
+    var running = Home.Devices.Count(d => d is { Kind: DeviceKind.Aircon, On: true });
+}
+
+<div class="sheet-backdrop" @onclick="Close">
+    <section class="sheet material" role="dialog" aria-label="用电" style="--accent: var(--yellow)"
+             @onclick:stopPropagation="true">
+        <header class="sheet__head">
+            <span class="widget__icon"><i class="fa-solid fa-bolt"></i></span>
+            <div class="sheet__title">
+                用电
+                <small>@(running > 0 ? $"{running} 台空调运行中" : "空调都关着")</small>
+            </div>
+            <button class="sheet__close pressable" aria-label="关闭" @onclick="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+        <div class="sheet__body">
+            <div class="energy-summary">
+                <div class="big num">
+                    @(kilowatts ? (energy.TotalWatts / 1000).ToString("0.00") : energy.TotalWatts.ToString("0"))<small>@(kilowatts ? "kW" : "W")</small>
+                </div>
+                <div class="sub">实时用电</div>
+                @if (energy.Parts.Count > 0)
+                {
+                    <div class="meter" role="img" aria-label="用电构成">
+                        @foreach (var part in energy.Parts)
+                        {
+                            <span style="width: @Format.Invariant(part.Watts / total * 100)%; --c: @Format.EnergyColor(part.Name)"></span>
+                        }
+                    </div>
+                    <div class="facts">
+                        @foreach (var part in energy.Parts)
+                        {
+                            <div>
+                                <span class="energy-part" style="--c: @Format.EnergyColor(part.Name)">@part.Name</span>
+                                <b class="num">@Format.Power(part.Watts)<small>@Format.Share(part.Watts, total)</small></b>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="energy-list list">
+                @foreach (var row in rows)
+                {
+                    var aircon = row.Aircon;
+                    <div class="list__row energy-row @(row.Watts > 0 || aircon is { On: true } ? "" : "is-idle")"
+                         style="--c: @Format.EnergyColor(row.Part); --share: @Format.Invariant(row.Watts / total * 100)%">
+                        <span class="list__icon"><i class="fa-solid @Format.EnergyIcon(row.Part)"></i></span>
+                        <span class="list__text">
+                            <span class="list__title">@row.Name</span>
+                            @if (aircon is not null)
+                            {
+                                <span class="list__sub">@AirconState(aircon)</span>
+                            }
+                        </span>
+                        @if (row.Watts > 0)
+                        {
+                            <span class="energy-row__value num">
+                                @Format.Power(row.Watts)<small>@Format.Share(row.Watts, total)</small>
+                            </span>
+                        }
+                        @if (aircon is { On: true })
+                        {
+                            <button class="mini pressable" @onclick="() => TurnOff(aircon.EntityId)">关</button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private sealed record Row(string Part, string Name, double Watts, DeviceInfo? Aircon);
+
+    [CascadingParameter] public DashboardUi Ui { get; set; } = null!;
+
+    [Parameter, EditorRequired] public HomeSnapshot Home { get; set; } = null!;
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <summary>
+    /// Devices drawing power, highest first, then the aircons that aren't: running ones whose estimate hasn't caught up
+    /// before the ones that are off.
+    /// </summary>
+    private List<Row> Rows()
+    {
+        var aircons = Home.Devices.Where(d => d.Kind == DeviceKind.Aircon).ToList();
+        var drawing = Home.Energy.Parts
+            .SelectMany(p => p.Devices.Select(d =>
+                new Row(p.Name, d.Name, d.Watts, aircons.FirstOrDefault(a => a.EntityId == d.EntityId))))
+            .OrderByDescending(r => r.Watts)
+            .ToList();
+        var idle = aircons
+            .Where(a => drawing.All(r => r.Aircon?.EntityId != a.EntityId))
+            .OrderByDescending(a => a.On)
+            .Select(a => new Row(EnergyPart.Aircons, a.Name, 0, a));
+
+        return [.. drawing, .. idle];
+    }
+
+    private static string AirconState(DeviceInfo aircon) => aircon.On
+        ? Format.AirconMode(aircon.Mode) +
+          (aircon.Temperature is { } t ? $" · 室内 {t:0.#}°" : "") +
+          (aircon.TargetTemperature is { } target ? $" → {target:0.#}°" : "")
+        : "已关";
+
+    private void TurnOff(string entityId) => Ui.Run(a => a.TurnOff([entityId]));
+
+    private Task Close() => OnClose.InvokeAsync();
+}
