@@ -8,13 +8,13 @@
         : "热水不足";
 }
 
-<GlassCard Model="Card" Title="热水器" Icon="fa-fire-flame-curved" Accent="var(--orange)" OnTap="Open"
+<WidgetCard Model="Card" Title="热水器" Icon="fa-fire-flame-curved" Accent="var(--orange)" OnTap="Open"
            Meta="@(IsSmall ? null : status)">
     <div class="hrow" style="gap: 16px; @(IsSmall ? "justify-content: center" : IsLarge ? "flex-direction: column; text-align: center" : "")">
-        <GlassRing Size="ringSize" Fraction="heater.InventoryFraction" Cool="!heater.On">
+        <RingGauge Size="ringSize" Fraction="heater.InventoryFraction" Cool="!heater.On">
             <span class="ring__value-text num">@heater.InventoryMinutes.ToString("0")</span>
             <span class="ring__unit">分钟</span>
-        </GlassRing>
+        </RingGauge>
         @if (!IsSmall)
         {
             <div class="grow">
@@ -51,7 +51,7 @@
     else if (heater.On && IsLarge)
     {
         <div class="actions">
-            <button class="gbtn pressable wide" @onclick="Stop" @onclick:stopPropagation="true">
+            <button class="gbtn destructive pressable wide" @onclick="Stop" @onclick:stopPropagation="true">
                 <i class="fa-solid fa-stop"></i>停止加热
             </button>
         </div>
@@ -62,13 +62,13 @@
             @foreach (var minutes in IsLarge ? new[] { 5, 10, 15 } : [10])
             {
                 var m = minutes;
-                <button class="gbtn primary pressable wide" @onclick="() => Heat(m)" @onclick:stopPropagation="true">
+                <button class="gbtn @(IsLarge ? "" : "primary") pressable wide" @onclick="() => Heat(m)" @onclick:stopPropagation="true">
                     <i class="fa-solid fa-fire-flame-curved"></i>@m 分钟
                 </button>
             }
         </div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void Open() => Ui.OpenSheet(DashboardSheet.WaterHeater);

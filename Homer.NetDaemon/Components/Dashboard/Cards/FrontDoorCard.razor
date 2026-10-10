@@ -3,7 +3,7 @@
     var since = door.LastChanged is { } changed ? Ui.Now - changed : TimeSpan.Zero;
 }
 
-<GlassCard Model="Card" Centered="true" Title="前门" Icon="@(door.Open ? "fa-door-open" : "fa-door-closed")"
+<WidgetCard Model="Card" Centered="true" Title="前门" Icon="@(door.Open ? "fa-door-open" : "fa-door-closed")"
            Accent="@(door.Open ? "var(--red)" : "var(--pink)")">
     @if (IsLarge)
     {
@@ -19,4 +19,4 @@
         <div class="headline">刚开过</div>
         <div class="sub">@(door.LastChanged is { } at ? Format.Ago(at, Ui.Now) : "")关上了</div>
     }
-</GlassCard>
+</WidgetCard>

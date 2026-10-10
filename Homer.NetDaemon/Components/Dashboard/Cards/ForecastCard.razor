@@ -4,7 +4,7 @@
     var temperatures = hours.Select(h => h.Temperature).OfType<double>().ToList();
 }
 
-<GlassCard Model="Card" Title="接下来几小时" Icon="fa-cloud-sun" Accent="#4f8cff"
+<WidgetCard Model="Card" Title="接下来几小时" Icon="fa-cloud-sun" Accent="var(--blue)"
            Meta="@(temperatures.Count > 0 ? $"{temperatures.Min():0}° – {temperatures.Max():0}°" : null)">
     <div class="fhours">
         @foreach (var hour in hours)
@@ -34,4 +34,4 @@
             }
         </div>
     }
-</GlassCard>
+</WidgetCard>

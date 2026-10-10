@@ -1,74 +1,162 @@
 /*
- * Homer living room dashboard — liquid glass.
- * Laid out for a Google Nest Hub (1024 × 600, touch), scales up for larger screens and reflows for phones.
- * Everything sits on a wallpaper that follows the time of day and the weather; panels are translucent glass with a
- * specular rim, and active controls fill with tinted glass.
+ * Homer living room dashboard, following Apple's Human Interface Guidelines.
+ * Laid out for a Google Nest Hub (1024 × 600, touch); scales up for larger screens and reflows for phones.
+ *
+ * - Plain system grouped background, light by day and dark at night (or when the browser prefers dark).
+ * - Content (the smart stack cards) sits on solid secondary backgrounds; no glass in the content layer.
+ * - Liquid Glass only for the functional layer floating above it: the control dock and sheets.
+ * - System colours, used sparingly: status, device state and one primary action per card.
  */
 
+/* ---------------------------------------------------------------- appearance tokens */
+
 .home {
-    --pad: 14px;
+    /* iOS system colours (June 2025 values) and semantic colours, light appearance. */
+    --red: rgb(255, 56, 60);
+    --orange: rgb(255, 141, 40);
+    --yellow: rgb(255, 204, 0);
+    --green: rgb(52, 199, 89);
+    --mint: rgb(0, 200, 179);
+    --teal: rgb(0, 195, 208);
+    --cyan: rgb(0, 192, 232);
+    --blue: rgb(0, 136, 255);
+    --indigo: rgb(97, 85, 245);
+    --purple: rgb(203, 48, 224);
+    --pink: rgb(255, 45, 85);
+    --brown: rgb(172, 127, 94);
+    --gray: rgb(142, 142, 147);
+
+    --bg: rgb(242, 242, 247);           /* systemGroupedBackground */
+    --card: rgb(255, 255, 255);         /* secondarySystemGroupedBackground */
+    --inset: rgb(242, 242, 247);        /* tertiarySystemGroupedBackground */
+    --label: rgb(0, 0, 0);
+    /* Secondary text a little stronger than secondaryLabel: this screen is read from across the room. */
+    --label-2: rgba(60, 60, 67, .74);
+    --label-3: rgba(60, 60, 67, .45);
+    --separator: rgba(60, 60, 67, .2);
+    --fill: rgba(120, 120, 128, .2);
+    --fill-2: rgba(120, 120, 128, .16);
+    --fill-3: rgba(118, 118, 128, .12);
+
+    /* Liquid Glass, regular variant: blurs and lifts what's behind it. */
+    --glass: rgba(255, 255, 255, .72);
+    --glass-edge: rgba(0, 0, 0, .06);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, .1);
+    --sheet: rgba(255, 255, 255, .9);
+    --dim: rgba(0, 0, 0, .2);
+
+    /* An "on" accessory tile, as in the Home app. */
+    --tile-on: rgb(255, 255, 255);
+    --tile-on-label: rgb(0, 0, 0);
+    --tile-on-label-2: rgba(60, 60, 67, .7);
+
+    --bus: rgb(0, 137, 50);             /* green, increased contrast, so white numbers stay legible */
+
+    --pad: 16px;
     --gap: 12px;
-    --radius-xl: 34px;
-    --radius-l: 28px;
-    --radius-m: 20px;
-    --radius-s: 14px;
-
-    --text: #fff;
-    --text-2: rgba(255, 255, 255, .74);
-    --text-3: rgba(255, 255, 255, .52);
-    --hairline: rgba(255, 255, 255, .16);
-
-    /* Glass material. Tuned per wallpaper below. */
-    --glass-top: rgba(255, 255, 255, .17);
-    --glass-bottom: rgba(255, 255, 255, .07);
-    --glass-tint: rgba(8, 18, 40, .08);
-    --glass-blur: 26px;
-    --glass-saturate: 180%;
-    --rim-strong: rgba(255, 255, 255, .85);
-    --rim-soft: rgba(255, 255, 255, .10);
-    --shadow: 0 18px 40px -16px rgba(4, 10, 30, .45), 0 2px 8px rgba(4, 10, 30, .12);
-
-    /* Fills for controls inside glass (no extra blur, cheaper than nesting backdrop filters). */
-    --well: rgba(255, 255, 255, .12);
-    --well-strong: rgba(255, 255, 255, .2);
-
-    --green: #30d158;
-    --amber: #ffb340;
-    --orange: #ff9f0a;
-    --red: #ff453a;
-    --blue: #0a84ff;
-    --sky: #64d2ff;
-    --indigo: #5e5ce6;
-    --purple: #bf5af2;
-    --pink: #ff375f;
-    --mint: #63e6be;
-    --teal: #40c8e0;
-    --yellow: #ffd60a;
-
-    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    --radius: 24px;
+    --radius-inner: 14px;
+    --spring: cubic-bezier(.34, 1.4, .64, 1);
     --ease: cubic-bezier(.2, .8, .2, 1);
 
     position: fixed;
     inset: 0;
     overflow: hidden;
-    color: var(--text);
-    background: #0b1530;
-    font-family: "Inter", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
-    font-feature-settings: "ss01", "cv11";
+    color: var(--label);
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .12);
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
     line-height: 1.25;
+    transition: background-color .6s var(--ease), color .6s var(--ease);
+}
+
+/* Dark appearance: at night (set by the server from the sun) or when the browser prefers it. */
+.home.dark {
+    --red: rgb(255, 66, 69);
+    --orange: rgb(255, 146, 48);
+    --yellow: rgb(255, 214, 0);
+    --green: rgb(48, 209, 88);
+    --mint: rgb(0, 218, 195);
+    --teal: rgb(0, 210, 224);
+    --cyan: rgb(60, 211, 254);
+    --blue: rgb(0, 145, 255);
+    --indigo: rgb(109, 124, 255);
+    --purple: rgb(219, 52, 242);
+    --pink: rgb(255, 55, 95);
+    --brown: rgb(183, 138, 102);
+
+    --bg: rgb(0, 0, 0);
+    --card: rgb(28, 28, 30);
+    --inset: rgb(44, 44, 46);
+    --label: rgb(255, 255, 255);
+    --label-2: rgba(235, 235, 245, .7);
+    --label-3: rgba(235, 235, 245, .4);
+    --separator: rgba(84, 84, 88, .6);
+    --fill: rgba(120, 120, 128, .36);
+    --fill-2: rgba(120, 120, 128, .32);
+    --fill-3: rgba(118, 118, 128, .24);
+
+    --glass: rgba(44, 44, 46, .72);
+    --glass-edge: rgba(255, 255, 255, .1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+    --sheet: rgba(36, 36, 38, .9);
+    --dim: rgba(0, 0, 0, .5);
+}
+
+@media (prefers-color-scheme: dark) {
+    .home {
+        --red: rgb(255, 66, 69);
+        --orange: rgb(255, 146, 48);
+        --yellow: rgb(255, 214, 0);
+        --green: rgb(48, 209, 88);
+        --mint: rgb(0, 218, 195);
+        --teal: rgb(0, 210, 224);
+        --cyan: rgb(60, 211, 254);
+        --blue: rgb(0, 145, 255);
+        --indigo: rgb(109, 124, 255);
+        --purple: rgb(219, 52, 242);
+        --pink: rgb(255, 55, 95);
+        --brown: rgb(183, 138, 102);
+
+        --bg: rgb(0, 0, 0);
+        --card: rgb(28, 28, 30);
+        --inset: rgb(44, 44, 46);
+        --label: rgb(255, 255, 255);
+        --label-2: rgba(235, 235, 245, .7);
+        --label-3: rgba(235, 235, 245, .4);
+        --separator: rgba(84, 84, 88, .6);
+        --fill: rgba(120, 120, 128, .36);
+        --fill-2: rgba(120, 120, 128, .32);
+        --fill-3: rgba(118, 118, 128, .24);
+
+        --glass: rgba(44, 44, 46, .72);
+        --glass-edge: rgba(255, 255, 255, .1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+        --sheet: rgba(36, 36, 38, .9);
+        --dim: rgba(0, 0, 0, .5);
+    }
+}
+
+/* After midnight: dim the whole screen so the hub doesn't light up the living room. */
+.home.late-night::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    background: rgba(0, 0, 0, .3);
 }
 
 .home *, .home *::before, .home *::after {
     box-sizing: border-box;
 }
 
-.home button {
+/* :where() keeps the reset at zero specificity, so a plain class like .gbtn can give a button its fill. */
+:where(.home) button {
     font: inherit;
     color: inherit;
     border: 0;
@@ -78,242 +166,42 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+:where(.home) button:disabled {
+    cursor: default;
+    opacity: .4;
+}
+
 .home h1, .home h2, .home h3, .home p {
     margin: 0;
 }
 
 .num {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -.02em;
 }
 
-/* ---------------------------------------------------------------- wallpaper */
+/* ---------------------------------------------------------------- materials */
 
-.wallpaper {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    background: var(--wp-base);
-    transition: background 2s var(--ease);
+/* Liquid Glass for controls and sheets that float above the content layer. */
+.material {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: inset 0 0 0 .5px var(--glass-edge), var(--glass-shadow);
 }
 
-.wallpaper .orb {
-    position: absolute;
-    border-radius: 50%;
-    transition: background 2s var(--ease);
-}
-
-.wallpaper .o1 {
-    width: 70vmax;
-    height: 70vmax;
-    left: -22vmax;
-    top: -28vmax;
-    background: radial-gradient(circle at 50% 50%, var(--wp-1) 0 32%, transparent 62%);
-}
-
-.wallpaper .o2 {
-    width: 60vmax;
-    height: 60vmax;
-    right: -18vmax;
-    top: -8vmax;
-    background: radial-gradient(circle at 50% 50%, var(--wp-2) 0 30%, transparent 64%);
-}
-
-.wallpaper .o3 {
-    width: 64vmax;
-    height: 64vmax;
-    left: 18vmax;
-    bottom: -40vmax;
-    background: radial-gradient(circle at 50% 50%, var(--wp-3) 0 34%, transparent 66%);
-}
-
-/* A crisp-edged ribbon gives the glass something to bend; soft gradients alone look flat through blur. */
-.wallpaper .o4 {
-    width: 120vmax;
-    height: 22vmax;
-    left: -10vmax;
-    top: 46%;
-    border-radius: 50%;
-    transform: rotate(-14deg);
-    background: linear-gradient(90deg, transparent, var(--wp-4) 30%, var(--wp-4) 70%, transparent);
-    opacity: .55;
-}
-
-.wallpaper::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--wp-veil, transparent);
-    pointer-events: none;
-}
-
-.wp-dawn {
-    --wp-base: linear-gradient(168deg, #2e2a6e 0%, #8a4f9e 34%, #e47f8f 64%, #ffc08a 100%);
-    --wp-1: #6d5dfc;
-    --wp-2: #ff8fab;
-    --wp-3: #ffb36b;
-    --wp-4: rgba(255, 214, 170, .7);
-}
-
-.wp-day {
-    --wp-base: linear-gradient(160deg, #0f4fc4 0%, #1f7ae0 32%, #22a6d8 62%, #3cc3b4 100%);
-    --wp-1: #3d5afe;
-    --wp-2: #2ec5ff;
-    --wp-3: #ffb547;
-    --wp-4: rgba(170, 236, 255, .55);
-    --glass-tint: rgba(4, 22, 60, .12);
-}
-
-.wp-overcast {
-    --wp-base: linear-gradient(165deg, #273a57 0%, #3f5878 40%, #5d7896 72%, #7f97ab 100%);
-    --wp-1: #4b6cb7;
-    --wp-2: #6a8fb0;
-    --wp-3: #3f8f9f;
-    --wp-4: rgba(190, 210, 230, .45);
-    --glass-tint: rgba(8, 18, 36, .14);
-}
-
-.wp-dusk {
-    --wp-base: linear-gradient(172deg, #1c1747 0%, #5a2b7d 36%, #c2416f 68%, #ff8a4c 100%);
-    --wp-1: #4b2fff;
-    --wp-2: #ff4f8b;
-    --wp-3: #ff9a3c;
-    --wp-4: rgba(255, 170, 130, .55);
-}
-
-.wp-night {
-    --wp-base: linear-gradient(172deg, #03061a 0%, #0a1240 46%, #1a1d5e 76%, #2b1d5c 100%);
-    --wp-1: #2340ff;
-    --wp-2: #7b2cff;
-    --wp-3: #008fa8;
-    --wp-4: rgba(120, 140, 255, .32);
-    --glass-top: rgba(255, 255, 255, .13);
-    --glass-bottom: rgba(255, 255, 255, .05);
-    --rim-strong: rgba(255, 255, 255, .6);
-}
-
-.wp-rain-night {
-    --wp-base: linear-gradient(172deg, #050a18 0%, #0f1a33 46%, #1d2c4a 78%, #26365a 100%);
-    --wp-1: #1f4f9e;
-    --wp-2: #3a3f8f;
-    --wp-3: #0f6f80;
-    --wp-4: rgba(130, 170, 220, .3);
-    --glass-top: rgba(255, 255, 255, .13);
-    --glass-bottom: rgba(255, 255, 255, .05);
-    --rim-strong: rgba(255, 255, 255, .6);
-}
-
-/* After midnight: dim everything so the hub doesn't light up the living room. */
-.wp-late-night {
-    --wp-base: linear-gradient(172deg, #020309 0%, #060a22 50%, #0e0f2e 100%);
-    --wp-1: #18237a;
-    --wp-2: #3d1a7a;
-    --wp-3: #04485a;
-    --wp-4: rgba(90, 100, 200, .2);
-    --glass-top: rgba(255, 255, 255, .10);
-    --glass-bottom: rgba(255, 255, 255, .04);
-    --rim-strong: rgba(255, 255, 255, .45);
-    --text-2: rgba(255, 255, 255, .64);
-    --text-3: rgba(255, 255, 255, .44);
-}
-
-/* An overlay rather than a filter: a filter on an ancestor would cut the glass off from the wallpaper it blurs. */
-.wp-late-night::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 40;
-    pointer-events: none;
-    background: rgba(0, 0, 0, .2);
-}
-
-.wp-night .o4, .wp-late-night .o4, .wp-rain-night .o4 {
-    opacity: .4;
-}
-
-/* Stars, only at night. */
-.wp-night .wallpaper::before, .wp-late-night .wallpaper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: .7;
-    background-image:
-        radial-gradient(1.2px 1.2px at 12% 18%, #fff 50%, transparent 51%),
-        radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent 51%),
-        radial-gradient(1.4px 1.4px at 44% 22%, #fff 50%, transparent 51%),
-        radial-gradient(1px 1px at 63% 12%, #fff 50%, transparent 51%),
-        radial-gradient(1.2px 1.2px at 78% 26%, #fff 50%, transparent 51%),
-        radial-gradient(1px 1px at 91% 9%, #fff 50%, transparent 51%),
-        radial-gradient(1px 1px at 8% 44%, #fff 50%, transparent 51%),
-        radial-gradient(1.3px 1.3px at 86% 52%, #fff 50%, transparent 51%),
-        radial-gradient(1px 1px at 55% 38%, #fff 50%, transparent 51%);
-}
-
-/* ---------------------------------------------------------------- glass */
-
-.glass {
-    position: relative;
-    isolation: isolate;
-    border-radius: var(--radius-l);
-    background:
-        linear-gradient(var(--glass-tint), var(--glass-tint)),
-        linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .32),
-        inset 0 -1px 0 rgba(255, 255, 255, .06),
-        var(--shadow);
-}
-
-/* Specular rim: light catches the top-left and bottom-right edges, as on a thick pane of glass. */
-.glass::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    padding: 1.4px;
-    border-radius: inherit;
-    pointer-events: none;
-    background: conic-gradient(from 210deg at 50% 50%,
-        var(--rim-strong) 0deg,
-        var(--rim-soft) 70deg,
-        rgba(255, 255, 255, .04) 120deg,
-        rgba(255, 255, 255, .45) 180deg,
-        var(--rim-soft) 250deg,
-        rgba(255, 255, 255, .04) 300deg,
-        var(--rim-strong) 360deg);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-}
-
-/* Lensing: the thick edge brightens and a soft sheen sits near the top. */
-.glass::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(130% 80% at 12% -18%, rgba(255, 255, 255, .22), transparent 52%);
-    box-shadow:
-        inset 10px 12px 22px -16px rgba(255, 255, 255, .55),
-        inset -10px -12px 22px -18px rgba(255, 255, 255, .3);
-}
-
-.glass > * {
-    position: relative;
-    z-index: 2;
-}
-
-/* Lite glass: no live blur, for screens that struggle with backdrop filters (?glass=lite). */
-.home[data-glass="lite"] .glass {
+/* Reduce Transparency, or ?glass=lite for screens that can't keep up with live blur. */
+.home[data-glass="lite"] .material {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    background:
-        linear-gradient(var(--glass-tint), var(--glass-tint)),
-        linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .12));
+    background: var(--card);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .home .material {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: var(--card);
+    }
 }
 
 /* ---------------------------------------------------------------- layout */
@@ -322,7 +210,7 @@
     position: absolute;
     inset: 0;
     display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-columns: 296px minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "hero stack" "dock dock";
     gap: var(--gap);
@@ -331,47 +219,39 @@
 
 /* ---------------------------------------------------------------- hero */
 
+/* Time and weather sit straight on the background, like the Lock Screen: no panel around them. */
 .hero {
     grid-area: hero;
     display: flex;
     flex-direction: column;
-    padding: 22px 24px 20px;
-    border-radius: var(--radius-xl);
     min-height: 0;
+    padding: 6px 8px 4px;
 }
 
 .hero__greeting {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
-    letter-spacing: .02em;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
-/* The clock is itself glass: bright at the top, fading toward the bottom. */
 .hero__clock {
     margin-top: 2px;
-    font-size: 92px;
-    font-weight: 700;
-    line-height: .98;
-    letter-spacing: -.045em;
+    font-size: 96px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -.035em;
     font-variant-numeric: tabular-nums;
-    background: linear-gradient(180deg, #fff 18%, rgba(255, 255, 255, .58) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: none;
-    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .18));
 }
 
 .hero__date {
     margin-top: 6px;
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--text-2);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--label-2);
 }
 
 .hero__weather {
-    margin-top: 22px;
+    margin-top: 24px;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
@@ -379,43 +259,40 @@
 }
 
 .hero__weather .wx {
-    font-size: 50px;
     grid-row: span 2;
+    font-size: 46px;
 }
 
 .hero__temp {
     font-size: 44px;
     font-weight: 600;
     line-height: 1;
-    letter-spacing: -.03em;
+    letter-spacing: -.02em;
 }
 
 .hero__condition {
-    font-size: 15px;
-    color: var(--text-2);
+    font-size: 16px;
+    color: var(--label-2);
 }
 
 .hero__facts {
-    margin-top: 12px;
+    margin-top: 14px;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 6px 16px;
 }
 
 .fact {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: var(--well);
-    font-size: 13px;
-    color: var(--text-2);
+    font-size: 15px;
+    color: var(--label-2);
 }
 
 .fact i {
-    font-size: 11px;
-    opacity: .9;
+    font-size: 13px;
+    color: var(--label-3);
 }
 
 .hero__footer {
@@ -429,12 +306,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-height: 34px;
 }
 
 .faces {
     display: flex;
 }
 
+/* Monogram avatars in a system colour per person. */
 .face {
     width: 34px;
     height: 34px;
@@ -443,30 +322,26 @@
     place-items: center;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: .02em;
     color: #fff;
-    background: linear-gradient(145deg, hsl(var(--h) 80% 62%), hsl(calc(var(--h) + 30) 75% 48%));
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, .55), 0 4px 10px rgba(0, 0, 0, .2);
+    background: var(--c, var(--gray));
+    box-shadow: 0 0 0 2px var(--bg);
 }
 
 .faces .face + .face {
-    margin-left: -8px;
+    margin-left: -4px;
 }
 
 .people__label {
-    font-size: 14px;
-    color: var(--text-2);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--label-2);
 }
 
 .energy-pill {
-    align-self: flex-start;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px 8px 10px;
-    border-radius: 999px;
-    background: var(--well);
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
 }
 
@@ -475,9 +350,9 @@
 }
 
 .energy-pill small {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
 /* ---------------------------------------------------------------- weather glyphs */
@@ -485,18 +360,19 @@
 .wx {
     display: inline-block;
     line-height: 1;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: none;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .18));
 }
 
-.wx-sun { background-image: linear-gradient(160deg, #fff2a8 10%, #ffcc33 45%, #ff9500 95%); }
-.wx-moon { background-image: linear-gradient(160deg, #fffbe6 10%, #ffe28a 60%, #e0b84d 100%); }
-.wx-cloud { background-image: linear-gradient(180deg, #ffffff 20%, #c9d6ea 100%); }
-.wx-rain { background-image: linear-gradient(180deg, #ffffff 15%, #bfe3ff 45%, #3aa0ff 100%); }
-.wx-bolt { background-image: linear-gradient(180deg, #ffffff 15%, #ffe066 55%, #ff9f0a 100%); }
+.wx-sun { color: var(--yellow); }
+.wx-moon { color: var(--indigo); }
+.wx-cloud { color: var(--gray); }
+.wx-rain { color: var(--blue); }
+.wx-bolt { color: var(--orange); }
+
+.dark .wx-moon, .dark .wx-cloud { color: var(--label-2); }
+
+@media (prefers-color-scheme: dark) {
+    .home .wx-moon, .home .wx-cloud { color: var(--label-2); }
+}
 
 /* ---------------------------------------------------------------- smart stack */
 
@@ -515,10 +391,6 @@
     overscroll-behavior: contain;
     scroll-snap-type: y mandatory;
     scrollbar-width: none;
-    /* Let card shadows breathe without being clipped by the scroller. */
-    margin: -10px -10px;
-    padding: 10px 10px;
-    scroll-padding: 10px;
 }
 
 .stack::-webkit-scrollbar {
@@ -535,9 +407,10 @@
     min-height: 0;
 }
 
+/* Page indicator, like the Smart Stack's. */
 .stack__dots {
     position: absolute;
-    right: -9px;
+    right: -10px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -547,63 +420,59 @@
 }
 
 .dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, .35);
-    transition: height .3s var(--ease), background .3s;
+    background: var(--fill);
+    transition: background-color .3s var(--ease);
 }
 
 .dot.is-active {
-    height: 14px;
-    border-radius: 3px;
-    background: #fff;
+    background: var(--label-2);
 }
 
 /* ---------------------------------------------------------------- cards */
 
 .widget {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
-    padding: 14px 16px 14px;
+    padding: var(--pad);
     overflow: hidden;
-    animation: card-in .5s var(--spring) both;
+    border-radius: var(--radius);
+    background: var(--card);
+    animation: card-in .4s var(--ease) both;
 }
 
 .widget.sz-m { grid-column: span 2; }
-.widget.sz-l { grid-column: span 2; grid-row: span 2; padding: 18px 20px; }
+.widget.sz-l { grid-column: span 2; grid-row: span 2; padding: 20px; }
 
 @keyframes card-in {
-    from { opacity: 0; transform: scale(.94) translateY(6px); }
+    from { opacity: 0; transform: scale(.97); }
 }
 
 .widget__head {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 32px;
+    gap: 8px;
+    min-height: 28px;
 }
 
+/* The symbol carries the card's colour; the title stays a quiet secondary label. */
 .widget__icon {
     flex: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 22px;
     display: grid;
     place-items: center;
-    font-size: 15px;
-    color: #fff;
-    background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 70%, #fff), var(--accent));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 4px 12px color-mix(in srgb, var(--accent) 45%, transparent);
-    text-shadow: none;
+    font-size: 17px;
+    color: var(--accent);
 }
 
-.widget.sz-l .widget__icon {
-    width: 38px;
-    height: 38px;
-    font-size: 17px;
+.widget__icon svg {
+    width: 19px;
+    height: 19px;
 }
 
 .widget__title {
@@ -611,37 +480,40 @@
     min-width: 0;
     font-size: 15px;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--label-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.widget.sz-l .widget__title {
-    font-size: 17px;
-}
+.widget.sz-l .widget__title { font-size: 17px; }
 
 .widget__meta {
     flex: none;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
 .widget__close {
     flex: none;
-    width: 40px;
-    height: 40px;
-    margin: -6px -10px -6px 0;
+    width: 30px;
+    height: 30px;
+    margin: -2px -4px -2px 0;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    color: var(--text-3);
-    font-size: 15px;
+    font-size: 13px;
+    color: var(--label-2);
+    background: var(--fill-3);
+    position: relative;
 }
 
-.widget__close:active {
-    background: var(--well);
+/* A 44 pt target around the small visible button. */
+.widget__close::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
 }
 
 .widget__body {
@@ -667,92 +539,69 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 13px;
     font-weight: 500;
-    color: var(--text-3);
+    color: var(--label-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .widget__reason i {
-    color: color-mix(in srgb, var(--accent) 60%, #fff);
-    font-size: 10px;
-}
-
-/* Small cards: a tighter header leaves the title room next to the dismiss button. */
-.widget.sz-s .widget__head {
-    gap: 8px;
-}
-
-.widget.sz-s .widget__icon {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-}
-
-.widget.sz-s .widget__title {
-    font-size: 13.5px;
-}
-
-.widget.sz-s .widget__close {
-    width: 32px;
-    height: 32px;
-    margin: -4px -8px -4px -4px;
-    font-size: 13px;
-}
-
-/* Large status cards lead with a big glyph in the card's colour. */
-.glyph {
-    font-size: 58px;
-    line-height: 1;
-    margin-bottom: 8px;
-    color: color-mix(in srgb, var(--accent) 45%, #fff);
-    text-shadow: none;
-    filter: drop-shadow(0 8px 22px color-mix(in srgb, var(--accent) 55%, transparent));
+    font-size: 11px;
+    color: var(--label-3);
 }
 
 .widget.is-tappable {
     cursor: pointer;
 }
 
+.widget.sz-s .widget__title { font-size: 14px; }
+
+.glyph {
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: var(--accent);
+}
+
 .big {
     font-size: 34px;
     font-weight: 700;
-    line-height: 1.02;
-    letter-spacing: -.03em;
+    line-height: 1.05;
+    letter-spacing: -.02em;
 }
 
-.widget.sz-l .big { font-size: 46px; }
-.widget.sz-s .big { font-size: 28px; }
+.widget.sz-l .big { font-size: 48px; }
+.widget.sz-s .big { font-size: 30px; }
 
 .big small {
+    margin-left: 3px;
     font-size: .45em;
     font-weight: 600;
     letter-spacing: 0;
-    margin-left: 3px;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
 .headline {
-    font-size: 21px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: -.01em;
     line-height: 1.15;
 }
 
-.widget.sz-l .headline { font-size: 32px; }
-.widget.sz-l .sub { font-size: 16px; }
+.widget.sz-l .headline { font-size: 28px; }
 
 .sub {
-    font-size: 14px;
-    color: var(--text-2);
+    font-size: 15px;
+    color: var(--label-2);
     line-height: 1.3;
 }
 
+.widget.sz-l .sub { font-size: 16px; }
+
 .muted {
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
 .hrow {
@@ -782,14 +631,16 @@
 /* ---------------------------------------------------------------- buttons */
 
 .pressable {
-    transition: transform .45s var(--spring), background .25s var(--ease), box-shadow .25s var(--ease), opacity .25s;
+    transition: transform .4s var(--spring), opacity .2s var(--ease), background-color .25s var(--ease);
 }
 
 .pressable:active {
-    transform: scale(.94);
+    transform: scale(.96);
+    opacity: .8;
     transition-duration: .08s;
 }
 
+/* Capsule buttons: grey by default; the one primary action per card is filled with the accent colour. */
 .gbtn {
     min-height: 44px;
     padding: 0 18px;
@@ -798,18 +649,26 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     white-space: nowrap;
-    background: var(--well-strong);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 0 0 .5px rgba(255, 255, 255, .2);
+    color: var(--label);
+    background: var(--fill-2);
 }
 
 .gbtn.primary {
     color: #fff;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 82%, #fff), var(--accent));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, .15);
+    background: var(--blue);
+}
+
+/* A toggled option, in the tinted style. */
+.gbtn.selected {
+    color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 16%, transparent);
+}
+
+.gbtn.destructive {
+    color: var(--red);
 }
 
 .gbtn.wide {
@@ -818,32 +677,41 @@
 
 .mini {
     flex: none;
-    min-width: 52px;
+    min-width: 56px;
     height: 36px;
-    padding: 0 12px;
+    padding: 0 14px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
-    background: var(--well-strong);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+    color: var(--blue);
+    background: var(--fill-3);
 }
 
+/* Status: a coloured dot and a word, so it reads without the colour too. */
 .chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 4px 10px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    background: var(--well);
     white-space: nowrap;
+    background: var(--fill-3);
 }
 
-.chip.free { color: #b6ffc8; background: rgba(48, 209, 88, .22); }
-.chip.busy { color: #ffe2a8; background: rgba(255, 179, 64, .24); }
-.chip.shower { color: #c8ecff; background: rgba(10, 132, 255, .3); }
-.chip.warn { color: #ffd0cc; background: rgba(255, 69, 58, .3); }
+.chip.free::before, .chip.busy::before, .chip.shower::before, .chip.warn::before, .crowd::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+}
+
+.chip.free { --dot: var(--green); }
+.chip.busy { --dot: var(--orange); }
+.chip.shower { --dot: var(--blue); }
+.chip.warn { --dot: var(--red); }
 
 .status-dot {
     width: 8px;
@@ -866,21 +734,22 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: 44px;
-    padding: 4px 4px 4px 10px;
-    border-radius: var(--radius-s);
-    background: var(--well);
+    min-height: 48px;
+    padding: 4px 6px 4px 12px;
+    border-radius: var(--radius-inner);
+    background: var(--inset);
 }
 
 .list__icon {
     flex: none;
-    width: 28px;
+    width: 24px;
     text-align: center;
-    color: var(--text-2);
+    font-size: 16px;
+    color: var(--label-2);
 }
 
 .list__icon.on {
-    color: var(--amber);
+    color: var(--accent);
 }
 
 .list__text {
@@ -891,7 +760,7 @@
 }
 
 .list__title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -899,8 +768,8 @@
 }
 
 .list__sub {
-    font-size: 12px;
-    color: var(--text-3);
+    font-size: 13px;
+    color: var(--label-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -919,32 +788,35 @@
     min-width: 52px;
     height: 34px;
     padding: 0 10px;
-    border-radius: 11px;
+    border-radius: 10px;
     display: grid;
     place-items: center;
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: -.01em;
     color: #fff;
-    background: linear-gradient(180deg, #43d675, #1fa34a);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 4px 12px rgba(31, 163, 74, .35);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    background: var(--bus);
 }
 
 .bus-next {
     font-size: 30px;
     font-weight: 700;
-    letter-spacing: -.03em;
+    letter-spacing: -.02em;
     line-height: 1;
 }
 
-.widget.sz-l .bus-next { font-size: 40px; }
-
 .bus-next small {
-    font-size: 14px;
-    font-weight: 600;
     margin-left: 2px;
-    color: var(--text-2);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+}
+
+.bus-later {
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--label-2);
+    text-align: right;
 }
 
 .widget.sz-l .bus-row {
@@ -952,13 +824,13 @@
 }
 
 .widget.sz-l .bus-row + .bus-row {
-    border-top: 1px solid var(--hairline);
+    border-top: .5px solid var(--separator);
 }
 
 .widget.sz-l .bus-badge {
     min-width: 68px;
     height: 46px;
-    border-radius: 15px;
+    border-radius: 13px;
     font-size: 23px;
 }
 
@@ -967,7 +839,7 @@
 }
 
 .widget.sz-l .bus-next small {
-    font-size: 17px;
+    font-size: 18px;
 }
 
 .bus-stack {
@@ -980,24 +852,16 @@
 .bus-meta {
     font-size: 15px;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
 .crowd {
     margin-left: auto;
 }
 
-.crowd.SEA { color: #b6ffc8; background: rgba(48, 209, 88, .22); }
-.crowd.SDA { color: #ffe2a8; background: rgba(255, 179, 64, .24); }
-.crowd.LSD { color: #ffd0cc; background: rgba(255, 69, 58, .3); }
-
-.bus-later {
-    margin-left: auto;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-2);
-    text-align: right;
-}
+.crowd.SEA { --dot: var(--green); }
+.crowd.SDA { --dot: var(--orange); }
+.crowd.LSD { --dot: var(--red); }
 
 /* ---------------------------------------------------------------- rain & forecast charts */
 
@@ -1007,10 +871,10 @@
     grid-auto-columns: minmax(0, 1fr);
     gap: 6px;
     align-items: end;
-    height: 74px;
+    height: 76px;
 }
 
-.widget.sz-l .pbars { height: 150px; }
+.widget.sz-l .pbars { height: 160px; }
 
 .pbar {
     display: flex;
@@ -1024,30 +888,28 @@
 
 .pbar__fill {
     width: 100%;
-    max-width: 30px;
+    max-width: 28px;
     min-height: 4px;
     height: calc(var(--v) * 1%);
-    border-radius: 8px;
-    background: linear-gradient(180deg, rgba(191, 227, 255, .9), rgba(58, 160, 255, .65));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+    border-radius: 6px;
+    background: var(--blue);
 }
 
 .pbar__fill.low {
-    background: rgba(255, 255, 255, .22);
-    box-shadow: none;
+    background: var(--fill);
 }
 
 .pbar__label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--text-3);
+    color: var(--label-2);
     white-space: nowrap;
 }
 
 .pbar__value {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
 .fhours {
@@ -1062,32 +924,27 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-.fhour .wx {
-    font-size: 24px;
-}
-
-.widget.sz-l .fhour .wx {
-    font-size: 32px;
-}
+.fhour .wx { font-size: 24px; }
+.widget.sz-l .fhour .wx { font-size: 32px; }
 
 .fhour__time {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
 .fhour__temp {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
 .fhour__rain {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--sky);
+    color: var(--blue);
 }
 
 /* ---------------------------------------------------------------- ring gauge */
@@ -1103,25 +960,22 @@
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
-    overflow: visible;
 }
 
 .ring__track {
     fill: none;
-    stroke: rgba(255, 255, 255, .16);
+    stroke: var(--fill);
 }
 
 .ring__value {
     fill: none;
-    stroke: url(#ring-ember);
+    stroke: var(--orange);
     stroke-linecap: round;
     transition: stroke-dashoffset .8s var(--ease);
-    filter: drop-shadow(0 0 6px rgba(255, 120, 60, .45));
 }
 
 .ring.cool .ring__value {
-    stroke: url(#ring-cool);
-    filter: drop-shadow(0 0 6px rgba(100, 210, 255, .4));
+    stroke: var(--cyan);
 }
 
 .ring__center {
@@ -1133,16 +987,15 @@
 }
 
 .ring__value-text {
-    font-size: calc(var(--size, 84px) * .26);
+    font-size: calc(var(--size, 84px) * .27);
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -.03em;
 }
 
 .ring__unit {
     font-size: calc(var(--size, 84px) * .12);
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
 /* ---------------------------------------------------------------- energy */
@@ -1150,10 +1003,10 @@
 .meter {
     display: flex;
     height: 12px;
+    gap: 2px;
     border-radius: 999px;
     overflow: hidden;
-    gap: 2px;
-    background: rgba(255, 255, 255, .1);
+    background: var(--fill-3);
 }
 
 .meter span {
@@ -1165,8 +1018,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px 12px;
-    font-size: 12px;
-    color: var(--text-2);
+    font-size: 13px;
+    color: var(--label-2);
 }
 
 .meter-legend span {
@@ -1189,19 +1042,18 @@
     flex: none;
     width: 64px;
     height: 64px;
-    border-radius: 16px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     font-size: 26px;
-    color: #fff;
-    background: linear-gradient(145deg, #ff6b9a, #a64dff 60%, #4b6bff);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 8px 20px rgba(166, 77, 255, .35);
+    color: var(--label-3);
+    background: var(--inset);
 }
 
 .widget.sz-l .artwork {
     width: 120px;
     height: 120px;
-    border-radius: 24px;
+    border-radius: 20px;
     font-size: 46px;
 }
 
@@ -1212,17 +1064,15 @@
     display: grid;
     place-items: center;
     font-size: 18px;
-    background: var(--well-strong);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+    background: var(--fill-3);
 }
 
 .rbtn.primary {
     width: 60px;
     height: 60px;
     font-size: 22px;
-    color: #1a1033;
-    background: linear-gradient(180deg, #fff, rgba(255, 255, 255, .78));
-    text-shadow: none;
+    color: var(--card);
+    background: var(--label);
 }
 
 /* ---------------------------------------------------------------- dock */
@@ -1232,7 +1082,7 @@
     display: flex;
     gap: 8px;
     padding: 8px;
-    border-radius: var(--radius-xl);
+    border-radius: 32px;
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -1241,35 +1091,32 @@
     display: none;
 }
 
+/* Accessory tiles, as in the Home app: quiet when off, solid white with a coloured symbol when on. */
 .tile {
     position: relative;
     flex: 1 0 104px;
     height: 84px;
     padding: 10px 12px;
-    border-radius: 26px;
+    border-radius: 24px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     text-align: left;
-    background: rgba(255, 255, 255, .08);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), inset 0 0 0 .5px rgba(255, 255, 255, .12);
+    background: var(--fill-2);
 }
 
 .tile__icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    font-size: 15px;
-    background: rgba(255, 255, 255, .16);
-    transition: background .3s var(--ease), color .3s var(--ease), transform .45s var(--spring);
+    height: 26px;
+    display: flex;
+    align-items: center;
+    font-size: 21px;
+    color: var(--label-2);
 }
 
 .tile__icon svg {
-    width: 17px;
-    height: 17px;
+    width: 22px;
+    height: 22px;
 }
 
 .tile__text {
@@ -1280,49 +1127,39 @@
 }
 
 .tile__label {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     white-space: nowrap;
 }
 
 .tile__detail {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--text-3);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--label-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* An active control fills with tinted glass and glows. */
 .tile.lit {
-    --tile-text: #2b1600;
-    color: var(--tile-text);
-    text-shadow: none;
-    background: linear-gradient(170deg, rgba(var(--tint), .95), rgba(var(--tint), .72));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .7),
-        inset 0 -8px 16px -10px rgba(0, 0, 0, .2),
-        0 8px 24px -6px rgba(var(--tint), .7);
+    color: var(--tile-on-label);
+    background: var(--tile-on);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
 }
 
 .tile.lit .tile__icon {
-    color: #fff;
-    background: rgba(0, 0, 0, .22);
+    color: var(--tint);
 }
 
 .tile.lit .tile__detail {
-    color: color-mix(in srgb, var(--tile-text) 70%, transparent);
+    color: var(--tile-on-label-2);
 }
 
-.tint-amber { --tint: 255, 196, 92; }
-.tint-ice { --tint: 120, 214, 255; }
-.tint-mint { --tint: 110, 236, 196; }
-.tint-sky { --tint: 150, 190, 255; }
-.tint-ember { --tint: 255, 128, 84; }
-
-.tint-ice.lit, .tint-mint.lit, .tint-sky.lit { --tile-text: #04223a; }
-.tint-ember.lit { --tile-text: #3a0b00; }
+.tint-amber { --tint: rgb(255, 179, 0); }
+.tint-ice { --tint: rgb(0, 160, 220); }
+.tint-mint { --tint: rgb(0, 170, 150); }
+.tint-sky { --tint: rgb(0, 122, 255); }
+.tint-ember { --tint: rgb(255, 120, 20); }
 
 .tile.is-pending .tile__icon {
     animation: pending 1s ease-in-out infinite;
@@ -1333,7 +1170,7 @@
 }
 
 @keyframes pending {
-    50% { transform: scale(.82); opacity: .6; }
+    50% { opacity: .35; }
 }
 
 /* ---------------------------------------------------------------- sheets */
@@ -1345,7 +1182,7 @@
     display: grid;
     place-items: center;
     padding: var(--pad);
-    background: rgba(2, 6, 20, .42);
+    background: var(--dim);
     /* Fade the colour, not opacity: opacity would make this the backdrop root and the sheet would stop blurring. */
     animation: dim-in .25s var(--ease) both;
 }
@@ -1359,22 +1196,34 @@
     height: min(520px, 100%);
     display: flex;
     flex-direction: column;
-    padding: 20px 24px 22px;
-    border-radius: var(--radius-xl);
-    animation: sheet-in .5s var(--spring) both;
-    --glass-top: rgba(255, 255, 255, .2);
-    --glass-bottom: rgba(255, 255, 255, .1);
-    --glass-blur: 40px;
+    padding: 20px 24px 24px;
+    border-radius: 34px;
+    animation: sheet-in .45s var(--spring) both;
+}
+
+/* Sheets hold a lot of text and controls, so their glass is thicker than the dock's. */
+.sheet.material {
+    background: var(--sheet);
 }
 
 @keyframes sheet-in {
-    from { opacity: 0; transform: translateY(40px) scale(.96); }
+    from { opacity: 0; transform: translateY(32px); }
 }
 
 .sheet__head {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.sheet__head .widget__icon {
+    width: 28px;
+    font-size: 22px;
+}
+
+.sheet__head .widget__icon svg {
+    width: 24px;
+    height: 24px;
 }
 
 .sheet__title {
@@ -1385,19 +1234,20 @@
 
 .sheet__title small {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
 .sheet__close {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: grid;
     place-items: center;
-    font-size: 18px;
-    background: var(--well-strong);
+    font-size: 17px;
+    color: var(--label-2);
+    background: var(--fill-3);
 }
 
 .sheet__body {
@@ -1405,7 +1255,7 @@
     min-height: 0;
     display: flex;
     gap: 24px;
-    padding-top: 16px;
+    padding-top: 18px;
 }
 
 .sheet__side {
@@ -1419,8 +1269,8 @@
     min-height: 56px;
     justify-content: flex-start;
     padding: 0 18px;
-    border-radius: 20px;
-    font-size: 16px;
+    border-radius: 18px;
+    font-size: 17px;
 }
 
 /* ---------------------------------------------------------------- blinds */
@@ -1441,18 +1291,18 @@
 }
 
 .blind__label {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
 }
 
 .blind__label small {
     margin-left: 6px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--text-3);
+    color: var(--label-2);
 }
 
-/* The track is a window; the fabric drops from the top as the blind lowers (0 open … 1 closed). */
+/* The track is the window; the blind drops from the top as it lowers (0 open … 1 closed). */
 .blind__track {
     --value: 0;
     --shown: var(--value);
@@ -1460,12 +1310,11 @@
     flex: 1;
     width: 100%;
     max-width: 150px;
-    border-radius: 26px;
+    border-radius: 24px;
     overflow: hidden;
     touch-action: none;
     cursor: ns-resize;
-    background: linear-gradient(180deg, rgba(160, 220, 255, .35), rgba(255, 255, 255, .08));
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25), inset 0 10px 30px -10px rgba(255, 255, 255, .4);
+    background: var(--fill-3);
 }
 
 .blind__track.is-dragging {
@@ -1478,11 +1327,9 @@
     right: 0;
     top: 0;
     height: calc(var(--shown) * 100%);
-    min-height: 10px;
-    background:
-        repeating-linear-gradient(180deg, rgba(255, 255, 255, .0) 0 13px, rgba(0, 0, 0, .12) 13px 15px),
-        linear-gradient(180deg, rgba(255, 247, 235, .95), rgba(240, 226, 206, .9));
-    box-shadow: 0 6px 14px rgba(0, 0, 0, .25);
+    min-height: 8px;
+    /* Slats: thin separator lines on a flat fill. */
+    background: repeating-linear-gradient(180deg, transparent 0 14px, var(--separator) 14px 15px), var(--label-3);
     transition: height .9s linear;
 }
 
@@ -1490,32 +1337,15 @@
     transition: none;
 }
 
-.blind__fabric::after {
-    content: "";
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    bottom: 0;
-    height: 6px;
-    border-radius: 3px 3px 0 0;
-    background: rgba(120, 100, 80, .55);
-}
-
-/* Where a moving blind is headed: a faint sheet of fabric down to the target. */
+/* Where a moving blind is headed. */
 .blind__ghost {
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     height: calc(var(--target) * 100%);
-    background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0) 0 13px, rgba(255, 255, 255, .08) 13px 15px),
-        rgba(255, 247, 235, .22);
+    background: var(--fill-2);
     pointer-events: none;
-}
-
-.blind__track.is-dragging .blind__ghost,
-.blind__track.is-dragging .blind__target {
-    display: none;
 }
 
 .blind__target {
@@ -1524,8 +1354,13 @@
     right: 12px;
     top: calc(var(--target) * 100%);
     height: 0;
-    border-top: 2px dashed rgba(255, 255, 255, .85);
+    border-top: 2px dashed var(--label-2);
     pointer-events: none;
+}
+
+.blind__track.is-dragging .blind__ghost,
+.blind__track.is-dragging .blind__target {
+    display: none;
 }
 
 /* ---------------------------------------------------------------- water heater sheet */
@@ -1537,6 +1372,7 @@
     align-items: center;
     justify-content: center;
     gap: 14px;
+    text-align: center;
 }
 
 .durations {
@@ -1547,7 +1383,7 @@
 
 .durations .gbtn {
     min-height: 64px;
-    border-radius: 22px;
+    border-radius: 20px;
     flex-direction: column;
     gap: 0;
     font-size: 22px;
@@ -1555,17 +1391,17 @@
 }
 
 .durations .gbtn small {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--label-2);
 }
 
 .facts {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 14px;
-    color: var(--text-2);
+    font-size: 15px;
+    color: var(--label-2);
 }
 
 .facts div {
@@ -1574,7 +1410,7 @@
 }
 
 .facts b {
-    color: var(--text);
+    color: var(--label);
 }
 
 /* ---------------------------------------------------------------- connection */
@@ -1584,7 +1420,8 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    padding: 18px 26px;
+    padding: 14px 24px;
+    border-radius: 999px;
     font-size: 17px;
     font-weight: 600;
 }
@@ -1626,14 +1463,10 @@
     }
 }
 
-/* Phones: hero on top, cards flow in two columns, dock pinned to the bottom. */
+/* Phones: time on top, cards flow in two columns, the dock floats at the bottom. */
 @media (max-width: 760px) {
     .home {
         overflow-y: auto;
-    }
-
-    .wallpaper {
-        position: fixed;
     }
 
     .home-grid {
@@ -1675,14 +1508,17 @@
         grid-row: span 2;
     }
 
-    /* Chromium doesn't blur behind a fixed bar over scrolling content, so this one is frosted rather than clear. */
+    /* Chromium doesn't blur behind a fixed bar over scrolling content, so this one uses the thicker material. */
     .dock {
         position: fixed;
         z-index: 10;
         left: var(--pad);
         right: var(--pad);
         bottom: var(--pad);
-        --glass-tint: rgba(10, 20, 45, .62);
+    }
+
+    .dock.material {
+        background: var(--sheet);
     }
 
     .sheet {

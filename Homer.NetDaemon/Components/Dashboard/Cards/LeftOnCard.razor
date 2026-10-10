@@ -4,7 +4,7 @@
     var shown = IsLarge ? devices.Take(5).ToList() : [];
 }
 
-<GlassCard Model="Card" Title="@(Home.NobodyHome ? "家里没人" : "开着没人用")" Icon="fa-power-off" Accent="var(--amber)"
+<WidgetCard Model="Card" Title="@(Home.NobodyHome ? "家里没人" : "开着没人用")" Icon="fa-power-off" Accent="var(--orange)"
            Meta="@($"{devices.Count} 个")" ShowReason="IsLarge">
     @if (IsLarge)
     {
@@ -39,7 +39,7 @@
             <i class="fa-solid fa-power-off"></i>全部关闭
         </button>
     </div>
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void TurnOff(List<string> entityIds) => Ui.Run(a => a.TurnOff(entityIds));

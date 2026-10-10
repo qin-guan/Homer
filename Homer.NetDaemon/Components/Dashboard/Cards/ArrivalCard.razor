@@ -5,12 +5,12 @@
         .ToList();
 }
 
-<GlassCard Model="Card" Centered="true" Title="欢迎回家" Icon="fa-house-chimney" Accent="var(--green)">
+<WidgetCard Model="Card" Centered="true" Title="欢迎回家" Icon="fa-house-chimney" Accent="var(--green)">
     <div class="hrow">
         <div class="faces">
             @foreach (var person in arrivals)
             {
-                <span class="face" style="--h: @Format.Hue(person.Id)">@person.Initials</span>
+                <span class="face" style="--c: @Format.PersonColor(person.Id)">@person.Initials</span>
             }
         </div>
     </div>
@@ -19,4 +19,4 @@
     {
         <div class="sub">@Format.Ago(since, Ui.Now)到家</div>
     }
-</GlassCard>
+</WidgetCard>

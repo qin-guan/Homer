@@ -4,7 +4,7 @@
     var now = Ui.Now;
 }
 
-<GlassCard Model="Card" Centered="@(appliance.Status == ApplianceStatus.Finished)" Title="@appliance.Name" Icon="@(washer ? "fa-shirt" : "fa-utensils")"
+<WidgetCard Model="Card" Centered="@(appliance.Status == ApplianceStatus.Finished)" Title="@appliance.Name" Icon="@(washer ? "fa-shirt" : "fa-utensils")"
            Accent="var(--indigo)" ShowReason="false">
     @if (appliance is { Status: ApplianceStatus.Finished, FinishedAt: { } finishedAt })
     {
@@ -25,8 +25,7 @@
             <div class="actions">
                 @if (washer)
                 {
-                    <button class="gbtn pressable wide @(Home.LaundryMode ? "primary" : "")" style="--accent: var(--mint)"
-                            @onclick="ToggleLaundryMode">
+                    <button class="gbtn pressable wide @(Home.LaundryMode ? "selected" : "")" @onclick="ToggleLaundryMode">
                         <i class="fa-solid fa-wind"></i>@(Home.LaundryMode ? "晾衣模式已开" : "开晾衣模式")
                     </button>
                 }
@@ -42,7 +41,7 @@
             运行中@(appliance.Watts is { } watts && !IsSmall ? $" · {Format.Power(watts)}" : "")
         </div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     [Parameter, EditorRequired] public ApplianceKind Kind { get; set; }

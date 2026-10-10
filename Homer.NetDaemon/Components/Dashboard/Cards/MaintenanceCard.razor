@@ -1,4 +1,4 @@
-<GlassCard Model="Card" Title="需要换电池" Icon="fa-battery-quarter" Accent="#8e8e93">
+<WidgetCard Model="Card" Title="需要换电池" Icon="fa-battery-quarter" Accent="var(--gray)">
     @if (IsSmall)
     {
         <div class="big num">@Home.LowBatteries.Count<small>个</small></div>
@@ -16,4 +16,4 @@
             }
         </div>
     }
-</GlassCard>
+</WidgetCard>

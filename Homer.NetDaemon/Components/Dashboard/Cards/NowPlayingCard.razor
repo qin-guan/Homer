@@ -2,7 +2,7 @@
     var media = Home.Media!;
 }
 
-<GlassCard Model="Card" Title="@(media.App ?? "正在播放")" Icon="fa-music" Accent="var(--pink)">
+<WidgetCard Model="Card" Title="@(media.App ?? "正在播放")" Icon="fa-music" Accent="var(--pink)">
     <div class="hrow" style="gap: 14px; @(IsLarge ? "flex-direction: column; align-items: flex-start" : "")">
         <div class="artwork"><i class="fa-solid fa-music"></i></div>
         <div class="grow" style="width: 100%">
@@ -21,7 +21,7 @@
             <i class="fa-solid fa-forward"></i>
         </button>
     </div>
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void PlayPause() => Ui.Run(a => a.MediaPlayPause(Home.Media!.EntityId));

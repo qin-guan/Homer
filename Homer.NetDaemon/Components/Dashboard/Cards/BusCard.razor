@@ -3,7 +3,7 @@
     var services = Home.Buses.Where(b => b.Arrivals.Count > 0).ToList();
 }
 
-<GlassCard Model="Card" Title="巴士" Icon="fa-bus" Accent="var(--green)">
+<WidgetCard Model="Card" Title="巴士" Icon="fa-bus" Accent="var(--green)">
     @foreach (var bus in services)
     {
         var next = bus.Arrivals[0];
@@ -38,7 +38,7 @@
             }
         </div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private RenderFragment NextText(int? minutes) => __builder =>

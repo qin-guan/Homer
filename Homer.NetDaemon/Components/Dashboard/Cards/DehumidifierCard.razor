@@ -1,4 +1,4 @@
-<GlassCard Model="Card" Centered="true" Title="除湿机" Icon="fa-droplet" Accent="var(--sky)">
+<WidgetCard Model="Card" Centered="true" Title="除湿机" Icon="fa-droplet" Accent="var(--cyan)">
     @if (IsLarge)
     {
         <i class="glyph fa-solid fa-droplet"></i>
@@ -7,4 +7,4 @@
     <div class="sub">
         倒水后重新开机@(Home.DehumidifierTankFullAt is { } at && !IsSmall ? $" · {Format.Ago(at, Ui.Now)}" : "")
     </div>
-</GlassCard>
+</WidgetCard>

@@ -2,7 +2,7 @@
     var devices = SubjectDevices();
 }
 
-<GlassCard Model="Card" Title="准备睡觉了？" Icon="fa-moon" Accent="var(--indigo)" ShowReason="IsLarge">
+<WidgetCard Model="Card" Title="准备睡觉了？" Icon="fa-moon" Accent="var(--indigo)" ShowReason="IsLarge">
     <div class="sub">将关闭</div>
     @if (IsLarge)
     {
@@ -38,7 +38,7 @@
         </button>
         <button class="gbtn pressable" @onclick="Dismiss">稍后</button>
     </div>
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void TurnOffAll() => Ui.Run(a => a.TurnOff(SubjectDevices().Select(d => d.EntityId).ToList()));

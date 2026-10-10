@@ -4,7 +4,7 @@
     var kilowatts = energy.TotalWatts >= 1000;
 }
 
-<GlassCard Model="Card" Title="用电" Icon="fa-bolt" Accent="#f5b400">
+<WidgetCard Model="Card" Title="用电" Icon="fa-bolt" Accent="var(--yellow)">
     <div class="big num">
         @(kilowatts ? (energy.TotalWatts / 1000).ToString("0.00") : energy.TotalWatts.ToString("0"))<small>@(kilowatts ? "kW" : "W")</small>
     </div>
@@ -43,12 +43,12 @@
     {
         <div class="sub">实时用电</div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private static string Colour(string part) => part switch
     {
-        "空调" => "var(--sky)",
+        "空调" => "var(--cyan)",
         "热水器" => "var(--orange)",
         "洗衣机" => "var(--indigo)",
         "洗碗机" => "var(--teal)",

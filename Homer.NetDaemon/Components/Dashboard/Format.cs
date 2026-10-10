@@ -83,8 +83,12 @@ public static class Format
         return percent <= 2 ? "全开" : percent >= 98 ? "全关" : $"关 {percent}%";
     }
 
-    /// <summary>A stable hue per person, so their avatar keeps its colour across restarts.</summary>
-    public static int Hue(string id) => id.Aggregate(17, (hash, c) => (hash * 31 + c) % 360);
+    private static readonly string[] PersonColors =
+        ["var(--blue)", "var(--orange)", "var(--green)", "var(--purple)", "var(--teal)", "var(--pink)", "var(--indigo)"];
+
+    /// <summary>A system colour per person that stays the same across restarts, for their monogram.</summary>
+    public static string PersonColor(string id) =>
+        PersonColors[id.Aggregate(17, (hash, c) => (hash * 31 + c) % 7919) % PersonColors.Length];
 
     public static string SizeClass(CardSize size) => size switch
     {

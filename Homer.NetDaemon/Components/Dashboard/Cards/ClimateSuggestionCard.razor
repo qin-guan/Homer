@@ -2,7 +2,7 @@
     var aircon = SubjectDevices().FirstOrDefault();
 }
 
-<GlassCard Model="Card" Title="客厅有点热" Icon="fa-temperature-high" Accent="var(--orange)" ShowReason="false">
+<WidgetCard Model="Card" Title="客厅有点热" Icon="fa-temperature-high" Accent="var(--orange)" ShowReason="false">
     <div class="hrow">
         <div class="big num">@Format.Temperature(Home.Indoor.Temperature)</div>
         <div class="sub">
@@ -16,13 +16,13 @@
     <div class="actions">
         @if (aircon is not null)
         {
-            <button class="gbtn primary pressable wide" style="--accent: #2aa8e0" @onclick="() => TurnOn(aircon.EntityId)">
+            <button class="gbtn primary pressable wide" @onclick="() => TurnOn(aircon.EntityId)">
                 <i class="fa-solid fa-snowflake"></i>开@(aircon.Name)
             </button>
         }
         <button class="gbtn pressable" @onclick="Dismiss">不用</button>
     </div>
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void TurnOn(string entityId) => Ui.Run(a => a.TurnOn(entityId));

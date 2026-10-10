@@ -6,7 +6,7 @@
     var humidity = Home.Indoor.Humidity ?? weather?.Humidity;
 }
 
-<section class="hero glass">
+<section class="hero">
     <div class="hero__greeting">@Format.Greeting(Ui.Now)</div>
     @if (Ui.Demo)
     {
@@ -52,7 +52,7 @@
                 <div class="faces">
                     @foreach (var person in home)
                     {
-                        <span class="face" style="--h: @Format.Hue(person.Id)" title="@person.Name">@person.Initials</span>
+                        <span class="face" style="--c: @Format.PersonColor(person.Id)" title="@person.Name">@person.Initials</span>
                     }
                 </div>
                 <span class="people__label">@home.Count 人在家</span>

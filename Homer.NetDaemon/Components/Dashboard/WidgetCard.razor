@@ -1,6 +1,6 @@
-@* The glass shell every smart stack card shares: icon, title, optional dismiss, body and why it's showing. *@
+@* The shell every smart stack card shares: symbol, title, optional dismiss, body and why it's showing. *@
 
-<article class="widget glass @Format.SizeClass(Model.Size) @(OnTap.HasDelegate ? "is-tappable pressable" : "")"
+<article class="widget @Format.SizeClass(Model.Size) @(OnTap.HasDelegate ? "is-tappable pressable" : "")"
          style="--accent: @Accent"
          @onclick="Tap">
     <header class="widget__head">

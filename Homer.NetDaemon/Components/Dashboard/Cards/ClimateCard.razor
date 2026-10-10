@@ -3,7 +3,7 @@
     var shown = running.Take(IsLarge ? 5 : 2).ToList();
 }
 
-<GlassCard Model="Card" Title="空调" Icon="fa-snowflake" Accent="var(--sky)"
+<WidgetCard Model="Card" Title="空调" Icon="fa-snowflake" Accent="var(--cyan)"
            Meta="@(IsSmall ? null : $"{running.Count} 台运行中")">
     @if (IsSmall)
     {
@@ -17,7 +17,7 @@
             {
                 var a = aircon;
                 <div class="list__row">
-                    <span class="list__icon" style="color: var(--sky)"><i class="fa-solid fa-snowflake"></i></span>
+                    <span class="list__icon" style="color: var(--cyan)"><i class="fa-solid fa-snowflake"></i></span>
                     <span class="list__text">
                         <span class="list__title">@a.Name</span>
                         <span class="list__sub">
@@ -33,7 +33,7 @@
             <div class="sub muted">还有 @(running.Count - shown.Count) 台</div>
         }
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void TurnOff(string entityId) => Ui.Run(a => a.TurnOff([entityId]));

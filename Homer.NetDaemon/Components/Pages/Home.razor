@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="@Assets["css/home.css"]"/>
-    <meta name="theme-color" content="#0b1530">
+    <meta name="color-scheme" content="light dark">
 </HeadContent>
 
 @if (!Authorized)
@@ -28,32 +28,10 @@
 }
 else
 {
-    <div class="home wp-@WallpaperFor(_view?.Home)" data-glass="@(Glass == "lite" ? "lite" : "full")">
-        <div class="wallpaper" aria-hidden="true">
-            <span class="orb o1"></span>
-            <span class="orb o2"></span>
-            <span class="orb o3"></span>
-            <span class="orb o4"></span>
-        </div>
-
-        <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-            <defs>
-                <linearGradient id="ring-ember" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#ffd166"/>
-                    <stop offset=".55" stop-color="#ff8a3d"/>
-                    <stop offset="1" stop-color="#ff4d4d"/>
-                </linearGradient>
-                <linearGradient id="ring-cool" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#b8f3ff"/>
-                    <stop offset=".6" stop-color="#64d2ff"/>
-                    <stop offset="1" stop-color="#3a8bff"/>
-                </linearGradient>
-            </defs>
-        </svg>
-
+    <div class="home @AppearanceFor(_view?.Home)" data-glass="@(Glass == "lite" ? "lite" : "full")">
         @if (_view is not { } view)
         {
-            <div class="connecting glass">正在连接 Home Assistant…</div>
+            <div class="connecting material">正在连接 Home Assistant…</div>
         }
         else
         {
@@ -98,7 +76,7 @@ else
             </CascadingValue>
         }
 
-        <div id="components-reconnect-modal" class="glass">
+        <div id="components-reconnect-modal" class="material">
             <i class="fa-solid fa-wifi"></i>连接中断，正在重新连接…
         </div>
     </div>
@@ -246,24 +224,17 @@ else
 
     private void CloseSheet() => _sheet = DashboardSheet.None;
 
-    /// <summary>The wallpaper follows the sun and the sky: bright by day, grey when it's wet, dim after midnight.</summary>
-    private static string WallpaperFor(HomeSnapshot? home)
+    /// <summary>
+    /// Light by day and dark from dusk, like the Automatic appearance: the hub has no appearance setting of its own.
+    /// A browser that prefers dark gets dark regardless, through the stylesheet. Dimmed further after midnight.
+    /// </summary>
+    private static string AppearanceFor(HomeSnapshot? home) => home?.Phase switch
     {
-        if (home is null)
-        {
-            return "night";
-        }
-
-        var wet = home.Weather is { } weather && (weather.IsRaining || weather.Code is 3 or 45 or 48);
-        return home.Phase switch
-        {
-            DayPhase.Dawn => "dawn",
-            DayPhase.Morning or DayPhase.Afternoon => wet ? "overcast" : "day",
-            DayPhase.Dusk => "dusk",
-            DayPhase.Night => wet ? "rain-night" : "night",
-            _ => "late-night"
-        };
-    }
+        null => "",
+        DayPhase.LateNight => "dark late-night",
+        DayPhase.Dusk or DayPhase.Night => "dark",
+        _ => ""
+    };
 
     public async ValueTask DisposeAsync()
     {

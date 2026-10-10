@@ -4,9 +4,9 @@
 @* Three blinds side by side: drag each window down to lower its blind. Positions run 0 (up) to 3 (down). *@
 
 <div class="sheet-backdrop" @onclick="Close">
-    <section class="sheet glass" role="dialog" aria-label="阳台窗帘" @onclick:stopPropagation="true">
+    <section class="sheet material" role="dialog" aria-label="阳台窗帘" @onclick:stopPropagation="true">
         <header class="sheet__head">
-            <span class="widget__icon" style="--accent: #4f8cff; width: 40px; height: 40px"><BlindsIcon/></span>
+            <span class="widget__icon" style="--accent: var(--blue)"><BlindsIcon/></span>
             <div class="sheet__title">
                 阳台窗帘
                 <small>上下拖动每一片窗帘</small>

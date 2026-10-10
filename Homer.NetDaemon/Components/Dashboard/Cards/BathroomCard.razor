@@ -3,7 +3,7 @@
     var title = Home.Bathrooms.Any(b => b.State == Homer.NetDaemon.Services.BathroomState.Showering) ? "有人在洗澡" : "浴室";
 }
 
-<GlassCard Model="Card" Title="@title" Icon="fa-shower" Accent="var(--teal)">
+<WidgetCard Model="Card" Title="@title" Icon="fa-shower" Accent="var(--teal)">
     @if (IsSmall)
     {
         @foreach (var bathroom in Home.Bathrooms)
@@ -35,7 +35,7 @@
             }
         </div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private static (string Tone, string Text) Describe(BathroomInfo bathroom) => bathroom.State switch

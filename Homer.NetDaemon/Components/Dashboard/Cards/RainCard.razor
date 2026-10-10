@@ -7,7 +7,7 @@
         .ToList();
 }
 
-<GlassCard Model="Card" Title="@(weather.IsRaining ? "正在下雨" : "快下雨了")" Icon="fa-cloud-rain"
+<WidgetCard Model="Card" Title="@(weather.IsRaining ? "正在下雨" : "快下雨了")" Icon="fa-cloud-rain"
            Accent="var(--blue)" Meta="@($"降雨 {chance}%")" ShowReason="IsLarge">
     @if (hours.Count > 0)
     {
@@ -40,7 +40,7 @@
     {
         <div class="sub"><i class="fa-solid fa-circle-check" style="color: var(--green)"></i> 阳台窗帘已关好</div>
     }
-</GlassCard>
+</WidgetCard>
 
 @code {
     private void CloseBlinds() => Ui.Run(a => a.CloseBlinds());
